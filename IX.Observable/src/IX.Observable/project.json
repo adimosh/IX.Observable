@@ -1,0 +1,150 @@
+﻿{
+  "title": "IX.Math",
+  "version": "0.3.0",
+
+  "dependencies": {
+    "NETStandard.Library": "1.6.0",
+    "System.ObjectModel": "4.0.12",
+    "System.Threading": "4.0.11"
+  },
+
+  "frameworks": {
+    "netstandard1.0": {
+      "buildOptions": {
+        "define": [ "NETSTANDARD10" ]
+      },
+      "imports": [
+        "wp80",
+        "wp81",
+        "portable-netcore451+wp81",
+        "portable-net45+wp8",
+        "portable-net45+netcore45+wp8",
+        "portable-wpa81+wp81",
+        "portable-netcore451+wpa81+wp81",
+        "portable-net45+netcore45+wpa81+wp8"
+      ],
+      "dependencies": {
+      }
+    },
+    "netstandard1.1": {
+      "buildOptions": {
+        "define": [ "NETSTANDARD11" ]
+      },
+      "imports": [
+        "net45",
+        "win80",
+        "portable-net45+netcore45",
+        "portable-net45+netcore45+wpa81"
+      ],
+      "dependencies": {
+        "System.Runtime.InteropServices": "4.1.0"
+      }
+    },
+    "netstandard1.2": {
+      "buildOptions": {
+        "define": [ "NETSTANDARD12" ]
+      },
+      "imports": [
+        "net451",
+        "net452",
+        "win81",
+        "wpa81",
+        "portable-netcore451+wpa81",
+        "portable-net451+netcore451",
+        "portable-net451+netcore451+wpa81",
+        "monoandroid",
+        "monotouch",
+        "monomac"
+      ],
+      "dependencies": {
+        "System.Runtime.InteropServices": "4.1.0"
+      }
+    },
+    "netstandard1.3": {
+      "buildOptions": {
+        "define": [ "NETSTANDARD13" ]
+      },
+      "imports": [
+        "net46"
+      ],
+      "dependencies": {
+        "System.Runtime.InteropServices": "4.1.0"
+      }
+    },
+    "netstandard1.4": {
+      "buildOptions": {
+        "define": [ "NETSTANDARD14" ]
+      },
+      "imports": [
+        "net461",
+        "uap10"
+      ],
+      "dependencies": {
+        "System.Runtime.InteropServices": "4.1.0"
+      }
+    },
+    "netstandard1.5": {
+      "buildOptions": {
+        "define": [ "NETSTANDARD15" ]
+      },
+      "imports": [
+        "net462"
+      ],
+      "dependencies": {
+        "System.Runtime.InteropServices": "4.1.0"
+      }
+    },
+    "netstandard1.6": {
+      "buildOptions": {
+        "define": [ "NETSTANDARD16" ]
+      },
+      "imports": [
+        "netcoreapp10",
+        "net463",
+        "dnxcore50",
+        "xamarinios",
+        "xamarinpsthree",
+        "xamarinpsfour",
+        "xamarinpsvita",
+        "xamarinwatchos",
+        "xamarintvos",
+        "xamarinxboxthreesixty",
+        "xamarinxboxone"
+      ],
+      "dependencies": {
+        "System.Runtime.InteropServices": "4.1.0"
+      }
+    }
+  },
+
+  "configurations": {
+    "Debug": {
+      "buildOptions": {
+        "define": [
+          "DEBUG"
+        ]
+      }
+    },
+    "Release": {
+      "buildOptions": {
+        "warningsAsErrors": true,
+        "optimize": true
+      }
+    }
+  },
+
+  "buildOptions": {
+    "xmlDoc": true
+  },
+
+  "authors": [ "Adrian Mos" ],
+  "copyright": "Adrian Mos, 2016",
+  "description": "A library with several collection types (dictionary, stack, etc.) that have been made observable.",
+  "packOptions": {
+    "licenseUrl": "https://github.com/adimosh/IX.Observable/blob/master/LICENSE.md",
+    "owners": [ "Adrian Mos" ],
+    "projectUrl": "https://github.com/adimosh/IX.Observable/",
+    "tags": [ "" ],
+    "requireLicenseAcceptance": false
+  }
+}
