@@ -15,6 +15,7 @@ namespace IX.Observable
     {
         private Dictionary<TKey, TValue> internalContainer;
 
+        #region Constructors
         /// <summary>
         /// Initializes a new instance of the <see cref="ObservableDictionary{TKey, TValue}" /> class.
         /// </summary>
@@ -40,6 +41,36 @@ namespace IX.Observable
         {
             internalContainer = new Dictionary<TKey, TValue>(equalityComparer);
         }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ObservableDictionary{TKey, TValue}" /> class.
+        /// </summary>
+        /// <param name="capacity">The initial capacity of the dictionary.</param>
+        /// <param name="equalityComparer">A comparer object to use for equality comparison.</param>
+        public ObservableDictionary(int capacity, IEqualityComparer<TKey> equalityComparer)
+        {
+            internalContainer = new Dictionary<TKey, TValue>(capacity, equalityComparer);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ObservableDictionary{TKey, TValue}" /> class.
+        /// </summary>
+        /// <param name="dictionary">A dictionary of items to copy from.</param>
+        public ObservableDictionary(IDictionary<TKey, TValue> dictionary)
+        {
+            internalContainer = new Dictionary<TKey, TValue>(dictionary);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ObservableDictionary{TKey, TValue}" /> class.
+        /// </summary>
+        /// <param name="dictionary">A dictionary of items to copy from.</param>
+        /// <param name="comparer">A comparer object to use for equality comparison.</param>
+        public ObservableDictionary(IDictionary<TKey, TValue> dictionary, IEqualityComparer<TKey> comparer)
+        {
+            internalContainer = new Dictionary<TKey, TValue>(dictionary, comparer);
+        }
+        #endregion
 
         #region IDictionary
         /// <summary>

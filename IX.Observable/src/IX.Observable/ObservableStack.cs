@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 
 namespace IX.Observable
 {
@@ -11,6 +12,34 @@ namespace IX.Observable
     public class ObservableStack<T> : ObservableCollectionBase, IStack<T>, IReadOnlyCollection<T>, ICollection
     {
         private Stack<T> internalContainer;
+
+        #region Constructors
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Stack{T}"/> class.
+        /// </summary>
+        public ObservableStack()
+        {
+            internalContainer = new Stack<T>();
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Stack{T}"/> class.
+        /// </summary>
+        /// <param name="capacity">The initial capacity of the stack.</param>
+        public ObservableStack(int capacity)
+        {
+            internalContainer = new Stack<T>(capacity);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Stack{T}"/> class.
+        /// </summary>
+        /// <param name="collection">A collection of items to copy into the stack.</param>
+        public ObservableStack(IEnumerable<T> collection)
+        {
+            internalContainer = new Stack<T>(collection);
+        }
+        #endregion
 
         #region IReadOnlyCollection
         /// <summary>
@@ -75,6 +104,9 @@ namespace IX.Observable
         public void Clear()
         {
             internalContainer.Clear();
+
+            OnCollectionChanged(NotifyCollectionChangedAction.Reset);
+            OnPropertyChanged(nameof(Count));
         }
 
         /// <summary>
@@ -102,7 +134,12 @@ namespace IX.Observable
         /// <returns>The topmost element in the stack, if any.</returns>
         public T Pop()
         {
-            return internalContainer.Pop();
+            T item = internalContainer.Pop();
+
+            OnCollectionChanged(NotifyCollectionChangedAction.Remove, oldItems: new List<T> { item });
+            OnPropertyChanged(nameof(Count));
+
+            return item;
         }
 
         /// <summary>
@@ -112,6 +149,9 @@ namespace IX.Observable
         public void Push(T item)
         {
             internalContainer.Push(item);
+
+            OnCollectionChanged(NotifyCollectionChangedAction.Add, newItems: new List<T> { item });
+            OnPropertyChanged(nameof(Count));
         }
 
         /// <summary>
