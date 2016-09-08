@@ -246,7 +246,7 @@ namespace IX.Observable
         {
             if (((ICollection<KeyValuePair<TKey, TValue>>)internalContainer).Remove(item))
             {
-                RemoveUtility(item);
+                RemoveUtility(item, 0);
                 return true;
             }
 
@@ -263,7 +263,7 @@ namespace IX.Observable
             TValue value;
             if (internalContainer.TryGetValue(key, out value) && internalContainer.Remove(key))
             {
-                RemoveUtility(new KeyValuePair<TKey, TValue>(key, value));
+                RemoveUtility(new KeyValuePair<TKey, TValue>(key, value), 0);
                 return true;
             }
 
@@ -298,9 +298,9 @@ namespace IX.Observable
             OnPropertyChanged(nameof(Count));
         }
 
-        private void RemoveUtility(KeyValuePair<TKey, TValue> item)
+        private void RemoveUtility(KeyValuePair<TKey, TValue> item, int index)
         {
-            OnCollectionChanged(NotifyCollectionChangedAction.Remove, oldItems: new List<KeyValuePair<TKey, TValue>> { item });
+            OnCollectionChanged(NotifyCollectionChangedAction.Remove, oldItems: new List<KeyValuePair<TKey, TValue>> { item }, oldIndex: index);
             OnPropertyChanged(nameof(Keys));
             OnPropertyChanged(nameof(Values));
             OnPropertyChanged(nameof(Count));

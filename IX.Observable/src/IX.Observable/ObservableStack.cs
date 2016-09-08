@@ -136,7 +136,7 @@ namespace IX.Observable
         {
             T item = internalContainer.Pop();
 
-            OnCollectionChanged(NotifyCollectionChangedAction.Remove, oldItems: new List<T> { item });
+            OnCollectionChanged(NotifyCollectionChangedAction.Remove, oldItems: new List<T> { item }, oldIndex: internalContainer.Count);
             OnPropertyChanged(nameof(Count));
 
             return item;
