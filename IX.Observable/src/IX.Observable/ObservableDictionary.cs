@@ -81,7 +81,7 @@ namespace IX.Observable
         /// </summary>
         /// <param name="key">The key.</param>
         /// <returns>The value associated with the specified key.</returns>
-        public TValue this[TKey key]
+        public virtual TValue this[TKey key]
         {
             get
             {
@@ -108,7 +108,7 @@ namespace IX.Observable
         /// <summary>
         /// Gets the number of key/value pairs in the dictionary.
         /// </summary>
-        public int Count
+        public virtual int Count
         {
             get
             {
@@ -130,7 +130,7 @@ namespace IX.Observable
         /// <summary>
         /// Gets the collection of keys in this dictionary.
         /// </summary>
-        public ICollection<TKey> Keys
+        public virtual ICollection<TKey> Keys
         {
             get
             {
@@ -142,14 +142,14 @@ namespace IX.Observable
         {
             get
             {
-                return internalContainer.Keys;
+                return Keys;
             }
         }
 
         /// <summary>
         /// Gets the collection of values in this dictionary.
         /// </summary>
-        public ICollection<TValue> Values
+        public virtual ICollection<TValue> Values
         {
             get
             {
@@ -161,7 +161,7 @@ namespace IX.Observable
         {
             get
             {
-                return internalContainer.Values;
+                return Values;
             }
         }
 
@@ -171,10 +171,7 @@ namespace IX.Observable
         /// <param name="item">The key/value pair.</param>
         public void Add(KeyValuePair<TKey, TValue> item)
         {
-            if (internalContainer.ContainsKey(item.Key))
-                throw new ArgumentException(Resources.DictionaryItemAlreadyExists, nameof(item));
-
-            internalContainer.Add(item.Key, item.Value);
+            AddInternal(item.Key, item.Value);
 
             BroadcastAdd(item);
         }
@@ -186,12 +183,22 @@ namespace IX.Observable
         /// <param name="value">The value.</param>
         public void Add(TKey key, TValue value)
         {
+            AddInternal(key, value);
+
+            BroadcastAdd(new KeyValuePair<TKey, TValue>(key, value));
+        }
+
+        /// <summary>
+        /// Adds an item to the dictionary (internal overridable procedure).
+        /// </summary>
+        /// <param name="key">The key.</param>
+        /// <param name="value">The value.</param>
+        protected virtual void AddInternal(TKey key, TValue value)
+        {
             if (internalContainer.ContainsKey(key))
                 throw new ArgumentException(Resources.DictionaryItemAlreadyExists, nameof(key));
 
             internalContainer.Add(key, value);
-
-            BroadcastAdd(new KeyValuePair<TKey, TValue>(key, value));
         }
 
         /// <summary>

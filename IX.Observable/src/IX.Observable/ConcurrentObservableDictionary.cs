@@ -333,5 +333,209 @@ namespace IX.Observable
 
             throw new TimeoutException();
         }
+
+        /// <summary>
+        /// Adds an item to the dictionary (internal overridable procedure).
+        /// </summary>
+        /// <param name="key">The key.</param>
+        /// <param name="value">The value.</param>
+        protected override void AddInternal(TKey key, TValue value)
+        {
+            if (disposedValue)
+                throw new ObjectDisposedException(nameof(ConcurrentObservableDictionary<TKey, TValue>));
+
+            if (locker.TryEnterUpgradeableReadLock(timeout))
+            {
+                try
+                {
+                    if (internalContainer.ContainsKey(key))
+                        throw new ArgumentException(Resources.DictionaryItemAlreadyExists, nameof(key));
+
+                    if (locker.TryEnterWriteLock(timeout))
+                    {
+                        try
+                        {
+                            internalContainer.Add(key, value);
+                        }
+                        finally
+                        {
+                            locker.ExitWriteLock();
+                        }
+                    }
+                    else
+                        throw new TimeoutException();
+                }
+                finally
+                {
+                    if (locker?.IsUpgradeableReadLockHeld ?? false)
+                        locker.ExitUpgradeableReadLock();
+                }
+            }
+            else
+                throw new TimeoutException();
+
+        }
+
+        /// <summary>
+        /// Gets the collection of keys in this dictionary.
+        /// </summary>
+        public override ICollection<TKey> Keys
+        {
+            get
+            {
+                if (disposedValue)
+                    throw new ObjectDisposedException(nameof(ConcurrentObservableDictionary<TKey, TValue>));
+
+                if (locker.TryEnterReadLock(timeout))
+                {
+                    try
+                    {
+                        return base.Keys;
+                    }
+                    finally
+                    {
+                        locker.ExitReadLock();
+                    }
+                }
+
+                throw new TimeoutException();
+            }
+        }
+
+        /// <summary>
+        /// Gets the collection of values in this dictionary.
+        /// </summary>
+        public override ICollection<TValue> Values
+        {
+            get
+            {
+                if (disposedValue)
+                    throw new ObjectDisposedException(nameof(ConcurrentObservableDictionary<TKey, TValue>));
+
+                if (locker.TryEnterReadLock(timeout))
+                {
+                    try
+                    {
+                        return base.Values;
+                    }
+                    finally
+                    {
+                        locker.ExitReadLock();
+                    }
+                }
+
+                throw new TimeoutException();
+            }
+        }
+
+        /// <summary>
+        /// Gets the number of key/value pairs in the dictionary.
+        /// </summary>
+        public override int Count
+        {
+            get
+            {
+                if (disposedValue)
+                    throw new ObjectDisposedException(nameof(ConcurrentObservableDictionary<TKey, TValue>));
+
+                if (locker.TryEnterReadLock(timeout))
+                {
+                    try
+                    {
+                        return base.Count;
+                    }
+                    finally
+                    {
+                        locker.ExitReadLock();
+                    }
+                }
+
+                throw new TimeoutException();
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the value associated with a specific key.
+        /// </summary>
+        /// <param name="key">The key.</param>
+        /// <returns>The value associated with the specified key.</returns>
+        public override TValue this[TKey key]
+        {
+            get
+            {
+                if (disposedValue)
+                    throw new ObjectDisposedException(nameof(ConcurrentObservableDictionary<TKey, TValue>));
+
+                if (locker.TryEnterReadLock(timeout))
+                {
+                    try
+                    {
+                        return base[key];
+                    }
+                    finally
+                    {
+                        locker.ExitReadLock();
+                    }
+                }
+
+                throw new TimeoutException();
+            }
+            set
+            {
+                if (disposedValue)
+                    throw new ObjectDisposedException(nameof(ConcurrentObservableDictionary<TKey, TValue>));
+
+                if (locker.TryEnterUpgradeableReadLock(timeout))
+                {
+                    try
+                    {
+                        TValue val;
+                        if (internalContainer.TryGetValue(key, out val))
+                        {
+                            if (locker.TryEnterWriteLock(timeout))
+                            {
+                                try
+                                {
+                                    internalContainer[key] = value;
+                                }
+                                finally
+                                {
+                                    locker.ExitWriteLock();
+                                }
+                            }
+                            else
+                                throw new TimeoutException();
+
+                            BroadcastChange(new KeyValuePair<TKey, TValue>(key, val), new KeyValuePair<TKey, TValue>(key, value));
+                        }
+                        else
+                        {
+                            if (locker.TryEnterWriteLock(timeout))
+                            {
+                                try
+                                {
+                                    internalContainer.Add(key, value);
+                                }
+                                finally
+                                {
+                                    locker.ExitWriteLock();
+                                }
+                            }
+                            else
+                                throw new TimeoutException();
+
+                            BroadcastAdd(new KeyValuePair<TKey, TValue>(key, value));
+                        }
+                    }
+                    finally
+                    {
+                        if (locker?.IsUpgradeableReadLockHeld ?? false)
+                            locker.ExitUpgradeableReadLock();
+                    }
+                }
+                else
+                    throw new TimeoutException();
+            }
+        }
     }
 }
