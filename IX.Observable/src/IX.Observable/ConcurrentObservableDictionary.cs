@@ -9,7 +9,7 @@ namespace IX.Observable
     /// </summary>
     /// <typeparam name="TKey">The data key type.</typeparam>
     /// <typeparam name="TValue">The data value type.</typeparam>
-    public class ConcurrentObservableDictionary<TKey, TValue> : ObservableDictionary<TKey, TValue>
+    public class ConcurrentObservableDictionary<TKey, TValue> : ObservableDictionary<TKey, TValue>, ICollection<KeyValuePair<TKey, TValue>>, IDisposable
     {
         private readonly ReaderWriterLockSlim locker = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
         private readonly TimeSpan timeout = TimeSpan.FromMilliseconds(100);
@@ -71,6 +71,50 @@ namespace IX.Observable
         }
         #endregion
 
+        #region IDisposable Support
+        private bool disposedValue = false; // To detect redundant calls
+
+        /// <summary>
+        /// Disposes the current instance of the <see cref="ConcurrentObservableDictionary{TKey, TValue}"/> class.
+        /// </summary>
+        /// <param name="disposing"><c>true</c> for normal disposal, where normal operation should dispose sub-objects,
+        /// <c>false</c> for a GC disposal without the normal pattern.</param>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    locker.Dispose();
+                }
+
+                // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
+
+                internalContainer.Clear();
+                internalContainer = null;
+
+                disposedValue = true;
+            }
+        }
+
+        // TODO: override a finalizer only if Dispose(bool disposing) above has code to free unmanaged resources.
+        // ~ConcurrentObservableDictionary() {
+        //   // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+        //   Dispose(false);
+        // }
+
+        /// <summary>
+        /// Disposes the current instance of the <see cref="ConcurrentObservableDictionary{TKey, TValue}"/> class.
+        /// </summary>
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+            Dispose(true);
+            // TODO: uncomment the following line if the finalizer is overridden above.
+            // GC.SuppressFinalize(this);
+        }
+        #endregion
+
         /// <summary>
         /// Attempts to fetch a value for a specific key in a thread-safe manner, indicating whether it has been found or not.
         /// </summary>
@@ -79,6 +123,9 @@ namespace IX.Observable
         /// <returns><c>true</c> if the value was successfully fetched, <c>false</c> otherwise.</returns>
         public override bool TryGetValue(TKey key, out TValue value)
         {
+            if (disposedValue)
+                throw new ObjectDisposedException(nameof(ConcurrentObservableDictionary<TKey,TValue>));
+
             if (locker.TryEnterReadLock(timeout))
             {
                 try
@@ -91,8 +138,7 @@ namespace IX.Observable
                 }
             }
 
-            value = default(TValue);
-            return false;
+            throw new TimeoutException();
         }
 
         /// <summary>
@@ -101,8 +147,11 @@ namespace IX.Observable
         /// <returns>An enumerator of key/value pairs.</returns>
         public override IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
         {
+            if (disposedValue)
+                throw new ObjectDisposedException(nameof(ConcurrentObservableDictionary<TKey, TValue>));
+
             if (!locker.TryEnterReadLock(timeout))
-                yield break;
+                throw new TimeoutException();
 
             KeyValuePair<TKey, TValue>[] array;
 
@@ -127,6 +176,9 @@ namespace IX.Observable
         /// </summary>
         protected override void ClearInternal()
         {
+            if (disposedValue)
+                throw new ObjectDisposedException(nameof(ConcurrentObservableDictionary<TKey, TValue>));
+
             if (locker.TryEnterWriteLock(timeout))
             {
                 try
@@ -138,6 +190,8 @@ namespace IX.Observable
                     locker.ExitWriteLock();
                 }
             }
+            else
+                throw new TimeoutException();
         }
 
         /// <summary>
@@ -148,6 +202,9 @@ namespace IX.Observable
         /// <returns><c>true</c> if the removal was successful, <c>false</c> otherwise.</returns>
         protected override bool RemoveInternal(TKey key, out TValue value)
         {
+            if (disposedValue)
+                throw new ObjectDisposedException(nameof(ConcurrentObservableDictionary<TKey, TValue>));
+
             if (locker.TryEnterUpgradeableReadLock(timeout))
             {
                 try
@@ -174,8 +231,7 @@ namespace IX.Observable
                 }
             }
 
-            value = default(TValue);
-            return false;
+            throw new TimeoutException();
         }
 
         /// <summary>
@@ -185,6 +241,9 @@ namespace IX.Observable
         /// <returns><c>true</c> if the removal was successful, <c>false</c> otherwise.</returns>
         protected override bool RemoveInternal(KeyValuePair<TKey, TValue> item)
         {
+            if (disposedValue)
+                throw new ObjectDisposedException(nameof(ConcurrentObservableDictionary<TKey, TValue>));
+
             if (locker.TryEnterWriteLock(timeout))
             {
                 try
@@ -197,7 +256,82 @@ namespace IX.Observable
                 }
             }
 
-            return false;
+            throw new TimeoutException();
+        }
+
+        /// <summary>
+        /// Copies the elements of the dictionary into an array, at the specified index.
+        /// </summary>
+        /// <param name="array">The array to copy elements into.</param>
+        /// <param name="arrayIndex">The index at which to start copying items.</param>
+        void ICollection<KeyValuePair<TKey, TValue>>.CopyTo(KeyValuePair<TKey, TValue>[] array, int arrayIndex)
+        {
+            if (disposedValue)
+                throw new ObjectDisposedException(nameof(ConcurrentObservableDictionary<TKey, TValue>));
+
+            if (locker.TryEnterReadLock(timeout))
+            {
+                try
+                {
+                    ((ICollection<KeyValuePair<TKey, TValue>>)internalContainer).CopyTo(array, arrayIndex);
+                }
+                finally
+                {
+                    locker.ExitWriteLock();
+                }
+            }
+            else
+                throw new TimeoutException();
+        }
+
+        /// <summary>
+        /// Determines whether the dictionary contains a specific key/value pair.
+        /// </summary>
+        /// <param name="item">The key/value pair to look for.</param>
+        /// <returns><c>true</c> whether a key has been found, <c>false</c> otherwise.</returns>
+        public override bool Contains(KeyValuePair<TKey, TValue> item)
+        {
+            if (disposedValue)
+                throw new ObjectDisposedException(nameof(ConcurrentObservableDictionary<TKey, TValue>));
+
+            if (locker.TryEnterReadLock(timeout))
+            {
+                try
+                {
+                    return base.Contains(item);
+                }
+                finally
+                {
+                    locker.ExitWriteLock();
+                }
+            }
+
+            throw new TimeoutException();
+        }
+
+        /// <summary>
+        /// Determines whether the dictionary contains a specific key.
+        /// </summary>
+        /// <param name="key">The key to look for.</param>
+        /// <returns><c>true</c> whether a key has been found, <c>false</c> otherwise.</returns>
+        public override bool ContainsKey(TKey key)
+        {
+            if (disposedValue)
+                throw new ObjectDisposedException(nameof(ConcurrentObservableDictionary<TKey, TValue>));
+
+            if (locker.TryEnterReadLock(timeout))
+            {
+                try
+                {
+                    return base.ContainsKey(key);
+                }
+                finally
+                {
+                    locker.ExitWriteLock();
+                }
+            }
+
+            throw new TimeoutException();
         }
     }
 }

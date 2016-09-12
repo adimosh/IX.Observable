@@ -220,7 +220,7 @@ namespace IX.Observable
         /// </summary>
         /// <param name="item">The key/value pair to look for.</param>
         /// <returns><c>true</c> whether a key has been found, <c>false</c> otherwise.</returns>
-        public bool Contains(KeyValuePair<TKey, TValue> item)
+        public virtual bool Contains(KeyValuePair<TKey, TValue> item)
         {
             return internalContainer.Contains(item);
         }
@@ -230,7 +230,7 @@ namespace IX.Observable
         /// </summary>
         /// <param name="key">The key to look for.</param>
         /// <returns><c>true</c> whether a key has been found, <c>false</c> otherwise.</returns>
-        public bool ContainsKey(TKey key)
+        public virtual bool ContainsKey(TKey key)
         {
             return internalContainer.ContainsKey(key);
         }
@@ -238,8 +238,8 @@ namespace IX.Observable
         /// <summary>
         /// Copies the elements of the dictionary into an array, at the specified index.
         /// </summary>
-        /// <param name="array"></param>
-        /// <param name="arrayIndex"></param>
+        /// <param name="array">The array to copy elements into.</param>
+        /// <param name="arrayIndex">The index at which to start copying items.</param>
         void ICollection<KeyValuePair<TKey, TValue>>.CopyTo(KeyValuePair<TKey, TValue>[] array, int arrayIndex)
         {
             ((ICollection<KeyValuePair<TKey, TValue>>)internalContainer).CopyTo(array, arrayIndex);
