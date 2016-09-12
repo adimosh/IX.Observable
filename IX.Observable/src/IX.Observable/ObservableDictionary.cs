@@ -13,7 +13,10 @@ namespace IX.Observable
     /// <typeparam name="TValue">The data value type.</typeparam>
     public class ObservableDictionary<TKey, TValue> : ObservableCollectionBase, IDictionary<TKey, TValue>, IReadOnlyDictionary<TKey, TValue>
     {
-        private Dictionary<TKey, TValue> internalContainer;
+        /// <summary>
+        /// The data container of the observable dictionary.
+        /// </summary>
+        protected internal Dictionary<TKey, TValue> internalContainer;
 
         #region Constructors
         /// <summary>
@@ -91,11 +94,13 @@ namespace IX.Observable
                 {
                     internalContainer[key] = value;
 
-                    ChangeUtility(new KeyValuePair<TKey, TValue>(key, val), new KeyValuePair<TKey, TValue>(key, value));
+                    BroadcastChange(new KeyValuePair<TKey, TValue>(key, val), new KeyValuePair<TKey, TValue>(key, value));
                 }
                 else
                 {
-                    AddUtility(new KeyValuePair<TKey, TValue>(key, value));
+                    internalContainer.Add(key, value);
+
+                    BroadcastAdd(new KeyValuePair<TKey, TValue>(key, value));
                 }
             }
         }
@@ -167,9 +172,11 @@ namespace IX.Observable
         public void Add(KeyValuePair<TKey, TValue> item)
         {
             if (internalContainer.ContainsKey(item.Key))
-                throw new ArgumentException("An item with the same key already exists in this dictionary.", nameof(item));
+                throw new ArgumentException(Resources.DictionaryItemAlreadyExists, nameof(item));
 
-            AddUtility(item);
+            internalContainer.Add(item.Key, item.Value);
+
+            BroadcastAdd(item);
         }
 
         /// <summary>
@@ -180,9 +187,11 @@ namespace IX.Observable
         public void Add(TKey key, TValue value)
         {
             if (internalContainer.ContainsKey(key))
-                throw new ArgumentException("An item with the same key already exists in this dictionary.", nameof(key));
+                throw new ArgumentException(Resources.DictionaryItemAlreadyExists, nameof(key));
 
-            AddUtility(new KeyValuePair<TKey, TValue>(key, value));
+            internalContainer.Add(key, value);
+
+            BroadcastAdd(new KeyValuePair<TKey, TValue>(key, value));
         }
 
         /// <summary>
@@ -190,12 +199,20 @@ namespace IX.Observable
         /// </summary>
         public void Clear()
         {
-            internalContainer.Clear();
+            ClearInternal();
 
-            OnCollectionChanged(NotifyCollectionChangedAction.Reset);
+            OnCollectionChanged();
             OnPropertyChanged(nameof(Keys));
             OnPropertyChanged(nameof(Values));
             OnPropertyChanged(nameof(Count));
+        }
+
+        /// <summary>
+        /// Clears all items from the dictionary (internal overridable procedure).
+        /// </summary>
+        protected virtual void ClearInternal()
+        {
+            internalContainer.Clear();
         }
 
         /// <summary>
@@ -232,7 +249,7 @@ namespace IX.Observable
         /// Gets the enumerator for this collection.
         /// </summary>
         /// <returns>An enumerator of key/value pairs.</returns>
-        public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
+        public virtual IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
         {
             return internalContainer.GetEnumerator();
         }
@@ -244,13 +261,23 @@ namespace IX.Observable
         /// <returns><c>true</c> if the removal was successful, <c>false</c> otherwise.</returns>
         public bool Remove(KeyValuePair<TKey, TValue> item)
         {
-            if (((ICollection<KeyValuePair<TKey, TValue>>)internalContainer).Remove(item))
+            if (RemoveInternal(item))
             {
-                RemoveUtility(item, 0);
+                BroadcastRemove(item, -1);
                 return true;
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// Attempts to remove a key/value pair (internal overridable procedure).
+        /// </summary>
+        /// <param name="item">The key/value pair to remove.</param>
+        /// <returns><c>true</c> if the removal was successful, <c>false</c> otherwise.</returns>
+        protected virtual bool RemoveInternal(KeyValuePair<TKey, TValue> item)
+        {
+            return ((ICollection<KeyValuePair<TKey, TValue>>)internalContainer).Remove(item);
         }
 
         /// <summary>
@@ -261,9 +288,9 @@ namespace IX.Observable
         public bool Remove(TKey key)
         {
             TValue value;
-            if (internalContainer.TryGetValue(key, out value) && internalContainer.Remove(key))
+            if (RemoveInternal(key, out value))
             {
-                RemoveUtility(new KeyValuePair<TKey, TValue>(key, value), 0);
+                BroadcastRemove(new KeyValuePair<TKey, TValue>(key, value), -1);
                 return true;
             }
 
@@ -271,47 +298,67 @@ namespace IX.Observable
         }
 
         /// <summary>
+        /// Attempts to remove all info related to a key from the dictionary (internal overridable procedure).
+        /// </summary>
+        /// <param name="key">The key to remove data from.</param>
+        /// <param name="value">The value that was removed, if any.</param>
+        /// <returns><c>true</c> if the removal was successful, <c>false</c> otherwise.</returns>
+        protected virtual bool RemoveInternal(TKey key, out TValue value)
+        {
+            return internalContainer.TryGetValue(key, out value) && internalContainer.Remove(key);
+        }
+
+        /// <summary>
         /// Attempts to fetch a value for a specific key, indicating whether it has been found or not.
         /// </summary>
         /// <param name="key">The key.</param>
         /// <param name="value">The value.</param>
-        /// <returns></returns>
-        public bool TryGetValue(TKey key, out TValue value)
+        /// <returns><c>true</c> if the value was successfully fetched, <c>false</c> otherwise.</returns>
+        public virtual bool TryGetValue(TKey key, out TValue value)
         {
             return internalContainer.TryGetValue(key, out value);
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return internalContainer.GetEnumerator();
+            return GetEnumerator();
         }
         #endregion
 
         #region Utility
-        private void AddUtility(KeyValuePair<TKey, TValue> item)
+        /// <summary>
+        /// Broadcasts an &quot;add&quot; change.
+        /// </summary>
+        /// <param name="item">The added item.</param>
+        protected void BroadcastAdd(KeyValuePair<TKey, TValue> item)
         {
-            internalContainer.Add(item.Key, item.Value);
-
-            OnCollectionChanged(NotifyCollectionChangedAction.Add, newItems: new List<KeyValuePair<TKey, TValue>> { item });
+            OnCollectionChanged(NotifyCollectionChangedAction.Add, newItem: item);
             OnPropertyChanged(nameof(Keys));
             OnPropertyChanged(nameof(Values));
             OnPropertyChanged(nameof(Count));
         }
 
-        private void RemoveUtility(KeyValuePair<TKey, TValue> item, int index)
+        /// <summary>
+        /// Broadcasts a &quot;remove&quot; change.
+        /// </summary>
+        /// <param name="item">The removed item.</param>
+        /// <param name="index">The removed index (mandatory for remove change).</param>
+        protected void BroadcastRemove(KeyValuePair<TKey, TValue> item, int index)
         {
-            OnCollectionChanged(NotifyCollectionChangedAction.Remove, oldItems: new List<KeyValuePair<TKey, TValue>> { item }, oldIndex: index);
+            OnCollectionChanged(NotifyCollectionChangedAction.Remove, oldItem: item, oldIndex: index);
             OnPropertyChanged(nameof(Keys));
             OnPropertyChanged(nameof(Values));
             OnPropertyChanged(nameof(Count));
         }
 
-        private void ChangeUtility(KeyValuePair<TKey, TValue> oldItem, KeyValuePair<TKey, TValue> newItem)
+        /// <summary>
+        /// B roagcasts a &quot;change&quot; change.
+        /// </summary>
+        /// <param name="oldItem">The old item.</param>
+        /// <param name="newItem">The new item.</param>
+        protected void BroadcastChange(KeyValuePair<TKey, TValue> oldItem, KeyValuePair<TKey, TValue> newItem)
         {
-            OnCollectionChanged(
-                NotifyCollectionChangedAction.Replace,
-                oldItems: new List<KeyValuePair<TKey, TValue>> { oldItem },
-                newItems: new List<KeyValuePair<TKey, TValue>> { newItem });
+            OnCollectionChanged(NotifyCollectionChangedAction.Replace, oldItem: oldItem, newItem: newItem);
             OnPropertyChanged(nameof(Keys));
             OnPropertyChanged(nameof(Values));
         }

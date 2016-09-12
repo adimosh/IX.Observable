@@ -105,7 +105,7 @@ namespace IX.Observable
         {
             internalContainer.Clear();
 
-            OnCollectionChanged(NotifyCollectionChangedAction.Reset);
+            OnCollectionChanged();
             OnPropertyChanged(nameof(Count));
         }
 

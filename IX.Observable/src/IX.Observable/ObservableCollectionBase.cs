@@ -42,7 +42,17 @@ namespace IX.Observable
         public event NotifyCollectionChangedEventHandler CollectionChanged;
 
         /// <summary>
-        /// In a child class, triggers a collection changed event.
+        /// In a child class, triggers a collection changed event for a reset change.
+        /// </summary>
+        protected void OnCollectionChanged()
+        {
+            var args = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset);
+
+            InvokeOnCollectionChanged(args);
+        }
+
+        /// <summary>
+        /// In a child class, triggers a collection changed event for a list of changes.
         /// </summary>
         /// <param name="action">The change action.</param>
         /// <param name="oldItems">The old items.</param>
@@ -78,9 +88,55 @@ namespace IX.Observable
                     break;
             }
 
+            InvokeOnCollectionChanged(args);
+        }
+
+        /// <summary>
+        /// In a child class, triggers a collection changed event for a single change.
+        /// </summary>
+        /// <param name="action">The change action.</param>
+        /// <param name="oldItem">The old item.</param>
+        /// <param name="newItem">The new item.</param>
+        /// <param name="oldIndex">The old index of the change, if any.</param>
+        /// <param name="newIndex">The new index of the change, if any.</param>
+        protected void OnCollectionChanged(NotifyCollectionChangedAction action, object oldItem = null, object newItem = null, int oldIndex = -1, int newIndex = -1)
+        {
+            NotifyCollectionChangedEventArgs args;
+
+            switch (action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                    if (newIndex != -1)
+                        args = new NotifyCollectionChangedEventArgs(action, newItem, newIndex);
+                    else
+                        args = new NotifyCollectionChangedEventArgs(action, newItem);
+                    break;
+                case NotifyCollectionChangedAction.Remove:
+                    args = new NotifyCollectionChangedEventArgs(action, oldItem, oldIndex);
+                    break;
+                case NotifyCollectionChangedAction.Replace:
+                    args = new NotifyCollectionChangedEventArgs(action, newItem, oldItem);
+                    break;
+                case NotifyCollectionChangedAction.Reset:
+                    args = new NotifyCollectionChangedEventArgs(action);
+                    break;
+                default:
+                    if (newIndex != -1 && oldIndex != -1)
+                        args = new NotifyCollectionChangedEventArgs(action, oldItem, newIndex, oldIndex);
+                    else
+                        args = new NotifyCollectionChangedEventArgs(action);
+                    break;
+            }
+
+            InvokeOnCollectionChanged(args);
+        }
+
+        private void InvokeOnCollectionChanged(NotifyCollectionChangedEventArgs args)
+        {
             var stateTransport =
                 new Tuple<ObservableCollectionBase, NotifyCollectionChangedEventHandler, NotifyCollectionChangedEventArgs>
                 (this, CollectionChanged, args);
+
             SynchronizationContext.Current.Post((state) =>
             {
                 var st = (Tuple<ObservableCollectionBase, NotifyCollectionChangedEventHandler, NotifyCollectionChangedEventArgs>)state;
