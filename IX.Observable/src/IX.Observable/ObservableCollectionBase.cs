@@ -16,6 +16,10 @@ namespace IX.Observable
         /// </summary>
         public event PropertyChangedEventHandler PropertyChanged;
 
+        /// <summary>
+        /// Determines whether or not there are listeners to the <see cref="PropertyChanged"/> event.
+        /// </summary>
+        /// <returns><c>true</c> if there are no listeners, <c>false</c> otherwise.</returns>
         protected bool PropertyChangedEmpty()
         {
             return PropertyChanged == null;
@@ -40,6 +44,10 @@ namespace IX.Observable
         /// </summary>
         public event NotifyCollectionChangedEventHandler CollectionChanged;
 
+        /// <summary>
+        /// Determines whether or not there are listeners to the <see cref="CollectionChanged"/> event.
+        /// </summary>
+        /// <returns><c>true</c> if there are no listeners, <c>false</c> otherwise.</returns>
         protected bool CollectionChangedEmpty()
         {
             return CollectionChanged == null;

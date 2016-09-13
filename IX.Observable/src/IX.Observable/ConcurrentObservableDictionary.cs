@@ -226,7 +226,7 @@ namespace IX.Observable
                 }
                 finally
                 {
-                    if (locker?.IsUpgradeableReadLockHeld ?? false)
+                    if (locker.IsUpgradeableReadLockHeld)
                         locker.ExitUpgradeableReadLock();
                 }
             }
@@ -277,7 +277,7 @@ namespace IX.Observable
                 }
                 finally
                 {
-                    locker.ExitWriteLock();
+                    locker.ExitReadLock();
                 }
             }
             else
@@ -302,7 +302,7 @@ namespace IX.Observable
                 }
                 finally
                 {
-                    locker.ExitWriteLock();
+                    locker.ExitReadLock();
                 }
             }
 
@@ -367,7 +367,7 @@ namespace IX.Observable
                 }
                 finally
                 {
-                    if (locker?.IsUpgradeableReadLockHeld ?? false)
+                    if (locker.IsUpgradeableReadLockHeld)
                         locker.ExitUpgradeableReadLock();
                 }
             }
@@ -469,7 +469,7 @@ namespace IX.Observable
                 {
                     try
                     {
-                        return base[key];
+                        return internalContainer[key];
                     }
                     finally
                     {
@@ -528,7 +528,7 @@ namespace IX.Observable
                     }
                     finally
                     {
-                        if (locker?.IsUpgradeableReadLockHeld ?? false)
+                        if (locker.IsUpgradeableReadLockHeld)
                             locker.ExitUpgradeableReadLock();
                     }
                 }

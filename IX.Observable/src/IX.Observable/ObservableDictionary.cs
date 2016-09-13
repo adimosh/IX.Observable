@@ -217,7 +217,14 @@ namespace IX.Observable
         /// </summary>
         protected virtual void ClearInternal()
         {
-            internalContainer.Clear();
+            var stateTransport = internalContainer;
+            internalContainer = new Dictionary<TKey, TValue>();
+
+            SynchronizationContext.Current.Post(
+                (state) =>
+                {
+                    ((Dictionary<TKey, TValue>)state).Clear();
+                }, stateTransport);
         }
 
         /// <summary>
@@ -340,9 +347,7 @@ namespace IX.Observable
             if (CollectionChangedEmpty() && PropertyChangedEmpty())
                 return;
 
-            // TODO: This continuous queueing is causing significant slowdown, should be solved at a later time
             SynchronizationContext.Current.Post(
-            //ThreadPool.QueueUserWorkItem(
                 (state) =>
             {
                 OnCollectionChanged(NotifyCollectionChangedAction.Add, newItem: item);
@@ -363,9 +368,7 @@ namespace IX.Observable
                 return;
 
             var stateTransport = new Tuple<KeyValuePair<TKey, TValue>, int>(item, index);
-            // TODO: This continuous queueing is causing significant slowdown, should be solved at a later time
             SynchronizationContext.Current.Post(
-            //ThreadPool.QueueUserWorkItem(
                 (state) =>
             {
                 var st = (Tuple<KeyValuePair<TKey, TValue>, int>)state;
@@ -387,10 +390,7 @@ namespace IX.Observable
                 return;
 
             var stateTransport = new Tuple<KeyValuePair<TKey, TValue>, KeyValuePair<TKey, TValue>>(oldItem, newItem);
-            // TODO: This continuous queueing is causing significant slowdown, should be solved at a later time
             SynchronizationContext.Current.Post(
-            //ThreadPool.QueueUserWorkItem(
-
                 (state) =>
             {
                 var st = (Tuple<KeyValuePair<TKey, TValue>, KeyValuePair<TKey, TValue>>)state;
@@ -408,9 +408,7 @@ namespace IX.Observable
             if (CollectionChangedEmpty() && PropertyChangedEmpty())
                 return;
 
-            // TODO: This continuous queueing is causing significant slowdown, should be solved at a later time
             SynchronizationContext.Current.Post(
-            //ThreadPool.QueueUserWorkItem(
                 (state) =>
             {
                 OnCollectionChanged();
