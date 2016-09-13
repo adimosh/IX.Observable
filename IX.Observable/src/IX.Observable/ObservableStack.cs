@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Threading;
 
 namespace IX.Observable
 {
@@ -105,8 +106,15 @@ namespace IX.Observable
         {
             internalContainer.Clear();
 
-            OnCollectionChanged();
-            OnPropertyChanged(nameof(Count));
+            if (CollectionChangedEmpty() && PropertyChangedEmpty())
+                return;
+
+            SynchronizationContext.Current.Post(
+                (state) =>
+                {
+                    OnCollectionChanged();
+                    OnPropertyChanged(nameof(Count));
+                }, null);
         }
 
         /// <summary>
@@ -136,8 +144,13 @@ namespace IX.Observable
         {
             T item = internalContainer.Pop();
 
-            OnCollectionChanged(NotifyCollectionChangedAction.Remove, oldItems: new List<T> { item }, oldIndex: internalContainer.Count);
-            OnPropertyChanged(nameof(Count));
+            SynchronizationContext.Current.Post(
+                (state) =>
+                {
+                    Tuple<T, int> st = (Tuple<T, int>)state;
+                    OnCollectionChanged(NotifyCollectionChangedAction.Remove, oldItem: st.Item1, oldIndex: st.Item2);
+                    OnPropertyChanged(nameof(Count));
+                }, new Tuple<T, int>(item, internalContainer.Count));
 
             return item;
         }
@@ -150,8 +163,12 @@ namespace IX.Observable
         {
             internalContainer.Push(item);
 
-            OnCollectionChanged(NotifyCollectionChangedAction.Add, newItems: new List<T> { item });
-            OnPropertyChanged(nameof(Count));
+            SynchronizationContext.Current.Post(
+                (state) =>
+                {
+                    OnCollectionChanged(NotifyCollectionChangedAction.Add, newItem: state);
+                    OnPropertyChanged(nameof(Count));
+                }, item);
         }
 
         /// <summary>

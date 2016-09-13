@@ -367,7 +367,6 @@ namespace IX.Observable
             if (CollectionChangedEmpty() && PropertyChangedEmpty())
                 return;
 
-            var stateTransport = new Tuple<KeyValuePair<TKey, TValue>, int>(item, index);
             SynchronizationContext.Current.Post(
                 (state) =>
             {
@@ -376,7 +375,7 @@ namespace IX.Observable
                 OnPropertyChanged(nameof(Keys));
                 OnPropertyChanged(nameof(Values));
                 OnPropertyChanged(nameof(Count));
-            }, stateTransport);
+            }, new Tuple<KeyValuePair<TKey, TValue>, int>(item, index));
         }
 
         /// <summary>
@@ -389,7 +388,6 @@ namespace IX.Observable
             if (CollectionChangedEmpty() && PropertyChangedEmpty())
                 return;
 
-            var stateTransport = new Tuple<KeyValuePair<TKey, TValue>, KeyValuePair<TKey, TValue>>(oldItem, newItem);
             SynchronizationContext.Current.Post(
                 (state) =>
             {
@@ -397,7 +395,7 @@ namespace IX.Observable
                 OnCollectionChanged(NotifyCollectionChangedAction.Replace, oldItem: st.Item1, newItem: st.Item2);
                 OnPropertyChanged(nameof(Keys));
                 OnPropertyChanged(nameof(Values));
-            }, stateTransport);
+            }, new Tuple<KeyValuePair<TKey, TValue>, KeyValuePair<TKey, TValue>>(oldItem, newItem));
         }
 
         /// <summary>
