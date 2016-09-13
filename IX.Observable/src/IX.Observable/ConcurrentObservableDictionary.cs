@@ -124,7 +124,7 @@ namespace IX.Observable
         public override bool TryGetValue(TKey key, out TValue value)
         {
             if (disposedValue)
-                throw new ObjectDisposedException(nameof(ConcurrentObservableDictionary<TKey,TValue>));
+                throw new ObjectDisposedException(nameof(ConcurrentObservableDictionary<TKey, TValue>));
 
             if (locker.TryEnterReadLock(timeout))
             {
@@ -373,7 +373,6 @@ namespace IX.Observable
             }
             else
                 throw new TimeoutException();
-
         }
 
         /// <summary>

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Threading;
 
 namespace IX.Observable
 {
@@ -208,10 +209,7 @@ namespace IX.Observable
         {
             ClearInternal();
 
-            OnCollectionChanged();
-            OnPropertyChanged(nameof(Keys));
-            OnPropertyChanged(nameof(Values));
-            OnPropertyChanged(nameof(Count));
+            BroadcastReset();
         }
 
         /// <summary>
@@ -339,10 +337,16 @@ namespace IX.Observable
         /// <param name="item">The added item.</param>
         protected void BroadcastAdd(KeyValuePair<TKey, TValue> item)
         {
-            OnCollectionChanged(NotifyCollectionChangedAction.Add, newItem: item);
-            OnPropertyChanged(nameof(Keys));
-            OnPropertyChanged(nameof(Values));
-            OnPropertyChanged(nameof(Count));
+            // TODO: This continuous queueing is causing significant slowdown, should be solved at a later time
+            SynchronizationContext.Current.Post(
+            //ThreadPool.QueueUserWorkItem(
+                (state) =>
+            {
+                OnCollectionChanged(NotifyCollectionChangedAction.Add, newItem: item);
+                OnPropertyChanged(nameof(Keys));
+                OnPropertyChanged(nameof(Values));
+                OnPropertyChanged(nameof(Count));
+            }, item);
         }
 
         /// <summary>
@@ -352,22 +356,56 @@ namespace IX.Observable
         /// <param name="index">The removed index (mandatory for remove change).</param>
         protected void BroadcastRemove(KeyValuePair<TKey, TValue> item, int index)
         {
-            OnCollectionChanged(NotifyCollectionChangedAction.Remove, oldItem: item, oldIndex: index);
-            OnPropertyChanged(nameof(Keys));
-            OnPropertyChanged(nameof(Values));
-            OnPropertyChanged(nameof(Count));
+            var stateTransport = new Tuple<KeyValuePair<TKey, TValue>, int>(item, index);
+            // TODO: This continuous queueing is causing significant slowdown, should be solved at a later time
+            SynchronizationContext.Current.Post(
+            //ThreadPool.QueueUserWorkItem(
+                (state) =>
+            {
+                var st = (Tuple<KeyValuePair<TKey, TValue>, int>)state;
+                OnCollectionChanged(NotifyCollectionChangedAction.Remove, oldItem: st.Item1, oldIndex: st.Item2);
+                OnPropertyChanged(nameof(Keys));
+                OnPropertyChanged(nameof(Values));
+                OnPropertyChanged(nameof(Count));
+            }, stateTransport);
         }
 
         /// <summary>
-        /// B roagcasts a &quot;change&quot; change.
+        /// Broadcasts a &quot;change&quot; change.
         /// </summary>
         /// <param name="oldItem">The old item.</param>
         /// <param name="newItem">The new item.</param>
         protected void BroadcastChange(KeyValuePair<TKey, TValue> oldItem, KeyValuePair<TKey, TValue> newItem)
         {
-            OnCollectionChanged(NotifyCollectionChangedAction.Replace, oldItem: oldItem, newItem: newItem);
-            OnPropertyChanged(nameof(Keys));
-            OnPropertyChanged(nameof(Values));
+            var stateTransport = new Tuple<KeyValuePair<TKey, TValue>, KeyValuePair<TKey, TValue>>(oldItem, newItem);
+            // TODO: This continuous queueing is causing significant slowdown, should be solved at a later time
+            SynchronizationContext.Current.Post(
+            //ThreadPool.QueueUserWorkItem(
+
+                (state) =>
+            {
+                var st = (Tuple<KeyValuePair<TKey, TValue>, KeyValuePair<TKey, TValue>>)state;
+                OnCollectionChanged(NotifyCollectionChangedAction.Replace, oldItem: st.Item1, newItem: st.Item2);
+                OnPropertyChanged(nameof(Keys));
+                OnPropertyChanged(nameof(Values));
+            }, stateTransport);
+        }
+
+        /// <summary>
+        /// Broadcasts a &quot;reset&quot; change.
+        /// </summary>
+        protected void BroadcastReset()
+        {
+            // TODO: This continuous queueing is causing significant slowdown, should be solved at a later time
+            SynchronizationContext.Current.Post(
+            //ThreadPool.QueueUserWorkItem(
+                (state) =>
+            {
+                OnCollectionChanged();
+                OnPropertyChanged(nameof(Keys));
+                OnPropertyChanged(nameof(Values));
+                OnPropertyChanged(nameof(Count));
+            }, null);
         }
         #endregion
     }

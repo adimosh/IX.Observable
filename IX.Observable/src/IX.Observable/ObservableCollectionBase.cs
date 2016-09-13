@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Linq;
 using System.Threading;
 
 namespace IX.Observable
@@ -26,12 +28,7 @@ namespace IX.Observable
             if (string.IsNullOrWhiteSpace(propertyName))
                 throw new ArgumentNullException(nameof(propertyName));
 
-            var stateTransport = new Tuple<ObservableCollectionBase, PropertyChangedEventHandler, string>(this, PropertyChanged, propertyName);
-            SynchronizationContext.Current.Post((state) =>
-            {
-                var st = (Tuple<ObservableCollectionBase, PropertyChangedEventHandler, string>)state;
-                st.Item2?.Invoke(st.Item1, new PropertyChangedEventArgs(st.Item3));
-            }, stateTransport);
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
         #endregion
 
@@ -48,7 +45,7 @@ namespace IX.Observable
         {
             var args = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset);
 
-            InvokeOnCollectionChanged(args);
+            CollectionChanged?.Invoke(this, args);
         }
 
         /// <summary>
@@ -88,7 +85,7 @@ namespace IX.Observable
                     break;
             }
 
-            InvokeOnCollectionChanged(args);
+            CollectionChanged?.Invoke(this, args);
         }
 
         /// <summary>
@@ -128,20 +125,7 @@ namespace IX.Observable
                     break;
             }
 
-            InvokeOnCollectionChanged(args);
-        }
-
-        private void InvokeOnCollectionChanged(NotifyCollectionChangedEventArgs args)
-        {
-            var stateTransport =
-                new Tuple<ObservableCollectionBase, NotifyCollectionChangedEventHandler, NotifyCollectionChangedEventArgs>
-                (this, CollectionChanged, args);
-
-            SynchronizationContext.Current.Post((state) =>
-            {
-                var st = (Tuple<ObservableCollectionBase, NotifyCollectionChangedEventHandler, NotifyCollectionChangedEventArgs>)state;
-                st.Item2?.Invoke(st.Item1, stateTransport.Item3);
-            }, stateTransport);
+            CollectionChanged?.Invoke(this, args);
         }
         #endregion
     }
