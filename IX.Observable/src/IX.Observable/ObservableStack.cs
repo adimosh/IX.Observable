@@ -12,11 +12,14 @@ namespace IX.Observable
     /// <typeparam name="T">The type of elements in the stack.</typeparam>
     public class ObservableStack<T> : ObservableCollectionBase, IStack<T>, IReadOnlyCollection<T>, ICollection
     {
-        private Stack<T> internalContainer;
+        /// <summary>
+        /// The data container for the observable stack.
+        /// </summary>
+        protected Stack<T> internalContainer;
 
         #region Constructors
         /// <summary>
-        /// Initializes a new instance of the <see cref="Stack{T}"/> class.
+        /// Initializes a new instance of the <see cref="ObservableStack{T}"/> class.
         /// </summary>
         public ObservableStack()
         {
@@ -24,7 +27,7 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Stack{T}"/> class.
+        /// Initializes a new instance of the <see cref="ObservableStack{T}"/> class.
         /// </summary>
         /// <param name="capacity">The initial capacity of the stack.</param>
         public ObservableStack(int capacity)
@@ -33,7 +36,7 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Stack{T}"/> class.
+        /// Initializes a new instance of the <see cref="ObservableStack{T}"/> class.
         /// </summary>
         /// <param name="collection">A collection of items to copy into the stack.</param>
         public ObservableStack(IEnumerable<T> collection)
@@ -46,7 +49,7 @@ namespace IX.Observable
         /// <summary>
         /// The number of elements in the observable stack.
         /// </summary>
-        public int Count
+        public virtual int Count
         {
             get
             {
@@ -58,7 +61,7 @@ namespace IX.Observable
         {
             get
             {
-                return internalContainer.Count;
+                return Count;
             }
         }
 
@@ -82,7 +85,7 @@ namespace IX.Observable
         /// Gets the enumerator for this collection.
         /// </summary>
         /// <returns>The enumerator.</returns>
-        public IEnumerator<T> GetEnumerator()
+        public virtual IEnumerator<T> GetEnumerator()
         {
             return internalContainer.GetEnumerator();
         }
@@ -94,7 +97,7 @@ namespace IX.Observable
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return internalContainer.GetEnumerator();
+            return GetEnumerator();
         }
         #endregion
 
@@ -104,7 +107,7 @@ namespace IX.Observable
         /// </summary>
         public void Clear()
         {
-            internalContainer.Clear();
+            ClearInternal();
 
             if (CollectionChangedEmpty() && PropertyChangedEmpty())
                 return;
@@ -118,11 +121,19 @@ namespace IX.Observable
         }
 
         /// <summary>
+        /// Clears the observable stack (internal overridable procedure).
+        /// </summary>
+        protected void ClearInternal()
+        {
+            internalContainer.Clear();
+        }
+
+        /// <summary>
         /// Checks whether or not a certain item is in the stack.
         /// </summary>
         /// <param name="item">The item to check for.</param>
         /// <returns><c>true</c> if the item was found, <c>false</c> otherwise.</returns>
-        public bool Contains(T item)
+        public virtual bool Contains(T item)
         {
             return internalContainer.Contains(item);
         }
@@ -131,7 +142,7 @@ namespace IX.Observable
         /// Peeks in the stack to view the topmost item, without removing it.
         /// </summary>
         /// <returns>The topmost element in the stack, if any.</returns>
-        public T Peek()
+        public virtual T Peek()
         {
             return internalContainer.Peek();
         }
@@ -142,7 +153,7 @@ namespace IX.Observable
         /// <returns>The topmost element in the stack, if any.</returns>
         public T Pop()
         {
-            T item = internalContainer.Pop();
+            T item = PopInternal();
 
             SynchronizationContext.Current.Post(
                 (state) =>
@@ -154,6 +165,12 @@ namespace IX.Observable
 
             return item;
         }
+
+        /// <summary>
+        /// Pops the topmost element from the stack, removing it (internal overridable procedure).
+        /// </summary>
+        /// <returns>The topmost element in the stack, if any.</returns>
+        protected virtual T PopInternal() => internalContainer.Pop();
 
         /// <summary>
         /// Pushes an element to the top of the stack.
@@ -172,10 +189,16 @@ namespace IX.Observable
         }
 
         /// <summary>
+        /// Pushes an element to the top of the stack (internal overridable procedure).
+        /// </summary>
+        /// <param name="item">The item to push.</param>
+        protected virtual void PushInternal(T item) => internalContainer.Push(item);
+
+        /// <summary>
         /// Copies all elements of the stack to a new array.
         /// </summary>
         /// <returns>An array containing all items in the stack.</returns>
-        public T[] ToArray()
+        public virtual T[] ToArray()
         {
             return internalContainer.ToArray();
         }
@@ -183,7 +206,7 @@ namespace IX.Observable
         /// <summary>
         /// Sets the capacity to the actual number of elements in the stack if that number is less than 90 percent of current capacity.
         /// </summary>
-        public void TrimExcess()
+        public virtual void TrimExcess()
         {
             internalContainer.TrimExcess();
         }
