@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
-using System.Linq;
-using System.Threading;
 
 namespace IX.Observable
 {
@@ -18,6 +15,11 @@ namespace IX.Observable
         /// Triggers when there is a change in any of this object's properties.
         /// </summary>
         public event PropertyChangedEventHandler PropertyChanged;
+
+        protected bool PropertyChangedEmpty()
+        {
+            return PropertyChanged == null;
+        }
 
         /// <summary>
         /// In a child class, triggers a property changed event.
@@ -37,6 +39,11 @@ namespace IX.Observable
         /// Triggers when there is a change in the collection.
         /// </summary>
         public event NotifyCollectionChangedEventHandler CollectionChanged;
+
+        protected bool CollectionChangedEmpty()
+        {
+            return CollectionChanged == null;
+        }
 
         /// <summary>
         /// In a child class, triggers a collection changed event for a reset change.

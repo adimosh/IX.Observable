@@ -337,6 +337,9 @@ namespace IX.Observable
         /// <param name="item">The added item.</param>
         protected void BroadcastAdd(KeyValuePair<TKey, TValue> item)
         {
+            if (CollectionChangedEmpty() && PropertyChangedEmpty())
+                return;
+
             // TODO: This continuous queueing is causing significant slowdown, should be solved at a later time
             SynchronizationContext.Current.Post(
             //ThreadPool.QueueUserWorkItem(
@@ -356,6 +359,9 @@ namespace IX.Observable
         /// <param name="index">The removed index (mandatory for remove change).</param>
         protected void BroadcastRemove(KeyValuePair<TKey, TValue> item, int index)
         {
+            if (CollectionChangedEmpty() && PropertyChangedEmpty())
+                return;
+
             var stateTransport = new Tuple<KeyValuePair<TKey, TValue>, int>(item, index);
             // TODO: This continuous queueing is causing significant slowdown, should be solved at a later time
             SynchronizationContext.Current.Post(
@@ -377,6 +383,9 @@ namespace IX.Observable
         /// <param name="newItem">The new item.</param>
         protected void BroadcastChange(KeyValuePair<TKey, TValue> oldItem, KeyValuePair<TKey, TValue> newItem)
         {
+            if (CollectionChangedEmpty() && PropertyChangedEmpty())
+                return;
+
             var stateTransport = new Tuple<KeyValuePair<TKey, TValue>, KeyValuePair<TKey, TValue>>(oldItem, newItem);
             // TODO: This continuous queueing is causing significant slowdown, should be solved at a later time
             SynchronizationContext.Current.Post(
@@ -396,6 +405,9 @@ namespace IX.Observable
         /// </summary>
         protected void BroadcastReset()
         {
+            if (CollectionChangedEmpty() && PropertyChangedEmpty())
+                return;
+
             // TODO: This continuous queueing is causing significant slowdown, should be solved at a later time
             SynchronizationContext.Current.Post(
             //ThreadPool.QueueUserWorkItem(
