@@ -1,6 +1,6 @@
 ﻿{
   "title": "IX.Observable",
-  "version": "0.3.0",
+  "version": "0.3.1",
 
   "dependencies": {
     "NETStandard.Library": "1.6.0",
