@@ -2,7 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Threading;
+using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace IX.Observable
 {
@@ -10,6 +11,7 @@ namespace IX.Observable
     /// A stack that broadcasts its changes.
     /// </summary>
     /// <typeparam name="T">The type of elements in the stack.</typeparam>
+    [DebuggerDisplay("Count = {Count}")]
     public class ObservableStack<T> : ObservableCollectionBase, IStack<T>, IReadOnlyCollection<T>, ICollection
     {
         /// <summary>
@@ -112,12 +114,11 @@ namespace IX.Observable
             if (CollectionChangedEmpty() && PropertyChangedEmpty())
                 return;
 
-            SynchronizationContext.Current.Post(
-                (state) =>
-                {
-                    OnCollectionChanged();
-                    OnPropertyChanged(nameof(Count));
-                }, null);
+            Task.Run(() =>
+            {
+                OnCollectionChanged();
+                OnPropertyChanged(nameof(Count));
+            });
         }
 
         /// <summary>
@@ -155,13 +156,13 @@ namespace IX.Observable
         {
             T item = PopInternal();
 
-            SynchronizationContext.Current.Post(
-                (state) =>
-                {
-                    Tuple<T, int> st = (Tuple<T, int>)state;
-                    OnCollectionChanged(NotifyCollectionChangedAction.Remove, oldItem: st.Item1, oldIndex: st.Item2);
-                    OnPropertyChanged(nameof(Count));
-                }, new Tuple<T, int>(item, internalContainer.Count));
+            var st = new Tuple<T, int>(item, internalContainer.Count);
+
+            Task.Run(() =>
+            {
+                OnCollectionChanged(NotifyCollectionChangedAction.Remove, oldItem: st.Item1, oldIndex: st.Item2);
+                OnPropertyChanged(nameof(Count));
+            });
 
             return item;
         }
@@ -180,12 +181,11 @@ namespace IX.Observable
         {
             internalContainer.Push(item);
 
-            SynchronizationContext.Current.Post(
-                (state) =>
-                {
-                    OnCollectionChanged(NotifyCollectionChangedAction.Add, newItem: state);
-                    OnPropertyChanged(nameof(Count));
-                }, item);
+            Task.Run(() =>
+            {
+                OnCollectionChanged(NotifyCollectionChangedAction.Add, newItem: item);
+                OnPropertyChanged(nameof(Count));
+            });
         }
 
         /// <summary>

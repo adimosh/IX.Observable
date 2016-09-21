@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading;
 
 namespace IX.Observable
@@ -9,6 +10,7 @@ namespace IX.Observable
     /// </summary>
     /// <typeparam name="TKey">The data key type.</typeparam>
     /// <typeparam name="TValue">The data value type.</typeparam>
+    [DebuggerDisplay("Count = {Count}")]
     public class ConcurrentObservableDictionary<TKey, TValue> : ObservableDictionary<TKey, TValue>, ICollection<KeyValuePair<TKey, TValue>>, IDisposable
     {
         private readonly ReaderWriterLockSlim locker = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);

@@ -1,7 +1,7 @@
 ﻿namespace IX.Observable
 {
     /// <summary>
-    /// A contract for a stack that broadcasts its changes.
+    /// A contract for a stack.
     /// </summary>
     /// <typeparam name="T">The type of elements in the stack.</typeparam>
     public interface IStack<T>

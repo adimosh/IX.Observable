@@ -2,8 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Linq;
-using System.Threading;
+using System.Threading.Tasks;
 
 namespace IX.Observable
 {
@@ -12,6 +13,7 @@ namespace IX.Observable
     /// </summary>
     /// <typeparam name="TKey">The data key type.</typeparam>
     /// <typeparam name="TValue">The data value type.</typeparam>
+    [DebuggerDisplay("Count = {Count}")]
     public class ObservableDictionary<TKey, TValue> : ObservableCollectionBase, IDictionary<TKey, TValue>, IReadOnlyDictionary<TKey, TValue>
     {
         /// <summary>
@@ -217,14 +219,13 @@ namespace IX.Observable
         /// </summary>
         protected virtual void ClearInternal()
         {
-            var stateTransport = internalContainer;
+            var st = internalContainer;
             internalContainer = new Dictionary<TKey, TValue>();
 
-            SynchronizationContext.Current.Post(
-                (state) =>
-                {
-                    ((Dictionary<TKey, TValue>)state).Clear();
-                }, stateTransport);
+            Task.Run(() =>
+            {
+                st.Clear();
+            });
         }
 
         /// <summary>
@@ -347,14 +348,15 @@ namespace IX.Observable
             if (CollectionChangedEmpty() && PropertyChangedEmpty())
                 return;
 
-            SynchronizationContext.Current.Post(
-                (state) =>
+            var st = item;
+
+            Task.Run(() =>
             {
-                OnCollectionChanged(NotifyCollectionChangedAction.Add, newItem: item);
+                OnCollectionChanged(NotifyCollectionChangedAction.Add, newItem: st);
                 OnPropertyChanged(nameof(Keys));
                 OnPropertyChanged(nameof(Values));
                 OnPropertyChanged(nameof(Count));
-            }, item);
+            }).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -367,15 +369,15 @@ namespace IX.Observable
             if (CollectionChangedEmpty() && PropertyChangedEmpty())
                 return;
 
-            SynchronizationContext.Current.Post(
-                (state) =>
+            var st = new Tuple<KeyValuePair<TKey, TValue>, int>(item, index);
+
+            Task.Run(() =>
             {
-                var st = (Tuple<KeyValuePair<TKey, TValue>, int>)state;
                 OnCollectionChanged(NotifyCollectionChangedAction.Remove, oldItem: st.Item1, oldIndex: st.Item2);
                 OnPropertyChanged(nameof(Keys));
                 OnPropertyChanged(nameof(Values));
                 OnPropertyChanged(nameof(Count));
-            }, new Tuple<KeyValuePair<TKey, TValue>, int>(item, index));
+            });
         }
 
         /// <summary>
@@ -388,14 +390,14 @@ namespace IX.Observable
             if (CollectionChangedEmpty() && PropertyChangedEmpty())
                 return;
 
-            SynchronizationContext.Current.Post(
-                (state) =>
+            var st = new Tuple<KeyValuePair<TKey, TValue>, KeyValuePair<TKey, TValue>>(oldItem, newItem);
+
+            Task.Run(() =>
             {
-                var st = (Tuple<KeyValuePair<TKey, TValue>, KeyValuePair<TKey, TValue>>)state;
                 OnCollectionChanged(NotifyCollectionChangedAction.Replace, oldItem: st.Item1, newItem: st.Item2);
                 OnPropertyChanged(nameof(Keys));
                 OnPropertyChanged(nameof(Values));
-            }, new Tuple<KeyValuePair<TKey, TValue>, KeyValuePair<TKey, TValue>>(oldItem, newItem));
+            });
         }
 
         /// <summary>
@@ -406,14 +408,13 @@ namespace IX.Observable
             if (CollectionChangedEmpty() && PropertyChangedEmpty())
                 return;
 
-            SynchronizationContext.Current.Post(
-                (state) =>
+            Task.Run(() =>
             {
                 OnCollectionChanged();
                 OnPropertyChanged(nameof(Keys));
                 OnPropertyChanged(nameof(Values));
                 OnPropertyChanged(nameof(Count));
-            }, null);
+            });
         }
         #endregion
     }

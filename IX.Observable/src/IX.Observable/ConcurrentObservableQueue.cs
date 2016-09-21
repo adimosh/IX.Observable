@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading;
 
 namespace IX.Observable
@@ -8,6 +9,7 @@ namespace IX.Observable
     /// A queue that broadcasts its changes.
     /// </summary>
     /// <typeparam name="T">The type of items in the queue.</typeparam>
+    [DebuggerDisplay("Count = {Count}")]
     public class ConcurrentObservableQueue<T> : ObservableQueue<T>, IDisposable
     {
         private readonly ReaderWriterLockSlim locker = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);

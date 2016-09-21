@@ -2,7 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Threading;
+using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace IX.Observable
 {
@@ -10,7 +11,8 @@ namespace IX.Observable
     /// A queue that broadcasts its changes.
     /// </summary>
     /// <typeparam name="T">The type of items in the queue.</typeparam>
-    public class ObservableQueue<T> : ObservableCollectionBase, IEnumerable<T>, ICollection
+    [DebuggerDisplay("Count = {Count}")]
+    public class ObservableQueue<T> : ObservableCollectionBase, IQueue<T>, IEnumerable<T>, ICollection
     {
         /// <summary>
         /// The data container of the observable queue.
@@ -100,12 +102,11 @@ namespace IX.Observable
         {
             ClearInternal();
 
-            SynchronizationContext.Current.Post(
-                (state) =>
-                {
-                    OnCollectionChanged();
-                    OnPropertyChanged(nameof(Count));
-                }, null);
+            Task.Run(() =>
+            {
+                OnCollectionChanged();
+                OnPropertyChanged(nameof(Count));
+            });
         }
 
         /// <summary>
@@ -144,12 +145,11 @@ namespace IX.Observable
         {
             T item = DequeueInternal();
 
-            SynchronizationContext.Current.Post(
-                (state) =>
-                {
-                    OnCollectionChanged(NotifyCollectionChangedAction.Remove, oldItem: state, oldIndex: 0);
-                    OnPropertyChanged(nameof(Count));
-                }, item);
+            Task.Run(() =>
+            {
+                OnCollectionChanged(NotifyCollectionChangedAction.Remove, oldItem: item, oldIndex: 0);
+                OnPropertyChanged(nameof(Count));
+            });
 
             return item;
         }
@@ -171,12 +171,11 @@ namespace IX.Observable
         {
             EnqueueInternal(item);
 
-            SynchronizationContext.Current.Post(
-                (state) =>
-                {
-                    OnCollectionChanged(NotifyCollectionChangedAction.Add, newItem: state, newIndex: 0);
-                    OnPropertyChanged(nameof(Count));
-                }, item);
+            Task.Run(() =>
+            {
+                OnCollectionChanged(NotifyCollectionChangedAction.Add, newItem: item, newIndex: 0);
+                OnPropertyChanged(nameof(Count));
+            });
         }
 
         /// <summary>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading;
 
 namespace IX.Observable
@@ -8,6 +9,7 @@ namespace IX.Observable
     /// A thread-safe stack that broadcasts its changes.
     /// </summary>
     /// <typeparam name="T">The type of elements in the stack.</typeparam>
+    [DebuggerDisplay("Count = {Count}")]
     public class ConcurrentObservableStack<T> : ObservableStack<T>, IDisposable
     {
         private readonly ReaderWriterLockSlim locker = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
