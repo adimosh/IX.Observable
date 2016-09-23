@@ -296,10 +296,17 @@ namespace IX.Observable
             var st = internalContainer;
             internalContainer = new Dictionary<TKey, TValue>();
 
-            Task.Run(() =>
+            if (syncContext == null)
             {
-                st.Clear();
-            });
+                Task.Run(() =>
+                {
+                    st.Clear();
+                });
+            }
+            else
+            {
+                syncContext.Post((state) => ((Dictionary<TKey, TValue>)state).Clear(), st);
+            }
         }
 
         /// <summary>
@@ -424,13 +431,26 @@ namespace IX.Observable
 
             var st = item;
 
-            Task.Run(() =>
+            if (syncContext == null)
             {
-                OnCollectionChanged(NotifyCollectionChangedAction.Add, newItem: st);
-                OnPropertyChanged(nameof(Keys));
-                OnPropertyChanged(nameof(Values));
-                OnPropertyChanged(nameof(Count));
-            }).ConfigureAwait(false);
+                Task.Run(() =>
+                {
+                    OnCollectionChanged(NotifyCollectionChangedAction.Add, newItem: st);
+                    OnPropertyChanged(nameof(Keys));
+                    OnPropertyChanged(nameof(Values));
+                    OnPropertyChanged(nameof(Count));
+                });
+            }
+            else
+            {
+                syncContext.Post((state) =>
+                {
+                    OnCollectionChanged(NotifyCollectionChangedAction.Add, newItem: ((KeyValuePair<TKey, TValue>)state));
+                    OnPropertyChanged(nameof(Keys));
+                    OnPropertyChanged(nameof(Values));
+                    OnPropertyChanged(nameof(Count));
+                }, st);
+            }
         }
 
         /// <summary>
