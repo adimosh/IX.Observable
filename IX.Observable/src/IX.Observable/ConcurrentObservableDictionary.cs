@@ -71,6 +71,67 @@ namespace IX.Observable
             : base(dictionary, comparer)
         {
         }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ConcurrentObservableDictionary{TKey, TValue}" /> class.
+        /// </summary>
+        /// <param name="context">The synchronization context top use when posting observable messages.</param>
+        public ConcurrentObservableDictionary(SynchronizationContext context)
+            : base(context)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ConcurrentObservableDictionary{TKey, TValue}" /> class.
+        /// </summary>
+        /// <param name="context">The synchronization context top use when posting observable messages.</param>
+        /// <param name="capacity">The initial capacity of the dictionary.</param>
+        public ConcurrentObservableDictionary(SynchronizationContext context, int capacity)
+            : base(context, capacity)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ConcurrentObservableDictionary{TKey, TValue}" /> class.
+        /// </summary>
+        /// <param name="context">The synchronization context top use when posting observable messages.</param>
+        /// <param name="equalityComparer">A comparer object to use for equality comparison.</param>
+        public ConcurrentObservableDictionary(SynchronizationContext context, IEqualityComparer<TKey> equalityComparer)
+            : base(context, equalityComparer)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ConcurrentObservableDictionary{TKey, TValue}" /> class.
+        /// </summary>
+        /// <param name="context">The synchronization context top use when posting observable messages.</param>
+        /// <param name="capacity">The initial capacity of the dictionary.</param>
+        /// <param name="equalityComparer">A comparer object to use for equality comparison.</param>
+        public ConcurrentObservableDictionary(SynchronizationContext context, int capacity, IEqualityComparer<TKey> equalityComparer)
+            : base(context, capacity, equalityComparer)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ConcurrentObservableDictionary{TKey, TValue}" /> class.
+        /// </summary>
+        /// <param name="context">The synchronization context top use when posting observable messages.</param>
+        /// <param name="dictionary">A dictionary of items to copy from.</param>
+        public ConcurrentObservableDictionary(SynchronizationContext context, IDictionary<TKey, TValue> dictionary)
+            : base(context, dictionary)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ConcurrentObservableDictionary{TKey, TValue}" /> class.
+        /// </summary>
+        /// <param name="context">The synchronization context top use when posting observable messages.</param>
+        /// <param name="dictionary">A dictionary of items to copy from.</param>
+        /// <param name="comparer">A comparer object to use for equality comparison.</param>
+        public ConcurrentObservableDictionary(SynchronizationContext context, IDictionary<TKey, TValue> dictionary, IEqualityComparer<TKey> comparer)
+            : base(context, dictionary, comparer)
+        {
+        }
         #endregion
 
         #region IDisposable Support

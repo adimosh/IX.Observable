@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace IX.Observable
@@ -24,6 +25,7 @@ namespace IX.Observable
         /// Initializes a new instance of the <see cref="ObservableQueue{T}"/> class.
         /// </summary>
         public ObservableQueue()
+            : base(null)
         {
             internalContainer = new Queue<T>();
         }
@@ -33,6 +35,7 @@ namespace IX.Observable
         /// </summary>
         /// <param name="collection">A collection of items to copy from.</param>
         public ObservableQueue(IEnumerable<T> collection)
+            : base(null)
         {
             internalContainer = new Queue<T>(collection);
         }
@@ -42,6 +45,39 @@ namespace IX.Observable
         /// </summary>
         /// <param name="capacity">The initial capacity of the queue.</param>
         public ObservableQueue(int capacity)
+            : base(null)
+        {
+            internalContainer = new Queue<T>(capacity);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ObservableQueue{T}"/> class.
+        /// </summary>
+        /// <param name="context">The synchronization context top use when posting observable messages.</param>
+        public ObservableQueue(SynchronizationContext context)
+            : base(context)
+        {
+            internalContainer = new Queue<T>();
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ObservableQueue{T}"/> class.
+        /// </summary>
+        /// <param name="context">The synchronization context top use when posting observable messages.</param>
+        /// <param name="collection">A collection of items to copy from.</param>
+        public ObservableQueue(SynchronizationContext context, IEnumerable<T> collection)
+            : base(context)
+        {
+            internalContainer = new Queue<T>(collection);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ObservableQueue{T}"/> class.
+        /// </summary>
+        /// <param name="context">The synchronization context top use when posting observable messages.</param>
+        /// <param name="capacity">The initial capacity of the queue.</param>
+        public ObservableQueue(SynchronizationContext context, int capacity)
+            : base(context)
         {
             internalContainer = new Queue<T>(capacity);
         }

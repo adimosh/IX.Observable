@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Threading;
 
 namespace IX.Observable
 {
@@ -10,7 +11,20 @@ namespace IX.Observable
     /// </summary>
     public abstract class ObservableCollectionBase : INotifyPropertyChanged, INotifyCollectionChanged
     {
-        #region INotifyPropertyChanged
+        /// <summary>
+        /// The synchronization context that should be used when posting messages. This field can be null.
+        /// </summary>
+        protected SynchronizationContext syncContext;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ObservableCollectionBase"/> class.
+        /// </summary>
+        /// <param name="context">The synchronization context to use, if any.</param>
+        protected ObservableCollectionBase(SynchronizationContext context)
+        {
+            syncContext = context;
+        }
+
         /// <summary>
         /// Triggers when there is a change in any of this object's properties.
         /// </summary>
@@ -36,9 +50,7 @@ namespace IX.Observable
 
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-        #endregion
 
-        #region INotifyCollectionChanged
         /// <summary>
         /// Triggers when there is a change in the collection.
         /// </summary>
@@ -142,6 +154,5 @@ namespace IX.Observable
 
             CollectionChanged?.Invoke(this, args);
         }
-        #endregion
     }
 }

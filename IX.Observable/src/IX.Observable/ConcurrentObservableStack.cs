@@ -41,6 +41,35 @@ namespace IX.Observable
             : base(collection)
         {
         }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Stack{T}"/> class.
+        /// </summary>
+        /// <param name="context">The synchronization context top use when posting observable messages.</param>
+        public ConcurrentObservableStack(SynchronizationContext context)
+            : base(context)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Stack{T}"/> class.
+        /// </summary>
+        /// <param name="context">The synchronization context top use when posting observable messages.</param>
+        /// <param name="capacity">The initial capacity of the stack.</param>
+        public ConcurrentObservableStack(SynchronizationContext context, int capacity)
+            : base(context, capacity)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Stack{T}"/> class.
+        /// </summary>
+        /// <param name="context">The synchronization context top use when posting observable messages.</param>
+        /// <param name="collection">A collection of items to copy into the stack.</param>
+        public ConcurrentObservableStack(SynchronizationContext context, IEnumerable<T> collection)
+            : base(context, collection)
+        {
+        }
         #endregion
 
         #region IDisposable Support

@@ -38,6 +38,32 @@ namespace IX.Observable
         public ConcurrentObservableQueue(int capacity)
             : base(capacity)
         { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ConcurrentObservableQueue{T}"/> class.
+        /// </summary>
+        /// <param name="context">The synchronization context top use when posting observable messages.</param>
+        public ConcurrentObservableQueue(SynchronizationContext context)
+            : base(context)
+        { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ConcurrentObservableQueue{T}"/> class.
+        /// </summary>
+        /// <param name="context">The synchronization context top use when posting observable messages.</param>
+        /// <param name="collection">A collection of items to copy from.</param>
+        public ConcurrentObservableQueue(SynchronizationContext context, IEnumerable<T> collection)
+            : base(context, collection)
+        { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ConcurrentObservableQueue{T}"/> class.
+        /// </summary>
+        /// <param name="context">The synchronization context top use when posting observable messages.</param>
+        /// <param name="capacity">The initial capacity of the queue.</param>
+        public ConcurrentObservableQueue(SynchronizationContext context, int capacity)
+            : base(context, capacity)
+        { }
         #endregion
 
         #region IDisposable Support

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace IX.Observable
@@ -26,6 +27,7 @@ namespace IX.Observable
         /// Initializes a new instance of the <see cref="ObservableDictionary{TKey, TValue}" /> class.
         /// </summary>
         public ObservableDictionary()
+            : base(null)
         {
             internalContainer = new Dictionary<TKey, TValue>();
         }
@@ -35,6 +37,7 @@ namespace IX.Observable
         /// </summary>
         /// <param name="capacity">The initial capacity of the dictionary.</param>
         public ObservableDictionary(int capacity)
+            : base(null)
         {
             internalContainer = new Dictionary<TKey, TValue>(capacity);
         }
@@ -44,6 +47,7 @@ namespace IX.Observable
         /// </summary>
         /// <param name="equalityComparer">A comparer object to use for equality comparison.</param>
         public ObservableDictionary(IEqualityComparer<TKey> equalityComparer)
+            : base(null)
         {
             internalContainer = new Dictionary<TKey, TValue>(equalityComparer);
         }
@@ -54,6 +58,7 @@ namespace IX.Observable
         /// <param name="capacity">The initial capacity of the dictionary.</param>
         /// <param name="equalityComparer">A comparer object to use for equality comparison.</param>
         public ObservableDictionary(int capacity, IEqualityComparer<TKey> equalityComparer)
+            : base(null)
         {
             internalContainer = new Dictionary<TKey, TValue>(capacity, equalityComparer);
         }
@@ -63,6 +68,7 @@ namespace IX.Observable
         /// </summary>
         /// <param name="dictionary">A dictionary of items to copy from.</param>
         public ObservableDictionary(IDictionary<TKey, TValue> dictionary)
+            : base(null)
         {
             internalContainer = new Dictionary<TKey, TValue>(dictionary);
         }
@@ -73,6 +79,74 @@ namespace IX.Observable
         /// <param name="dictionary">A dictionary of items to copy from.</param>
         /// <param name="comparer">A comparer object to use for equality comparison.</param>
         public ObservableDictionary(IDictionary<TKey, TValue> dictionary, IEqualityComparer<TKey> comparer)
+            : base(null)
+        {
+            internalContainer = new Dictionary<TKey, TValue>(dictionary, comparer);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ObservableDictionary{TKey, TValue}" /> class.
+        /// </summary>
+        /// <param name="context">The synchronization context top use when posting observable messages.</param>
+        public ObservableDictionary(SynchronizationContext context)
+            : base(context)
+        {
+            internalContainer = new Dictionary<TKey, TValue>();
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ObservableDictionary{TKey, TValue}" /> class.
+        /// </summary>
+        /// <param name="context">The synchronization context top use when posting observable messages.</param>
+        /// <param name="capacity">The initial capacity of the dictionary.</param>
+        public ObservableDictionary(SynchronizationContext context, int capacity)
+            : base(context)
+        {
+            internalContainer = new Dictionary<TKey, TValue>(capacity);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ObservableDictionary{TKey, TValue}" /> class.
+        /// </summary>
+        /// <param name="context">The synchronization context top use when posting observable messages.</param>
+        /// <param name="equalityComparer">A comparer object to use for equality comparison.</param>
+        public ObservableDictionary(SynchronizationContext context, IEqualityComparer<TKey> equalityComparer)
+            : base(context)
+        {
+            internalContainer = new Dictionary<TKey, TValue>(equalityComparer);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ObservableDictionary{TKey, TValue}" /> class.
+        /// </summary>
+        /// <param name="context">The synchronization context top use when posting observable messages.</param>
+        /// <param name="capacity">The initial capacity of the dictionary.</param>
+        /// <param name="equalityComparer">A comparer object to use for equality comparison.</param>
+        public ObservableDictionary(SynchronizationContext context, int capacity, IEqualityComparer<TKey> equalityComparer)
+            : base(context)
+        {
+            internalContainer = new Dictionary<TKey, TValue>(capacity, equalityComparer);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ObservableDictionary{TKey, TValue}" /> class.
+        /// </summary>
+        /// <param name="context">The synchronization context top use when posting observable messages.</param>
+        /// <param name="dictionary">A dictionary of items to copy from.</param>
+        public ObservableDictionary(SynchronizationContext context, IDictionary<TKey, TValue> dictionary)
+            : base(context)
+        {
+            internalContainer = new Dictionary<TKey, TValue>(dictionary);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ObservableDictionary{TKey, TValue}" /> class.
+        /// </summary>
+        /// <param name="context">The synchronization context top use when posting observable messages.</param>
+        /// <param name="dictionary">A dictionary of items to copy from.</param>
+        /// <param name="comparer">A comparer object to use for equality comparison.</param>
+        public ObservableDictionary(SynchronizationContext context, IDictionary<TKey, TValue> dictionary, IEqualityComparer<TKey> comparer)
+            : base(context)
         {
             internalContainer = new Dictionary<TKey, TValue>(dictionary, comparer);
         }

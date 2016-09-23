@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace IX.Observable
@@ -24,6 +25,7 @@ namespace IX.Observable
         /// Initializes a new instance of the <see cref="ObservableStack{T}"/> class.
         /// </summary>
         public ObservableStack()
+            : base(null)
         {
             internalContainer = new Stack<T>();
         }
@@ -33,6 +35,7 @@ namespace IX.Observable
         /// </summary>
         /// <param name="capacity">The initial capacity of the stack.</param>
         public ObservableStack(int capacity)
+            : base(null)
         {
             internalContainer = new Stack<T>(capacity);
         }
@@ -42,6 +45,39 @@ namespace IX.Observable
         /// </summary>
         /// <param name="collection">A collection of items to copy into the stack.</param>
         public ObservableStack(IEnumerable<T> collection)
+            : base(null)
+        {
+            internalContainer = new Stack<T>(collection);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ObservableStack{T}"/> class.
+        /// </summary>
+        /// <param name="context">The synchronization context top use when posting observable messages.</param>
+        public ObservableStack(SynchronizationContext context)
+            : base(context)
+        {
+            internalContainer = new Stack<T>();
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ObservableStack{T}"/> class.
+        /// </summary>
+        /// <param name="context">The synchronization context top use when posting observable messages.</param>
+        /// <param name="capacity">The initial capacity of the stack.</param>
+        public ObservableStack(SynchronizationContext context, int capacity)
+            : base(context)
+        {
+            internalContainer = new Stack<T>(capacity);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ObservableStack{T}"/> class.
+        /// </summary>
+        /// <param name="context">The synchronization context top use when posting observable messages.</param>
+        /// <param name="collection">A collection of items to copy into the stack.</param>
+        public ObservableStack(SynchronizationContext context, IEnumerable<T> collection)
+            : base(context)
         {
             internalContainer = new Stack<T>(collection);
         }
