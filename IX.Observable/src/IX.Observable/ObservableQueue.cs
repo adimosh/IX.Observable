@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace IX.Observable
 {
@@ -139,8 +140,9 @@ namespace IX.Observable
 
             AsyncPost(() =>
             {
-                OnCollectionChanged();
                 OnPropertyChanged(nameof(Count));
+                OnPropertyChanged("Item[]");
+                OnCollectionChanged();
             });
         }
 
@@ -149,7 +151,10 @@ namespace IX.Observable
         /// </summary>
         protected virtual void ClearInternal()
         {
-            internalContainer.Clear();
+            var st = internalContainer;
+            internalContainer = new Queue<T>();
+
+            Task.Run(() => st.Clear());
         }
 
         /// <summary>
@@ -182,8 +187,9 @@ namespace IX.Observable
 
             AsyncPost((state) =>
             {
-                OnCollectionChanged(NotifyCollectionChangedAction.Remove, oldItem: state, oldIndex: 0);
                 OnPropertyChanged(nameof(Count));
+                OnPropertyChanged("Item[]");
+                OnCollectionChanged(NotifyCollectionChangedAction.Remove, oldItem: state, oldIndex: 0);
             }, item);
 
             return item;
@@ -206,11 +212,14 @@ namespace IX.Observable
         {
             EnqueueInternal(item);
 
+            var st = new Tuple<T, int>(item, Count - 1);
+
             AsyncPost((state) =>
             {
-                OnCollectionChanged(NotifyCollectionChangedAction.Add, newItem: state, newIndex: 0);
                 OnPropertyChanged(nameof(Count));
-            }, item);
+                OnPropertyChanged("Item[]");
+                OnCollectionChanged(NotifyCollectionChangedAction.Add, newItem: state.Item1, newIndex: st.Item2);
+            }, st);
         }
 
         /// <summary>

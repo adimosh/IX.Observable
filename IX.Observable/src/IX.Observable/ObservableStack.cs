@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace IX.Observable
 {
@@ -151,8 +152,9 @@ namespace IX.Observable
 
             AsyncPost(() =>
             {
-                OnCollectionChanged();
                 OnPropertyChanged(nameof(Count));
+                OnPropertyChanged("Item[]");
+                OnCollectionChanged();
             });
         }
 
@@ -161,7 +163,10 @@ namespace IX.Observable
         /// </summary>
         protected void ClearInternal()
         {
-            internalContainer.Clear();
+            var st = internalContainer;
+            internalContainer = new Stack<T>();
+
+            Task.Run(() => st.Clear());
         }
 
         /// <summary>
@@ -191,12 +196,13 @@ namespace IX.Observable
         {
             T item = PopInternal();
 
-            var st = new Tuple<T, int>(item, internalContainer.Count);
+            var st = new Tuple<T, int>(item, Count);
 
             AsyncPost((state) =>
             {
-                OnCollectionChanged(NotifyCollectionChangedAction.Remove, oldItem: state.Item1, oldIndex: state.Item2);
                 OnPropertyChanged(nameof(Count));
+                OnPropertyChanged("Item[]");
+                OnCollectionChanged(NotifyCollectionChangedAction.Remove, oldItem: state.Item1, oldIndex: state.Item2);
             }, st);
 
             return item;
@@ -214,13 +220,16 @@ namespace IX.Observable
         /// <param name="item">The item to push.</param>
         public void Push(T item)
         {
-            internalContainer.Push(item);
+            PushInternal(item);
+
+            var st = new Tuple<T, int>(item, Count - 1);
 
             AsyncPost((state) =>
             {
-                OnCollectionChanged(NotifyCollectionChangedAction.Add, newItem: state);
                 OnPropertyChanged(nameof(Count));
-            }, item);
+                OnPropertyChanged("Item[]");
+                OnCollectionChanged(NotifyCollectionChangedAction.Add, newItem: state.Item1, newIndex: state.Item2);
+            }, st);
         }
 
         /// <summary>

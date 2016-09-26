@@ -140,7 +140,7 @@ namespace IX.Observable
                     args = new NotifyCollectionChangedEventArgs(action, oldItem, oldIndex);
                     break;
                 case NotifyCollectionChangedAction.Replace:
-                    args = new NotifyCollectionChangedEventArgs(action, newItem, oldItem);
+                    args = new NotifyCollectionChangedEventArgs(action, newItem, oldItem, newIndex);
                     break;
                 case NotifyCollectionChangedAction.Reset:
                     args = new NotifyCollectionChangedEventArgs(action);

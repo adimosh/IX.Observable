@@ -568,7 +568,7 @@ namespace IX.Observable
                             else
                                 throw new TimeoutException();
 
-                            BroadcastChange(new KeyValuePair<TKey, TValue>(key, val), new KeyValuePair<TKey, TValue>(key, value));
+                            BroadcastChange(new KeyValuePair<TKey, TValue>(key, val), new KeyValuePair<TKey, TValue>(key, value), 0);
                         }
                         else
                         {

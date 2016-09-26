@@ -5,6 +5,7 @@ using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace IX.Observable
 {
@@ -170,7 +171,7 @@ namespace IX.Observable
                 {
                     internalContainer[key] = value;
 
-                    BroadcastChange(new KeyValuePair<TKey, TValue>(key, val), new KeyValuePair<TKey, TValue>(key, value));
+                    BroadcastChange(new KeyValuePair<TKey, TValue>(key, val), new KeyValuePair<TKey, TValue>(key, value), 0);
                 }
                 else
                 {
@@ -295,7 +296,7 @@ namespace IX.Observable
             var st = internalContainer;
             internalContainer = new Dictionary<TKey, TValue>();
 
-            AsyncPost((state) => { state.Clear(); }, st);
+            Task.Run(() => st.Clear());
         }
 
         /// <summary>
@@ -344,9 +345,10 @@ namespace IX.Observable
         /// <returns><c>true</c> if the removal was successful, <c>false</c> otherwise.</returns>
         public bool Remove(KeyValuePair<TKey, TValue> item)
         {
+            
             if (RemoveInternal(item))
             {
-                BroadcastRemove(item, -1);
+                BroadcastRemove(item, 0);
                 return true;
             }
 
@@ -373,7 +375,7 @@ namespace IX.Observable
             TValue value;
             if (RemoveInternal(key, out value))
             {
-                BroadcastRemove(new KeyValuePair<TKey, TValue>(key, value), -1);
+                BroadcastRemove(new KeyValuePair<TKey, TValue>(key, value), 0);
                 return true;
             }
 
@@ -418,14 +420,15 @@ namespace IX.Observable
             if (CollectionChangedEmpty() && PropertyChangedEmpty())
                 return;
 
-            var st = item;
+            var st = new Tuple<KeyValuePair<TKey, TValue>, int>(item, 0);
 
             AsyncPost((state) =>
             {
-                OnCollectionChanged(NotifyCollectionChangedAction.Add, newItem: state);
                 OnPropertyChanged(nameof(Keys));
                 OnPropertyChanged(nameof(Values));
                 OnPropertyChanged(nameof(Count));
+                OnPropertyChanged("Item[]");
+                OnCollectionChanged(NotifyCollectionChangedAction.Add, newItem: state.Item1, newIndex: state.Item2);
             }, st);
         }
 
@@ -443,10 +446,11 @@ namespace IX.Observable
 
             AsyncPost((state) =>
             {
-                OnCollectionChanged(NotifyCollectionChangedAction.Remove, oldItem: state.Item1, oldIndex: state.Item2);
                 OnPropertyChanged(nameof(Keys));
                 OnPropertyChanged(nameof(Values));
                 OnPropertyChanged(nameof(Count));
+                OnPropertyChanged("Item[]");
+                OnCollectionChanged(NotifyCollectionChangedAction.Remove, oldItem: state.Item1, oldIndex: state.Item2);
             }, st);
         }
 
@@ -455,18 +459,20 @@ namespace IX.Observable
         /// </summary>
         /// <param name="oldItem">The old item.</param>
         /// <param name="newItem">The new item.</param>
-        protected void BroadcastChange(KeyValuePair<TKey, TValue> oldItem, KeyValuePair<TKey, TValue> newItem)
+        /// <param name="index">The index of the change.</param>
+        protected void BroadcastChange(KeyValuePair<TKey, TValue> oldItem, KeyValuePair<TKey, TValue> newItem, int index)
         {
             if (CollectionChangedEmpty() && PropertyChangedEmpty())
                 return;
 
-            var st = new Tuple<KeyValuePair<TKey, TValue>, KeyValuePair<TKey, TValue>>(oldItem, newItem);
+            var st = new Tuple<KeyValuePair<TKey, TValue>, KeyValuePair<TKey, TValue>, int>(oldItem, newItem, index);
 
             AsyncPost((state) =>
             {
-                OnCollectionChanged(NotifyCollectionChangedAction.Replace, oldItem: state.Item1, newItem: state.Item2);
                 OnPropertyChanged(nameof(Keys));
                 OnPropertyChanged(nameof(Values));
+                OnPropertyChanged("Item[]");
+                OnCollectionChanged(NotifyCollectionChangedAction.Replace, oldItem: state.Item1, newItem: state.Item2, newIndex: state.Item3);
             }, st);
         }
 
@@ -480,10 +486,11 @@ namespace IX.Observable
 
             AsyncPost(() =>
             {
-                OnCollectionChanged();
                 OnPropertyChanged(nameof(Keys));
                 OnPropertyChanged(nameof(Values));
                 OnPropertyChanged(nameof(Count));
+                OnPropertyChanged("Item[]");
+                OnCollectionChanged();
             });
         }
         #endregion
