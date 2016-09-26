@@ -1,6 +1,6 @@
 {
   "title": "IX.Observable",
-  "version": "0.3.5",
+  "version": "0.3.4",
 
   "dependencies": {
     "System.Collections": "4.0.11",
