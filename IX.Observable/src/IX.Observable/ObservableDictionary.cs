@@ -5,7 +5,6 @@ using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace IX.Observable
 {
@@ -296,17 +295,7 @@ namespace IX.Observable
             var st = internalContainer;
             internalContainer = new Dictionary<TKey, TValue>();
 
-            if (syncContext == null)
-            {
-                Task.Run(() =>
-                {
-                    st.Clear();
-                });
-            }
-            else
-            {
-                syncContext.Post((state) => ((Dictionary<TKey, TValue>)state).Clear(), st);
-            }
+            AsyncPost((state) => { state.Clear(); }, st);
         }
 
         /// <summary>
@@ -431,26 +420,13 @@ namespace IX.Observable
 
             var st = item;
 
-            if (syncContext == null)
+            AsyncPost((state) =>
             {
-                Task.Run(() =>
-                {
-                    OnCollectionChanged(NotifyCollectionChangedAction.Add, newItem: st);
-                    OnPropertyChanged(nameof(Keys));
-                    OnPropertyChanged(nameof(Values));
-                    OnPropertyChanged(nameof(Count));
-                });
-            }
-            else
-            {
-                syncContext.Post((state) =>
-                {
-                    OnCollectionChanged(NotifyCollectionChangedAction.Add, newItem: ((KeyValuePair<TKey, TValue>)state));
-                    OnPropertyChanged(nameof(Keys));
-                    OnPropertyChanged(nameof(Values));
-                    OnPropertyChanged(nameof(Count));
-                }, st);
-            }
+                OnCollectionChanged(NotifyCollectionChangedAction.Add, newItem: state);
+                OnPropertyChanged(nameof(Keys));
+                OnPropertyChanged(nameof(Values));
+                OnPropertyChanged(nameof(Count));
+            }, st);
         }
 
         /// <summary>
@@ -465,13 +441,13 @@ namespace IX.Observable
 
             var st = new Tuple<KeyValuePair<TKey, TValue>, int>(item, index);
 
-            Task.Run(() =>
+            AsyncPost((state) =>
             {
-                OnCollectionChanged(NotifyCollectionChangedAction.Remove, oldItem: st.Item1, oldIndex: st.Item2);
+                OnCollectionChanged(NotifyCollectionChangedAction.Remove, oldItem: state.Item1, oldIndex: state.Item2);
                 OnPropertyChanged(nameof(Keys));
                 OnPropertyChanged(nameof(Values));
                 OnPropertyChanged(nameof(Count));
-            });
+            }, st);
         }
 
         /// <summary>
@@ -486,12 +462,12 @@ namespace IX.Observable
 
             var st = new Tuple<KeyValuePair<TKey, TValue>, KeyValuePair<TKey, TValue>>(oldItem, newItem);
 
-            Task.Run(() =>
+            AsyncPost((state) =>
             {
-                OnCollectionChanged(NotifyCollectionChangedAction.Replace, oldItem: st.Item1, newItem: st.Item2);
+                OnCollectionChanged(NotifyCollectionChangedAction.Replace, oldItem: state.Item1, newItem: state.Item2);
                 OnPropertyChanged(nameof(Keys));
                 OnPropertyChanged(nameof(Values));
-            });
+            }, st);
         }
 
         /// <summary>
@@ -502,7 +478,7 @@ namespace IX.Observable
             if (CollectionChangedEmpty() && PropertyChangedEmpty())
                 return;
 
-            Task.Run(() =>
+            AsyncPost(() =>
             {
                 OnCollectionChanged();
                 OnPropertyChanged(nameof(Keys));

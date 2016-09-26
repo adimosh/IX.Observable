@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace IX.Observable
 {
@@ -14,7 +15,7 @@ namespace IX.Observable
         /// <summary>
         /// The synchronization context that should be used when posting messages. This field can be null.
         /// </summary>
-        protected SynchronizationContext syncContext;
+        private SynchronizationContext syncContext;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ObservableCollectionBase"/> class.
@@ -153,6 +154,47 @@ namespace IX.Observable
             }
 
             CollectionChanged?.Invoke(this, args);
+        }
+
+        /// <summary>
+        /// Asynchronously defers the execution of a method, either on the synchronization context, or on a new thread.
+        /// </summary>
+        /// <typeparam name="T">The type of the transport object, if any.</typeparam>
+        /// <param name="postAction">The action to post.</param>
+        /// <param name="stateTransport">The object used to do state transportation.</param>
+        protected void AsyncPost<T>(Action<T> postAction, T stateTransport)
+        {
+            if (syncContext == null)
+            {
+                Task.Run(() => postAction(stateTransport));
+            }
+            else
+            {
+                syncContext.Post((state) =>
+                {
+                    var st = (T)state;
+                    postAction(st);
+                }, stateTransport);
+            }
+        }
+
+        /// <summary>
+        /// Asynchronously defers the execution of a method, either on the synchronization context, or on a new thread.
+        /// </summary>
+        /// <param name="postAction">The action to post.</param>
+        protected void AsyncPost(Action postAction)
+        {
+            if (syncContext == null)
+            {
+                Task.Run(postAction);
+            }
+            else
+            {
+                syncContext.Post((state) =>
+                {
+                    postAction();
+                }, null);
+            }
         }
     }
 }

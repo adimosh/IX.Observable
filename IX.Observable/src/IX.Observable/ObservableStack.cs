@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace IX.Observable
 {
@@ -150,7 +149,7 @@ namespace IX.Observable
             if (CollectionChangedEmpty() && PropertyChangedEmpty())
                 return;
 
-            Task.Run(() =>
+            AsyncPost(() =>
             {
                 OnCollectionChanged();
                 OnPropertyChanged(nameof(Count));
@@ -194,11 +193,11 @@ namespace IX.Observable
 
             var st = new Tuple<T, int>(item, internalContainer.Count);
 
-            Task.Run(() =>
+            AsyncPost((state) =>
             {
-                OnCollectionChanged(NotifyCollectionChangedAction.Remove, oldItem: st.Item1, oldIndex: st.Item2);
+                OnCollectionChanged(NotifyCollectionChangedAction.Remove, oldItem: state.Item1, oldIndex: state.Item2);
                 OnPropertyChanged(nameof(Count));
-            });
+            }, st);
 
             return item;
         }
@@ -217,11 +216,11 @@ namespace IX.Observable
         {
             internalContainer.Push(item);
 
-            Task.Run(() =>
+            AsyncPost((state) =>
             {
-                OnCollectionChanged(NotifyCollectionChangedAction.Add, newItem: item);
+                OnCollectionChanged(NotifyCollectionChangedAction.Add, newItem: state);
                 OnPropertyChanged(nameof(Count));
-            });
+            }, item);
         }
 
         /// <summary>

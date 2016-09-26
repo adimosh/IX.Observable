@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace IX.Observable
 {
@@ -138,7 +137,7 @@ namespace IX.Observable
         {
             ClearInternal();
 
-            Task.Run(() =>
+            AsyncPost(() =>
             {
                 OnCollectionChanged();
                 OnPropertyChanged(nameof(Count));
@@ -181,11 +180,11 @@ namespace IX.Observable
         {
             T item = DequeueInternal();
 
-            Task.Run(() =>
+            AsyncPost((state) =>
             {
-                OnCollectionChanged(NotifyCollectionChangedAction.Remove, oldItem: item, oldIndex: 0);
+                OnCollectionChanged(NotifyCollectionChangedAction.Remove, oldItem: state, oldIndex: 0);
                 OnPropertyChanged(nameof(Count));
-            });
+            }, item);
 
             return item;
         }
@@ -207,11 +206,11 @@ namespace IX.Observable
         {
             EnqueueInternal(item);
 
-            Task.Run(() =>
+            AsyncPost((state) =>
             {
-                OnCollectionChanged(NotifyCollectionChangedAction.Add, newItem: item, newIndex: 0);
+                OnCollectionChanged(NotifyCollectionChangedAction.Add, newItem: state, newIndex: 0);
                 OnPropertyChanged(nameof(Count));
-            });
+            }, item);
         }
 
         /// <summary>
