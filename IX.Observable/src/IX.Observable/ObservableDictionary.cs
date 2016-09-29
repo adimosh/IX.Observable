@@ -345,7 +345,6 @@ namespace IX.Observable
         /// <returns><c>true</c> if the removal was successful, <c>false</c> otherwise.</returns>
         public bool Remove(KeyValuePair<TKey, TValue> item)
         {
-            
             if (RemoveInternal(item))
             {
                 BroadcastRemove(item, 0);

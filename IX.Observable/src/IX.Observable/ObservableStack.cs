@@ -20,7 +20,6 @@ namespace IX.Observable
         /// </summary>
         protected Stack<T> internalContainer;
 
-        #region Constructors
         /// <summary>
         /// Initializes a new instance of the <see cref="ObservableStack{T}"/> class.
         /// </summary>
@@ -81,9 +80,7 @@ namespace IX.Observable
         {
             internalContainer = new Stack<T>(collection);
         }
-        #endregion
 
-        #region IReadOnlyCollection
         /// <summary>
         /// The number of elements in the observable stack.
         /// </summary>
@@ -123,23 +120,12 @@ namespace IX.Observable
         /// Gets the enumerator for this collection.
         /// </summary>
         /// <returns>The enumerator.</returns>
-        public virtual IEnumerator<T> GetEnumerator()
-        {
-            return internalContainer.GetEnumerator();
-        }
+        public virtual IEnumerator<T> GetEnumerator() => internalContainer.GetEnumerator();
 
-        void ICollection.CopyTo(Array array, int index)
-        {
-            ((ICollection)internalContainer).CopyTo(array, index);
-        }
+        void ICollection.CopyTo(Array array, int index) => ((ICollection)internalContainer).CopyTo(array, index);
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-        #endregion
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-        #region IStack
         /// <summary>
         /// Clears the observable stack.
         /// </summary>
@@ -174,19 +160,13 @@ namespace IX.Observable
         /// </summary>
         /// <param name="item">The item to check for.</param>
         /// <returns><c>true</c> if the item was found, <c>false</c> otherwise.</returns>
-        public virtual bool Contains(T item)
-        {
-            return internalContainer.Contains(item);
-        }
+        public virtual bool Contains(T item) => internalContainer.Contains(item);
 
         /// <summary>
         /// Peeks in the stack to view the topmost item, without removing it.
         /// </summary>
         /// <returns>The topmost element in the stack, if any.</returns>
-        public virtual T Peek()
-        {
-            return internalContainer.Peek();
-        }
+        public virtual T Peek() => internalContainer.Peek();
 
         /// <summary>
         /// Pops the topmost element from the stack, removing it.
@@ -242,18 +222,11 @@ namespace IX.Observable
         /// Copies all elements of the stack to a new array.
         /// </summary>
         /// <returns>An array containing all items in the stack.</returns>
-        public virtual T[] ToArray()
-        {
-            return internalContainer.ToArray();
-        }
+        public virtual T[] ToArray() => internalContainer.ToArray();
 
         /// <summary>
         /// Sets the capacity to the actual number of elements in the stack if that number is less than 90 percent of current capacity.
         /// </summary>
-        public virtual void TrimExcess()
-        {
-            internalContainer.TrimExcess();
-        }
-        #endregion
+        public virtual void TrimExcess() => internalContainer.TrimExcess();
     }
 }

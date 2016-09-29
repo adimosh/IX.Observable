@@ -20,7 +20,6 @@ namespace IX.Observable
         /// </summary>
         protected Queue<T> internalContainer;
 
-        #region Constructors
         /// <summary>
         /// Initializes a new instance of the <see cref="ObservableQueue{T}"/> class.
         /// </summary>
@@ -81,7 +80,6 @@ namespace IX.Observable
         {
             internalContainer = new Queue<T>(capacity);
         }
-        #endregion
 
         /// <summary>
         /// Gets the number of items currently in the queue.
@@ -103,7 +101,6 @@ namespace IX.Observable
             return internalContainer.GetEnumerator();
         }
 
-        #region Explicit implementations
         bool ICollection.IsSynchronized
         {
             get
@@ -120,16 +117,9 @@ namespace IX.Observable
             }
         }
 
-        void ICollection.CopyTo(Array array, int index)
-        {
-            ((ICollection)internalContainer).CopyTo(array, index);
-        }
+        void ICollection.CopyTo(Array array, int index) => ((ICollection)internalContainer).CopyTo(array, index);
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-        #endregion
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         /// <summary>
         /// Clears the queue of all its objects.
@@ -162,20 +152,14 @@ namespace IX.Observable
         /// </summary>
         /// <param name="item">The item to search for.</param>
         /// <returns><c>true</c> if the queue contains a specific item, <c>false</c> otherwise.</returns>
-        public virtual bool Contains(T item)
-        {
-            return internalContainer.Contains(item);
-        }
+        public virtual bool Contains(T item) => internalContainer.Contains(item);
 
         /// <summary>
         /// Copies the contents of the queue to an array, starting at the specified index.
         /// </summary>
         /// <param name="array">The array to copy the items into.</param>
         /// <param name="arrayIndex">The index at which to start in the array.</param>
-        public virtual void CopyTo(T[] array, int arrayIndex)
-        {
-            internalContainer.CopyTo(array, arrayIndex);
-        }
+        public virtual void CopyTo(T[] array, int arrayIndex) => internalContainer.CopyTo(array, arrayIndex);
 
         /// <summary>
         /// Dequeues and removes an item from the queue.
@@ -199,10 +183,7 @@ namespace IX.Observable
         /// Dequeues and removes an item from the queue (internal overridable procedure).
         /// </summary>
         /// <returns>The dequeued item.</returns>
-        protected virtual T DequeueInternal()
-        {
-            return internalContainer.Dequeue();
-        }
+        protected virtual T DequeueInternal() => internalContainer.Dequeue();
 
         /// <summary>
         /// Enqueues an item into the queue.
@@ -226,35 +207,23 @@ namespace IX.Observable
         /// Enqueues an item into the queue (internal overridable procedure).
         /// </summary>
         /// <param name="item">The item to enqueue.</param>
-        protected virtual void EnqueueInternal(T item)
-        {
-            internalContainer.Enqueue(item);
-        }
+        protected virtual void EnqueueInternal(T item) => internalContainer.Enqueue(item);
 
         /// <summary>
         /// Peeks at the topmost item in the queue without dequeueing it.
         /// </summary>
         /// <returns>The topmost item in the queue.</returns>
-        public virtual T Peek()
-        {
-            return internalContainer.Peek();
-        }
+        public virtual T Peek() => internalContainer.Peek();
 
         /// <summary>
         /// Copies the items of the queue into a new array.
         /// </summary>
         /// <returns>An array of items that are contained in the queue.</returns>
-        public virtual T[] ToArray()
-        {
-            return internalContainer.ToArray();
-        }
+        public virtual T[] ToArray() => internalContainer.ToArray();
 
         /// <summary>
         /// Sets the capacity to the actual number of elements in the <see cref="ObservableQueue{T}"/>, if that number is less than 90 percent of current capacity.
         /// </summary>
-        public virtual void TrimExcess()
-        {
-            internalContainer.TrimExcess();
-        }
+        public virtual void TrimExcess() => internalContainer.TrimExcess();
     }
 }

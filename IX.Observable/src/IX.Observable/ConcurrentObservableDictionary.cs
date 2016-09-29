@@ -16,7 +16,8 @@ namespace IX.Observable
         private readonly ReaderWriterLockSlim locker = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
         private readonly TimeSpan timeout = TimeSpan.FromMilliseconds(100);
 
-        #region Constructors
+        private bool disposedValue = false; // To detect redundant calls
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ConcurrentObservableDictionary{TKey, TValue}" /> class.
         /// </summary>
@@ -132,10 +133,6 @@ namespace IX.Observable
             : base(context, dictionary, comparer)
         {
         }
-        #endregion
-
-        #region IDisposable Support
-        private bool disposedValue = false; // To detect redundant calls
 
         /// <summary>
         /// Disposes the current instance of the <see cref="ConcurrentObservableDictionary{TKey, TValue}"/> class.
@@ -176,7 +173,6 @@ namespace IX.Observable
             // TODO: uncomment the following line if the finalizer is overridden above.
             // GC.SuppressFinalize(this);
         }
-        #endregion
 
         /// <summary>
         /// Attempts to fetch a value for a specific key in a thread-safe manner, indicating whether it has been found or not.
@@ -390,7 +386,7 @@ namespace IX.Observable
                 }
                 finally
                 {
-                    locker.ExitWriteLock();
+                    locker.ExitReadLock();
                 }
             }
 

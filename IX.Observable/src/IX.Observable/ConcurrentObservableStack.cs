@@ -15,7 +15,6 @@ namespace IX.Observable
         private readonly ReaderWriterLockSlim locker = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
         private readonly TimeSpan timeout = TimeSpan.FromMilliseconds(100);
 
-        #region Constructors
         /// <summary>
         /// Initializes a new instance of the <see cref="Stack{T}"/> class.
         /// </summary>
@@ -70,9 +69,7 @@ namespace IX.Observable
             : base(context, collection)
         {
         }
-        #endregion
 
-        #region IDisposable Support
         private bool disposedValue = false; // To detect redundant calls
 
         /// <summary>
@@ -114,7 +111,6 @@ namespace IX.Observable
             // TODO: uncomment the following line if the finalizer is overridden above.
             // GC.SuppressFinalize(this);
         }
-        #endregion
 
         /// <summary>
         /// Checks whether or not a certain item is in the stack.
