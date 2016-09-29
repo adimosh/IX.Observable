@@ -171,7 +171,7 @@ namespace IX.Observable
                 {
                     internalContainer[key] = value;
 
-                    BroadcastChange(new KeyValuePair<TKey, TValue>(key, val), new KeyValuePair<TKey, TValue>(key, value), 0);
+                    BroadcastChange(new KeyValuePair<TKey, TValue>(key, val), new KeyValuePair<TKey, TValue>(key, value));
                 }
                 else
                 {
@@ -324,10 +324,8 @@ namespace IX.Observable
         /// </summary>
         /// <param name="array">The array to copy elements into.</param>
         /// <param name="arrayIndex">The index at which to start copying items.</param>
-        void ICollection<KeyValuePair<TKey, TValue>>.CopyTo(KeyValuePair<TKey, TValue>[] array, int arrayIndex)
-        {
-            ((ICollection<KeyValuePair<TKey, TValue>>)internalContainer).CopyTo(array, arrayIndex);
-        }
+        public virtual void CopyTo(KeyValuePair<TKey, TValue>[] array, int arrayIndex)
+            => ((ICollection<KeyValuePair<TKey, TValue>>)internalContainer).CopyTo(array, arrayIndex);
 
         /// <summary>
         /// Gets the enumerator for this collection.
@@ -458,20 +456,23 @@ namespace IX.Observable
         /// </summary>
         /// <param name="oldItem">The old item.</param>
         /// <param name="newItem">The new item.</param>
-        /// <param name="index">The index of the change.</param>
-        protected void BroadcastChange(KeyValuePair<TKey, TValue> oldItem, KeyValuePair<TKey, TValue> newItem, int index)
+        protected void BroadcastChange(KeyValuePair<TKey, TValue> oldItem, KeyValuePair<TKey, TValue> newItem)
         {
             if (CollectionChangedEmpty() && PropertyChangedEmpty())
                 return;
 
-            var st = new Tuple<KeyValuePair<TKey, TValue>, KeyValuePair<TKey, TValue>, int>(oldItem, newItem, index);
+            var st = new Tuple<KeyValuePair<TKey, TValue>, KeyValuePair<TKey, TValue>>(oldItem, newItem);
 
             AsyncPost((state) =>
             {
                 OnPropertyChanged(nameof(Keys));
                 OnPropertyChanged(nameof(Values));
                 OnPropertyChanged("Item[]");
-                OnCollectionChanged(NotifyCollectionChangedAction.Replace, oldItem: state.Item1, newItem: state.Item2, newIndex: state.Item3);
+
+                var array = new KeyValuePair<TKey, TValue>[Count];
+                CopyTo(array, 0);
+
+                OnCollectionChanged(NotifyCollectionChangedAction.Replace, oldItem: state.Item1, newItem: state.Item2, newIndex: array.ToList().IndexOf(newItem));
             }, st);
         }
 

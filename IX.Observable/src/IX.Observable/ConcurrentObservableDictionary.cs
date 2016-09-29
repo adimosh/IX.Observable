@@ -323,7 +323,7 @@ namespace IX.Observable
         /// </summary>
         /// <param name="array">The array to copy elements into.</param>
         /// <param name="arrayIndex">The index at which to start copying items.</param>
-        void ICollection<KeyValuePair<TKey, TValue>>.CopyTo(KeyValuePair<TKey, TValue>[] array, int arrayIndex)
+        public override void CopyTo(KeyValuePair<TKey, TValue>[] array, int arrayIndex)
         {
             if (disposedValue)
                 throw new ObjectDisposedException(nameof(ConcurrentObservableDictionary<TKey, TValue>));
@@ -332,7 +332,7 @@ namespace IX.Observable
             {
                 try
                 {
-                    ((ICollection<KeyValuePair<TKey, TValue>>)internalContainer).CopyTo(array, arrayIndex);
+                    base.CopyTo(array, arrayIndex);
                 }
                 finally
                 {
@@ -564,7 +564,7 @@ namespace IX.Observable
                             else
                                 throw new TimeoutException();
 
-                            BroadcastChange(new KeyValuePair<TKey, TValue>(key, val), new KeyValuePair<TKey, TValue>(key, value), 0);
+                            BroadcastChange(new KeyValuePair<TKey, TValue>(key, val), new KeyValuePair<TKey, TValue>(key, value));
                         }
                         else
                         {
