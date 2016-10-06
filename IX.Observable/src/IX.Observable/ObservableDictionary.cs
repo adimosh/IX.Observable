@@ -15,6 +15,7 @@ namespace IX.Observable
     /// <typeparam name="TKey">The data key type.</typeparam>
     /// <typeparam name="TValue">The data value type.</typeparam>
     [DebuggerDisplay("Count = {Count}")]
+    [DebuggerTypeProxy(typeof(DictionaryDebugView<,>))]
     public class ObservableDictionary<TKey, TValue> : ObservableCollectionBase, IDictionary<TKey, TValue>, IReadOnlyDictionary<TKey, TValue>
     {
         /// <summary>
@@ -22,7 +23,6 @@ namespace IX.Observable
         /// </summary>
         protected internal Dictionary<TKey, TValue> internalContainer;
 
-        #region Constructors
         /// <summary>
         /// Initializes a new instance of the <see cref="ObservableDictionary{TKey, TValue}" /> class.
         /// </summary>
@@ -150,9 +150,7 @@ namespace IX.Observable
         {
             internalContainer = new Dictionary<TKey, TValue>(dictionary, comparer);
         }
-        #endregion
 
-        #region IDictionary
         /// <summary>
         /// Gets or sets the value associated with a specific key.
         /// </summary>
@@ -405,9 +403,7 @@ namespace IX.Observable
         {
             return GetEnumerator();
         }
-        #endregion
 
-        #region Utility
         /// <summary>
         /// Broadcasts an &quot;add&quot; change.
         /// </summary>
@@ -472,7 +468,11 @@ namespace IX.Observable
                 var array = new KeyValuePair<TKey, TValue>[Count];
                 CopyTo(array, 0);
 
-                OnCollectionChanged(NotifyCollectionChangedAction.Replace, oldItem: state.Item1, newItem: state.Item2, newIndex: array.ToList().IndexOf(newItem));
+                int index = Array.IndexOf(array, state.Item2);
+                if (index != -1)
+                {
+                    OnCollectionChanged(NotifyCollectionChangedAction.Replace, oldItem: state.Item1, newItem: state.Item2, newIndex: index);
+                }
             }, st);
         }
 
@@ -493,6 +493,38 @@ namespace IX.Observable
                 OnCollectionChanged();
             });
         }
-        #endregion
+    }
+    internal sealed class DictionaryDebugView<TKey, TValue>
+    {
+        private readonly ObservableDictionary<TKey, TValue> dict;
+
+        public DictionaryDebugView(ObservableDictionary<TKey, TValue> dictionary)
+        {
+            if (dictionary == null)
+                throw new ArgumentNullException(nameof(dictionary));
+
+            dict = dictionary;
+        }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
+        public KVP<TKey, TValue>[] Items
+        {
+            get
+            {
+                KeyValuePair<TKey, TValue>[] items = new KeyValuePair<TKey, TValue>[dict.internalContainer.Count];
+                ((ICollection<KeyValuePair<TKey, TValue>>)dict.internalContainer).CopyTo(items, 0);
+                return items.Select(p => new KVP<TKey, TValue> { Key = p.Key, Value = p.Value }).ToArray();
+            }
+        }
+    }
+
+    [DebuggerDisplay("[{Key}] = \"{Value}\"")]
+    internal sealed class KVP<TKey, TValue>
+    {
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        public TKey Key { get; internal set; }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        public TValue Value { get; internal set; }
     }
 }

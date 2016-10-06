@@ -113,7 +113,14 @@ namespace IX.Observable
                     break;
             }
 
-            CollectionChanged?.Invoke(this, args);
+            try
+            {
+                CollectionChanged?.Invoke(this, args);
+            }
+            catch (Exception ex)
+            {
+                ExceptionOccurredWhileNotifying?.Invoke(this, new ExceptionOccurredEventArgs(ex));
+            }
         }
 
         /// <summary>
@@ -153,8 +160,25 @@ namespace IX.Observable
                     break;
             }
 
-            CollectionChanged?.Invoke(this, args);
+            try
+            {
+                CollectionChanged?.Invoke(this, args);
+            }
+            catch (Exception ex)
+            {
+                try
+                {
+                    ExceptionOccurredWhileNotifying?.Invoke(this, new ExceptionOccurredEventArgs(ex));
+                }
+                catch
+                { }
+            }
         }
+
+        /// <summary>
+        /// Triggered when an exception has occurred during a <see cref="CollectionChanged"/> event is invoked.
+        /// </summary>
+        public event EventHandler<ExceptionOccurredEventArgs> ExceptionOccurredWhileNotifying;
 
         /// <summary>
         /// Asynchronously defers the execution of a method, either on the synchronization context, or on a new thread.

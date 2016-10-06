@@ -12,6 +12,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "IX.Observable", "src\IX.Observable\IX.Observable.xproj", "{E5672090-831E-4CEC-BBB7-E787C40A1212}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{F48DDC47-78C6-409E-9575-45FEDE0DBDD3}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "IX.Observable.UnitTests", "test\IX.Observable.UnitTests\IX.Observable.UnitTests.xproj", "{498A1813-BB19-426F-BA2A-13B411B0E69D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -22,11 +26,16 @@ Global
 		{E5672090-831E-4CEC-BBB7-E787C40A1212}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E5672090-831E-4CEC-BBB7-E787C40A1212}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E5672090-831E-4CEC-BBB7-E787C40A1212}.Release|Any CPU.Build.0 = Release|Any CPU
+		{498A1813-BB19-426F-BA2A-13B411B0E69D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{498A1813-BB19-426F-BA2A-13B411B0E69D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{498A1813-BB19-426F-BA2A-13B411B0E69D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{498A1813-BB19-426F-BA2A-13B411B0E69D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{E5672090-831E-4CEC-BBB7-E787C40A1212} = {0F5A1DD8-8CE5-456B-83AA-C4C30A092728}
+		{498A1813-BB19-426F-BA2A-13B411B0E69D} = {F48DDC47-78C6-409E-9575-45FEDE0DBDD3}
 	EndGlobalSection
 EndGlobal

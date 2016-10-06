@@ -13,12 +13,13 @@ namespace IX.Observable
     /// </summary>
     /// <typeparam name="T">The type of elements in the stack.</typeparam>
     [DebuggerDisplay("Count = {Count}")]
+    [DebuggerTypeProxy(typeof(StackDebugView<>))]
     public class ObservableStack<T> : ObservableCollectionBase, IStack<T>, IReadOnlyCollection<T>, ICollection
     {
         /// <summary>
         /// The data container for the observable stack.
         /// </summary>
-        protected Stack<T> internalContainer;
+        protected internal Stack<T> internalContainer;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ObservableStack{T}"/> class.
@@ -228,5 +229,29 @@ namespace IX.Observable
         /// Sets the capacity to the actual number of elements in the stack if that number is less than 90 percent of current capacity.
         /// </summary>
         public virtual void TrimExcess() => internalContainer.TrimExcess();
+    }
+
+    internal sealed class StackDebugView<T>
+    {
+        private readonly ObservableStack<T> stack;
+
+        public StackDebugView(ObservableStack<T> stack)
+        {
+            if (stack == null)
+                throw new ArgumentNullException(nameof(stack));
+
+            this.stack = stack;
+        }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
+        public T[] Items
+        {
+            get
+            {
+                T[] items = new T[stack.internalContainer.Count];
+                stack.internalContainer.CopyTo(items, 0);
+                return items;
+            }
+        }
     }
 }

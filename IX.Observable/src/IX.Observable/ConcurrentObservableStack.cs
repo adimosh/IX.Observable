@@ -10,6 +10,7 @@ namespace IX.Observable
     /// </summary>
     /// <typeparam name="T">The type of elements in the stack.</typeparam>
     [DebuggerDisplay("Count = {Count}")]
+    [DebuggerTypeProxy(typeof(StackDebugView<>))]
     public class ConcurrentObservableStack<T> : ObservableStack<T>, IDisposable
     {
         private readonly ReaderWriterLockSlim locker = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);

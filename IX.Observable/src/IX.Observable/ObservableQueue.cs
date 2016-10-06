@@ -13,12 +13,13 @@ namespace IX.Observable
     /// </summary>
     /// <typeparam name="T">The type of items in the queue.</typeparam>
     [DebuggerDisplay("Count = {Count}")]
+    [DebuggerTypeProxy(typeof(QueueDebugView<>))]
     public class ObservableQueue<T> : ObservableCollectionBase, IQueue<T>, IEnumerable<T>, ICollection
     {
         /// <summary>
         /// The data container of the observable queue.
         /// </summary>
-        protected Queue<T> internalContainer;
+        protected internal Queue<T> internalContainer;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ObservableQueue{T}"/> class.
@@ -225,5 +226,29 @@ namespace IX.Observable
         /// Sets the capacity to the actual number of elements in the <see cref="ObservableQueue{T}"/>, if that number is less than 90 percent of current capacity.
         /// </summary>
         public virtual void TrimExcess() => internalContainer.TrimExcess();
+    }
+
+    internal sealed class QueueDebugView<T>
+    {
+        private readonly ObservableQueue<T> queue;
+
+        public QueueDebugView(ObservableQueue<T> queue)
+        {
+            if (queue == null)
+                throw new ArgumentNullException(nameof(queue));
+
+            this.queue = queue;
+        }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
+        public T[] Items
+        {
+            get
+            {
+                T[] items = new T[queue.internalContainer.Count];
+                queue.internalContainer.CopyTo(items, 0);
+                return items;
+            }
+        }
     }
 }

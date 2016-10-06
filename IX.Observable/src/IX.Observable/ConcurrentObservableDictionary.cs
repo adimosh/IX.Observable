@@ -11,6 +11,7 @@ namespace IX.Observable
     /// <typeparam name="TKey">The data key type.</typeparam>
     /// <typeparam name="TValue">The data value type.</typeparam>
     [DebuggerDisplay("Count = {Count}")]
+    [DebuggerTypeProxy(typeof(DictionaryDebugView<,>))]
     public class ConcurrentObservableDictionary<TKey, TValue> : ObservableDictionary<TKey, TValue>, ICollection<KeyValuePair<TKey, TValue>>, IDisposable
     {
         private readonly ReaderWriterLockSlim locker = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
@@ -147,8 +148,6 @@ namespace IX.Observable
                 {
                     locker.Dispose();
                 }
-
-                // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
 
                 internalContainer.Clear();
                 internalContainer = null;

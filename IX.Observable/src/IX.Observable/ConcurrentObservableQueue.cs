@@ -10,6 +10,7 @@ namespace IX.Observable
     /// </summary>
     /// <typeparam name="T">The type of items in the queue.</typeparam>
     [DebuggerDisplay("Count = {Count}")]
+    [DebuggerTypeProxy(typeof(QueueDebugView<>))]
     public class ConcurrentObservableQueue<T> : ObservableQueue<T>, IDisposable
     {
         private readonly ReaderWriterLockSlim locker = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
