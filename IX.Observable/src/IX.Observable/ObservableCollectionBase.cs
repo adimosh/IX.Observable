@@ -32,6 +32,16 @@ namespace IX.Observable
         public event PropertyChangedEventHandler PropertyChanged;
 
         /// <summary>
+        /// Triggers when there is a change in the collection.
+        /// </summary>
+        public event NotifyCollectionChangedEventHandler CollectionChanged;
+
+        /// <summary>
+        /// Triggered when an exception has occurred during a <see cref="CollectionChanged"/> or <see cref="PropertyChanged"/> event invocation.
+        /// </summary>
+        public event EventHandler<ExceptionOccurredEventArgs> ExceptionOccurredWhileNotifying;
+
+        /// <summary>
         /// Determines whether or not there are listeners to the <see cref="PropertyChanged"/> event.
         /// </summary>
         /// <returns><c>true</c> if there are no listeners, <c>false</c> otherwise.</returns>
@@ -51,11 +61,6 @@ namespace IX.Observable
 
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-
-        /// <summary>
-        /// Triggers when there is a change in the collection.
-        /// </summary>
-        public event NotifyCollectionChangedEventHandler CollectionChanged;
 
         /// <summary>
         /// Determines whether or not there are listeners to the <see cref="CollectionChanged"/> event.
@@ -119,7 +124,12 @@ namespace IX.Observable
             }
             catch (Exception ex)
             {
-                ExceptionOccurredWhileNotifying?.Invoke(this, new ExceptionOccurredEventArgs(ex));
+                try
+                {
+                    ExceptionOccurredWhileNotifying?.Invoke(this, new ExceptionOccurredEventArgs(ex));
+                }
+                catch
+                { }
             }
         }
 
@@ -174,11 +184,6 @@ namespace IX.Observable
                 { }
             }
         }
-
-        /// <summary>
-        /// Triggered when an exception has occurred during a <see cref="CollectionChanged"/> event is invoked.
-        /// </summary>
-        public event EventHandler<ExceptionOccurredEventArgs> ExceptionOccurredWhileNotifying;
 
         /// <summary>
         /// Asynchronously defers the execution of a method, either on the synchronization context, or on a new thread.
