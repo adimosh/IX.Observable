@@ -1,4 +1,8 @@
-﻿using System;
+﻿// <copyright file="ConcurrentObservableStack.cs" company="Adrian Mos">
+// Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
+// </copyright>
+
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
@@ -15,9 +19,10 @@ namespace IX.Observable
     {
         private readonly ReaderWriterLockSlim locker = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
         private readonly TimeSpan timeout = TimeSpan.FromMilliseconds(100);
+        private bool disposedValue = false; // To detect redundant calls
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Stack{T}"/> class.
+        /// Initializes a new instance of the <see cref="ConcurrentObservableStack{T}"/> class.
         /// </summary>
         public ConcurrentObservableStack()
             : base()
@@ -25,7 +30,7 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Stack{T}"/> class.
+        /// Initializes a new instance of the <see cref="ConcurrentObservableStack{T}"/> class.
         /// </summary>
         /// <param name="capacity">The initial capacity of the stack.</param>
         public ConcurrentObservableStack(int capacity)
@@ -34,7 +39,7 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Stack{T}"/> class.
+        /// Initializes a new instance of the <see cref="ConcurrentObservableStack{T}"/> class.
         /// </summary>
         /// <param name="collection">A collection of items to copy into the stack.</param>
         public ConcurrentObservableStack(IEnumerable<T> collection)
@@ -43,7 +48,7 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Stack{T}"/> class.
+        /// Initializes a new instance of the <see cref="ConcurrentObservableStack{T}"/> class.
         /// </summary>
         /// <param name="context">The synchronization context top use when posting observable messages.</param>
         public ConcurrentObservableStack(SynchronizationContext context)
@@ -52,7 +57,7 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Stack{T}"/> class.
+        /// Initializes a new instance of the <see cref="ConcurrentObservableStack{T}"/> class.
         /// </summary>
         /// <param name="context">The synchronization context top use when posting observable messages.</param>
         /// <param name="capacity">The initial capacity of the stack.</param>
@@ -62,7 +67,7 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Stack{T}"/> class.
+        /// Initializes a new instance of the <see cref="ConcurrentObservableStack{T}"/> class.
         /// </summary>
         /// <param name="context">The synchronization context top use when posting observable messages.</param>
         /// <param name="collection">A collection of items to copy into the stack.</param>
@@ -71,46 +76,46 @@ namespace IX.Observable
         {
         }
 
-        private bool disposedValue = false; // To detect redundant calls
-
         /// <summary>
-        /// Disposes the current instance of the <see cref="ConcurrentObservableDictionary{TKey, TValue}"/> class.
+        /// Finalizes an instance of the <see cref="ConcurrentObservableStack{T}"/> class.
         /// </summary>
-        /// <param name="disposing"><c>true</c> for normal disposal, where normal operation should dispose sub-objects,
-        /// <c>false</c> for a GC disposal without the normal pattern.</param>
-        protected virtual void Dispose(bool disposing)
+        ~ConcurrentObservableStack()
         {
-            if (!disposedValue)
-            {
-                if (disposing)
-                {
-                    locker.Dispose();
-                }
-
-                // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
-
-                internalContainer.Clear();
-                internalContainer = null;
-
-                disposedValue = true;
-            }
+            // Do not change this code. Put cleanup code in Dispose(bool disposing).
+            this.Dispose(false);
         }
 
-        // TODO: override a finalizer only if Dispose(bool disposing) above has code to free unmanaged resources.
-        // ~ConcurrentObservableStack() {
-        //   // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
-        //   Dispose(false);
-        // }
+        /// <summary>
+        /// Gets the number of elements in the observable stack.
+        /// </summary>
+        public override int Count
+        {
+            get
+            {
+                if (this.locker.TryEnterReadLock(this.timeout))
+                {
+                    try
+                    {
+                        return this.internalContainer.Count;
+                    }
+                    finally
+                    {
+                        this.locker.ExitReadLock();
+                    }
+                }
+
+                throw new TimeoutException();
+            }
+        }
 
         /// <summary>
         /// Disposes the current instance of the <see cref="ConcurrentObservableDictionary{TKey, TValue}"/> class.
         /// </summary>
         public void Dispose()
         {
-            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
-            Dispose(true);
-            // TODO: uncomment the following line if the finalizer is overridden above.
-            // GC.SuppressFinalize(this);
+            // Do not change this code. Put cleanup code in Dispose(bool disposing).
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         /// <summary>
@@ -120,42 +125,19 @@ namespace IX.Observable
         /// <returns><c>true</c> if the item was found, <c>false</c> otherwise.</returns>
         public override bool Contains(T item)
         {
-            if (locker.TryEnterReadLock(timeout))
+            if (this.locker.TryEnterReadLock(this.timeout))
             {
                 try
                 {
-                    return internalContainer.Contains(item);
+                    return this.internalContainer.Contains(item);
                 }
                 finally
                 {
-                    locker.ExitReadLock();
+                    this.locker.ExitReadLock();
                 }
             }
 
             throw new TimeoutException();
-        }
-
-        /// <summary>
-        /// The number of elements in the observable stack.
-        /// </summary>
-        public override int Count
-        {
-            get
-            {
-                if (locker.TryEnterReadLock(timeout))
-                {
-                    try
-                    {
-                        return internalContainer.Count;
-                    }
-                    finally
-                    {
-                        locker.ExitReadLock();
-                    }
-                }
-
-                throw new TimeoutException();
-            }
         }
 
         /// <summary>
@@ -166,20 +148,21 @@ namespace IX.Observable
         {
             T[] array;
 
-            if (locker.TryEnterReadLock(timeout))
+            if (this.locker.TryEnterReadLock(this.timeout))
             {
                 try
                 {
-                    array = internalContainer.ToArray();
-
+                    array = this.internalContainer.ToArray();
                 }
                 finally
                 {
-                    locker.ExitReadLock();
+                    this.locker.ExitReadLock();
                 }
             }
             else
+            {
                 throw new TimeoutException();
+            }
 
             foreach (T item in array)
             {
@@ -195,19 +178,21 @@ namespace IX.Observable
         /// <returns>An array containing all items in the stack.</returns>
         public override T[] ToArray()
         {
-            if (locker.TryEnterReadLock(timeout))
+            if (this.locker.TryEnterReadLock(this.timeout))
             {
                 try
                 {
-                    return internalContainer.ToArray();
+                    return this.internalContainer.ToArray();
                 }
                 finally
                 {
-                    locker.ExitReadLock();
+                    this.locker.ExitReadLock();
                 }
             }
             else
+            {
                 throw new TimeoutException();
+            }
         }
 
         /// <summary>
@@ -216,19 +201,43 @@ namespace IX.Observable
         /// <returns>The topmost element in the stack, if any.</returns>
         public override T Peek()
         {
-            if (locker.TryEnterReadLock(timeout))
+            if (this.locker.TryEnterReadLock(this.timeout))
             {
                 try
                 {
-                    return internalContainer.Peek();
+                    return this.internalContainer.Peek();
                 }
                 finally
                 {
-                    locker.ExitReadLock();
+                    this.locker.ExitReadLock();
                 }
             }
             else
+            {
                 throw new TimeoutException();
+            }
+        }
+
+        /// <summary>
+        /// Sets the capacity to the actual number of elements in the stack if that number is less than 90 percent of current capacity.
+        /// </summary>
+        public override void TrimExcess()
+        {
+            if (this.locker.TryEnterUpgradeableReadLock(this.timeout))
+            {
+                try
+                {
+                    this.internalContainer.TrimExcess();
+                }
+                finally
+                {
+                    this.locker.ExitUpgradeableReadLock();
+                }
+            }
+            else
+            {
+                throw new TimeoutException();
+            }
         }
 
         /// <summary>
@@ -237,19 +246,42 @@ namespace IX.Observable
         /// <returns>The topmost element in the stack, if any.</returns>
         protected override T PopInternal()
         {
-            if (locker.TryEnterWriteLock(timeout))
+            if (this.locker.TryEnterWriteLock(this.timeout))
             {
                 try
                 {
-                    return internalContainer.Pop();
+                    return this.internalContainer.Pop();
                 }
                 finally
                 {
-                    locker.ExitWriteLock();
+                    this.locker.ExitWriteLock();
                 }
             }
             else
+            {
                 throw new TimeoutException();
+            }
+        }
+
+        /// <summary>
+        /// Disposes the current instance of the <see cref="ConcurrentObservableDictionary{TKey, TValue}"/> class.
+        /// </summary>
+        /// <param name="disposing"><c>true</c> for normal disposal, where normal operation should dispose sub-objects,
+        /// <c>false</c> for a GC disposal without the normal pattern.</param>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!this.disposedValue)
+            {
+                if (disposing)
+                {
+                    this.locker.Dispose();
+                }
+
+                this.internalContainer.Clear();
+                this.internalContainer = null;
+
+                this.disposedValue = true;
+            }
         }
 
         /// <summary>
@@ -258,39 +290,21 @@ namespace IX.Observable
         /// <param name="item">The item to push.</param>
         protected override void PushInternal(T item)
         {
-            if (locker.TryEnterWriteLock(timeout))
+            if (this.locker.TryEnterWriteLock(this.timeout))
             {
                 try
                 {
-                    internalContainer.Push(item);
+                    this.internalContainer.Push(item);
                 }
                 finally
                 {
-                    locker.ExitWriteLock();
+                    this.locker.ExitWriteLock();
                 }
             }
             else
-                throw new TimeoutException();
-        }
-
-        /// <summary>
-        /// Sets the capacity to the actual number of elements in the stack if that number is less than 90 percent of current capacity.
-        /// </summary>
-        public override void TrimExcess()
-        {
-            if (locker.TryEnterUpgradeableReadLock(timeout))
             {
-                try
-                {
-                    internalContainer.TrimExcess();
-                }
-                finally
-                {
-                    locker.ExitUpgradeableReadLock();
-                }
-            }
-            else
                 throw new TimeoutException();
+            }
         }
     }
 }

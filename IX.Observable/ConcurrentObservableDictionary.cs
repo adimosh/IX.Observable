@@ -1,4 +1,8 @@
-﻿using System;
+﻿// <copyright file="ConcurrentObservableDictionary.cs" company="Adrian Mos">
+// Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
+// </copyright>
+
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
@@ -136,41 +140,22 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Disposes the current instance of the <see cref="ConcurrentObservableDictionary{TKey, TValue}"/> class.
+        /// Finalizes an instance of the <see cref="ConcurrentObservableDictionary{TKey, TValue}"/> class.
         /// </summary>
-        /// <param name="disposing"><c>true</c> for normal disposal, where normal operation should dispose sub-objects,
-        /// <c>false</c> for a GC disposal without the normal pattern.</param>
-        protected virtual void Dispose(bool disposing)
+        ~ConcurrentObservableDictionary()
         {
-            if (!disposedValue)
-            {
-                if (disposing)
-                {
-                    locker.Dispose();
-                }
-
-                internalContainer.Clear();
-                internalContainer = null;
-
-                disposedValue = true;
-            }
+            // Do not change this code. Put cleanup code in Dispose(bool disposing).
+            this.Dispose(false);
         }
-
-        // TODO: override a finalizer only if Dispose(bool disposing) above has code to free unmanaged resources.
-        // ~ConcurrentObservableDictionary() {
-        //   // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
-        //   Dispose(false);
-        // }
 
         /// <summary>
         /// Disposes the current instance of the <see cref="ConcurrentObservableDictionary{TKey, TValue}"/> class.
         /// </summary>
         public void Dispose()
         {
-            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
-            Dispose(true);
-            // TODO: uncomment the following line if the finalizer is overridden above.
-            // GC.SuppressFinalize(this);
+            // Do not change this code. Put cleanup code in Dispose(bool disposing).
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         /// <summary>
@@ -181,10 +166,12 @@ namespace IX.Observable
         /// <returns><c>true</c> if the value was successfully fetched, <c>false</c> otherwise.</returns>
         public override bool TryGetValue(TKey key, out TValue value)
         {
-            if (disposedValue)
+            if (this.disposedValue)
+            {
                 throw new ObjectDisposedException(nameof(ConcurrentObservableDictionary<TKey, TValue>));
+            }
 
-            if (locker.TryEnterReadLock(timeout))
+            if (this.locker.TryEnterReadLock(this.timeout))
             {
                 try
                 {
@@ -192,7 +179,7 @@ namespace IX.Observable
                 }
                 finally
                 {
-                    locker.ExitReadLock();
+                    this.locker.ExitReadLock();
                 }
             }
 
@@ -205,116 +192,34 @@ namespace IX.Observable
         /// <returns>An enumerator of key/value pairs.</returns>
         public override IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
         {
-            if (disposedValue)
+            if (this.disposedValue)
+            {
                 throw new ObjectDisposedException(nameof(ConcurrentObservableDictionary<TKey, TValue>));
+            }
 
-            if (!locker.TryEnterReadLock(timeout))
+            if (!this.locker.TryEnterReadLock(this.timeout))
+            {
                 throw new TimeoutException();
+            }
 
             KeyValuePair<TKey, TValue>[] array;
 
             try
             {
-                array = new KeyValuePair<TKey, TValue>[internalContainer.Count];
-                ((ICollection<KeyValuePair<TKey, TValue>>)internalContainer).CopyTo(array, 0);
+                array = new KeyValuePair<TKey, TValue>[this.internalContainer.Count];
+                ((ICollection<KeyValuePair<TKey, TValue>>)this.internalContainer).CopyTo(array, 0);
             }
             finally
             {
-                locker.ExitReadLock();
+                this.locker.ExitReadLock();
             }
 
             foreach (var kvp in array)
+            {
                 yield return kvp;
+            }
 
             yield break;
-        }
-
-        /// <summary>
-        /// Clears all items from the dictionary (internal overridable procedure).
-        /// </summary>
-        protected override void ClearInternal()
-        {
-            if (disposedValue)
-                throw new ObjectDisposedException(nameof(ConcurrentObservableDictionary<TKey, TValue>));
-
-            if (locker.TryEnterWriteLock(timeout))
-            {
-                try
-                {
-                    base.ClearInternal();
-                }
-                finally
-                {
-                    locker.ExitWriteLock();
-                }
-            }
-            else
-                throw new TimeoutException();
-        }
-
-        /// <summary>
-        /// Attempts to remove all info related to a key from the dictionary (internal overridable procedure).
-        /// </summary>
-        /// <param name="key">The key to remove data from.</param>
-        /// <param name="value">The value that was removed, if any.</param>
-        /// <returns><c>true</c> if the removal was successful, <c>false</c> otherwise.</returns>
-        protected override bool RemoveInternal(TKey key, out TValue value)
-        {
-            if (disposedValue)
-                throw new ObjectDisposedException(nameof(ConcurrentObservableDictionary<TKey, TValue>));
-
-            if (locker.TryEnterUpgradeableReadLock(timeout))
-            {
-                try
-                {
-                    if (!internalContainer.TryGetValue(key, out value))
-                        return false;
-
-                    if (locker.TryEnterWriteLock(timeout))
-                    {
-                        try
-                        {
-                            return internalContainer.Remove(key);
-                        }
-                        finally
-                        {
-                            locker.ExitWriteLock();
-                        }
-                    }
-                }
-                finally
-                {
-                    if (locker.IsUpgradeableReadLockHeld)
-                        locker.ExitUpgradeableReadLock();
-                }
-            }
-
-            throw new TimeoutException();
-        }
-
-        /// <summary>
-        /// Attempts to remove a key/value pair (internal overridable procedure).
-        /// </summary>
-        /// <param name="item">The key/value pair to remove.</param>
-        /// <returns><c>true</c> if the removal was successful, <c>false</c> otherwise.</returns>
-        protected override bool RemoveInternal(KeyValuePair<TKey, TValue> item)
-        {
-            if (disposedValue)
-                throw new ObjectDisposedException(nameof(ConcurrentObservableDictionary<TKey, TValue>));
-
-            if (locker.TryEnterWriteLock(timeout))
-            {
-                try
-                {
-                    return ((ICollection<KeyValuePair<TKey, TValue>>)internalContainer).Remove(item);
-                }
-                finally
-                {
-                    locker.ExitWriteLock();
-                }
-            }
-
-            throw new TimeoutException();
         }
 
         /// <summary>
@@ -324,10 +229,12 @@ namespace IX.Observable
         /// <param name="arrayIndex">The index at which to start copying items.</param>
         public override void CopyTo(KeyValuePair<TKey, TValue>[] array, int arrayIndex)
         {
-            if (disposedValue)
+            if (this.disposedValue)
+            {
                 throw new ObjectDisposedException(nameof(ConcurrentObservableDictionary<TKey, TValue>));
+            }
 
-            if (locker.TryEnterReadLock(timeout))
+            if (this.locker.TryEnterReadLock(this.timeout))
             {
                 try
                 {
@@ -335,11 +242,13 @@ namespace IX.Observable
                 }
                 finally
                 {
-                    locker.ExitReadLock();
+                    this.locker.ExitReadLock();
                 }
             }
             else
+            {
                 throw new TimeoutException();
+            }
         }
 
         /// <summary>
@@ -349,10 +258,12 @@ namespace IX.Observable
         /// <returns><c>true</c> whether a key has been found, <c>false</c> otherwise.</returns>
         public override bool Contains(KeyValuePair<TKey, TValue> item)
         {
-            if (disposedValue)
+            if (this.disposedValue)
+            {
                 throw new ObjectDisposedException(nameof(ConcurrentObservableDictionary<TKey, TValue>));
+            }
 
-            if (locker.TryEnterReadLock(timeout))
+            if (this.locker.TryEnterReadLock(this.timeout))
             {
                 try
                 {
@@ -360,7 +271,7 @@ namespace IX.Observable
                 }
                 finally
                 {
-                    locker.ExitReadLock();
+                    this.locker.ExitReadLock();
                 }
             }
 
@@ -374,10 +285,12 @@ namespace IX.Observable
         /// <returns><c>true</c> whether a key has been found, <c>false</c> otherwise.</returns>
         public override bool ContainsKey(TKey key)
         {
-            if (disposedValue)
+            if (this.disposedValue)
+            {
                 throw new ObjectDisposedException(nameof(ConcurrentObservableDictionary<TKey, TValue>));
+            }
 
-            if (locker.TryEnterReadLock(timeout))
+            if (this.locker.TryEnterReadLock(this.timeout))
             {
                 try
                 {
@@ -385,11 +298,32 @@ namespace IX.Observable
                 }
                 finally
                 {
-                    locker.ExitReadLock();
+                    this.locker.ExitReadLock();
                 }
             }
 
             throw new TimeoutException();
+        }
+
+        /// <summary>
+        /// Disposes the current instance of the <see cref="ConcurrentObservableDictionary{TKey, TValue}"/> class.
+        /// </summary>
+        /// <param name="disposing"><c>true</c> for normal disposal, where normal operation should dispose sub-objects,
+        /// <c>false</c> for a GC disposal without the normal pattern.</param>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!this.disposedValue)
+            {
+                if (disposing)
+                {
+                    this.locker.Dispose();
+                }
+
+                this.internalContainer.Clear();
+                this.internalContainer = null;
+
+                this.disposedValue = true;
+            }
         }
 
         /// <summary>
@@ -399,200 +333,148 @@ namespace IX.Observable
         /// <param name="value">The value.</param>
         protected override void AddInternal(TKey key, TValue value)
         {
-            if (disposedValue)
+            if (this.disposedValue)
+            {
                 throw new ObjectDisposedException(nameof(ConcurrentObservableDictionary<TKey, TValue>));
+            }
 
-            if (locker.TryEnterUpgradeableReadLock(timeout))
+            if (this.locker.TryEnterUpgradeableReadLock(this.timeout))
             {
                 try
                 {
-                    if (internalContainer.ContainsKey(key))
+                    if (this.internalContainer.ContainsKey(key))
+                    {
                         throw new ArgumentException(Resources.DictionaryItemAlreadyExists, nameof(key));
+                    }
 
-                    if (locker.TryEnterWriteLock(timeout))
+                    if (this.locker.TryEnterWriteLock(this.timeout))
                     {
                         try
                         {
-                            internalContainer.Add(key, value);
+                            this.internalContainer.Add(key, value);
                         }
                         finally
                         {
-                            locker.ExitWriteLock();
+                            this.locker.ExitWriteLock();
                         }
                     }
                     else
+                    {
                         throw new TimeoutException();
+                    }
                 }
                 finally
                 {
-                    if (locker.IsUpgradeableReadLockHeld)
-                        locker.ExitUpgradeableReadLock();
+                    if (this.locker.IsUpgradeableReadLockHeld)
+                    {
+                        this.locker.ExitUpgradeableReadLock();
+                    }
                 }
             }
             else
-                throw new TimeoutException();
-        }
-
-        /// <summary>
-        /// Gets the collection of keys in this dictionary.
-        /// </summary>
-        public override ICollection<TKey> Keys
-        {
-            get
             {
-                if (disposedValue)
-                    throw new ObjectDisposedException(nameof(ConcurrentObservableDictionary<TKey, TValue>));
-
-                if (locker.TryEnterReadLock(timeout))
-                {
-                    try
-                    {
-                        return base.Keys;
-                    }
-                    finally
-                    {
-                        locker.ExitReadLock();
-                    }
-                }
-
                 throw new TimeoutException();
             }
         }
 
         /// <summary>
-        /// Gets the collection of values in this dictionary.
+        /// Clears all items from the dictionary (internal overridable procedure).
         /// </summary>
-        public override ICollection<TValue> Values
+        protected override void ClearInternal()
         {
-            get
+            if (this.disposedValue)
             {
-                if (disposedValue)
-                    throw new ObjectDisposedException(nameof(ConcurrentObservableDictionary<TKey, TValue>));
+                throw new ObjectDisposedException(nameof(ConcurrentObservableDictionary<TKey, TValue>));
+            }
 
-                if (locker.TryEnterReadLock(timeout))
+            if (this.locker.TryEnterWriteLock(this.timeout))
+            {
+                try
                 {
-                    try
-                    {
-                        return base.Values;
-                    }
-                    finally
-                    {
-                        locker.ExitReadLock();
-                    }
+                    base.ClearInternal();
                 }
-
+                finally
+                {
+                    this.locker.ExitWriteLock();
+                }
+            }
+            else
+            {
                 throw new TimeoutException();
             }
         }
 
         /// <summary>
-        /// Gets the number of key/value pairs in the dictionary.
+        /// Attempts to remove all info related to a key from the dictionary (internal overridable procedure).
         /// </summary>
-        public override int Count
+        /// <param name="key">The key to remove data from.</param>
+        /// <param name="value">The value that was removed, if any.</param>
+        /// <returns><c>true</c> if the removal was successful, <c>false</c> otherwise.</returns>
+        protected override bool RemoveInternal(TKey key, out TValue value)
         {
-            get
+            if (this.disposedValue)
             {
-                if (disposedValue)
-                    throw new ObjectDisposedException(nameof(ConcurrentObservableDictionary<TKey, TValue>));
-
-                if (locker.TryEnterReadLock(timeout))
-                {
-                    try
-                    {
-                        return base.Count;
-                    }
-                    finally
-                    {
-                        locker.ExitReadLock();
-                    }
-                }
-
-                throw new TimeoutException();
+                throw new ObjectDisposedException(nameof(ConcurrentObservableDictionary<TKey, TValue>));
             }
-        }
 
-        /// <summary>
-        /// Gets or sets the value associated with a specific key.
-        /// </summary>
-        /// <param name="key">The key.</param>
-        /// <returns>The value associated with the specified key.</returns>
-        public override TValue this[TKey key]
-        {
-            get
+            if (this.locker.TryEnterUpgradeableReadLock(this.timeout))
             {
-                if (disposedValue)
-                    throw new ObjectDisposedException(nameof(ConcurrentObservableDictionary<TKey, TValue>));
-
-                if (locker.TryEnterReadLock(timeout))
+                try
                 {
-                    try
+                    if (!this.internalContainer.TryGetValue(key, out value))
                     {
-                        return internalContainer[key];
+                        return false;
                     }
-                    finally
-                    {
-                        locker.ExitReadLock();
-                    }
-                }
 
-                throw new TimeoutException();
-            }
-            set
-            {
-                if (disposedValue)
-                    throw new ObjectDisposedException(nameof(ConcurrentObservableDictionary<TKey, TValue>));
-
-                if (locker.TryEnterUpgradeableReadLock(timeout))
-                {
-                    try
+                    if (this.locker.TryEnterWriteLock(this.timeout))
                     {
-                        TValue val;
-                        if (internalContainer.TryGetValue(key, out val))
+                        try
                         {
-                            if (locker.TryEnterWriteLock(timeout))
-                            {
-                                try
-                                {
-                                    internalContainer[key] = value;
-                                }
-                                finally
-                                {
-                                    locker.ExitWriteLock();
-                                }
-                            }
-                            else
-                                throw new TimeoutException();
-
-                            BroadcastChange(new KeyValuePair<TKey, TValue>(key, val), new KeyValuePair<TKey, TValue>(key, value));
+                            return this.internalContainer.Remove(key);
                         }
-                        else
+                        finally
                         {
-                            if (locker.TryEnterWriteLock(timeout))
-                            {
-                                try
-                                {
-                                    internalContainer.Add(key, value);
-                                }
-                                finally
-                                {
-                                    locker.ExitWriteLock();
-                                }
-                            }
-                            else
-                                throw new TimeoutException();
-
-                            BroadcastAdd(new KeyValuePair<TKey, TValue>(key, value));
+                            this.locker.ExitWriteLock();
                         }
                     }
-                    finally
+                }
+                finally
+                {
+                    if (this.locker.IsUpgradeableReadLockHeld)
                     {
-                        if (locker.IsUpgradeableReadLockHeld)
-                            locker.ExitUpgradeableReadLock();
+                        this.locker.ExitUpgradeableReadLock();
                     }
                 }
-                else
-                    throw new TimeoutException();
             }
+
+            throw new TimeoutException();
+        }
+
+        /// <summary>
+        /// Attempts to remove a key/value pair (internal overridable procedure).
+        /// </summary>
+        /// <param name="item">The key/value pair to remove.</param>
+        /// <returns><c>true</c> if the removal was successful, <c>false</c> otherwise.</returns>
+        protected override bool RemoveInternal(KeyValuePair<TKey, TValue> item)
+        {
+            if (this.disposedValue)
+            {
+                throw new ObjectDisposedException(nameof(ConcurrentObservableDictionary<TKey, TValue>));
+            }
+
+            if (this.locker.TryEnterWriteLock(this.timeout))
+            {
+                try
+                {
+                    return ((ICollection<KeyValuePair<TKey, TValue>>)this.internalContainer).Remove(item);
+                }
+                finally
+                {
+                    this.locker.ExitWriteLock();
+                }
+            }
+
+            throw new TimeoutException();
         }
     }
 }

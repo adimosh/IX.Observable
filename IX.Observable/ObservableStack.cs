@@ -27,7 +27,7 @@ namespace IX.Observable
         public ObservableStack()
             : base(null)
         {
-            internalContainer = new Stack<T>();
+            this.internalContainer = new Stack<T>();
         }
 
         /// <summary>
@@ -37,7 +37,7 @@ namespace IX.Observable
         public ObservableStack(int capacity)
             : base(null)
         {
-            internalContainer = new Stack<T>(capacity);
+            this.internalContainer = new Stack<T>(capacity);
         }
 
         /// <summary>
@@ -47,7 +47,7 @@ namespace IX.Observable
         public ObservableStack(IEnumerable<T> collection)
             : base(null)
         {
-            internalContainer = new Stack<T>(collection);
+            this.internalContainer = new Stack<T>(collection);
         }
 
         /// <summary>
@@ -57,7 +57,7 @@ namespace IX.Observable
         public ObservableStack(SynchronizationContext context)
             : base(context)
         {
-            internalContainer = new Stack<T>();
+            this.internalContainer = new Stack<T>();
         }
 
         /// <summary>
@@ -68,7 +68,7 @@ namespace IX.Observable
         public ObservableStack(SynchronizationContext context, int capacity)
             : base(context)
         {
-            internalContainer = new Stack<T>(capacity);
+            this.internalContainer = new Stack<T>(capacity);
         }
 
         /// <summary>
@@ -79,7 +79,7 @@ namespace IX.Observable
         public ObservableStack(SynchronizationContext context, IEnumerable<T> collection)
             : base(context)
         {
-            internalContainer = new Stack<T>(collection);
+            this.internalContainer = new Stack<T>(collection);
         }
 
         /// <summary>
@@ -89,7 +89,7 @@ namespace IX.Observable
         {
             get
             {
-                return internalContainer.Count;
+                return this.internalContainer.Count;
             }
         }
 
@@ -97,7 +97,7 @@ namespace IX.Observable
         {
             get
             {
-                return Count;
+                return this.Count;
             }
         }
 
@@ -105,7 +105,7 @@ namespace IX.Observable
         {
             get
             {
-                return ((ICollection)internalContainer).IsSynchronized;
+                return ((ICollection)this.internalContainer).IsSynchronized;
             }
         }
 
@@ -113,7 +113,7 @@ namespace IX.Observable
         {
             get
             {
-                return ((ICollection)internalContainer).SyncRoot;
+                return ((ICollection)this.internalContainer).SyncRoot;
             }
         }
 
@@ -121,27 +121,27 @@ namespace IX.Observable
         /// Gets the enumerator for this collection.
         /// </summary>
         /// <returns>The enumerator.</returns>
-        public virtual IEnumerator<T> GetEnumerator() => internalContainer.GetEnumerator();
+        public virtual IEnumerator<T> GetEnumerator() => this.internalContainer.GetEnumerator();
 
-        void ICollection.CopyTo(Array array, int index) => ((ICollection)internalContainer).CopyTo(array, index);
+        void ICollection.CopyTo(Array array, int index) => ((ICollection)this.internalContainer).CopyTo(array, index);
 
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
 
         /// <summary>
         /// Clears the observable stack.
         /// </summary>
         public void Clear()
         {
-            ClearInternal();
+            this.ClearInternal();
 
-            if (CollectionChangedEmpty() && PropertyChangedEmpty())
+            if (this.CollectionChangedEmpty() && this.PropertyChangedEmpty())
                 return;
 
-            AsyncPost(() =>
+            this.AsyncPost(() =>
             {
-                OnPropertyChanged(nameof(Count));
-                OnPropertyChanged("Item[]");
-                OnCollectionChanged();
+                this.OnPropertyChanged(nameof(this.Count));
+                this.OnPropertyChanged("Item[]");
+                this.OnCollectionChanged();
             });
         }
 
@@ -150,8 +150,8 @@ namespace IX.Observable
         /// </summary>
         protected void ClearInternal()
         {
-            var st = internalContainer;
-            internalContainer = new Stack<T>();
+            var st = this.internalContainer;
+            this.internalContainer = new Stack<T>();
 
             Task.Run(() => st.Clear());
         }
@@ -161,13 +161,13 @@ namespace IX.Observable
         /// </summary>
         /// <param name="item">The item to check for.</param>
         /// <returns><c>true</c> if the item was found, <c>false</c> otherwise.</returns>
-        public virtual bool Contains(T item) => internalContainer.Contains(item);
+        public virtual bool Contains(T item) => this.internalContainer.Contains(item);
 
         /// <summary>
         /// Peeks in the stack to view the topmost item, without removing it.
         /// </summary>
         /// <returns>The topmost element in the stack, if any.</returns>
-        public virtual T Peek() => internalContainer.Peek();
+        public virtual T Peek() => this.internalContainer.Peek();
 
         /// <summary>
         /// Pops the topmost element from the stack, removing it.
@@ -175,15 +175,15 @@ namespace IX.Observable
         /// <returns>The topmost element in the stack, if any.</returns>
         public T Pop()
         {
-            T item = PopInternal();
+            T item = this.PopInternal();
 
-            var st = new Tuple<T, int>(item, Count);
+            var st = new Tuple<T, int>(item, this.Count);
 
-            AsyncPost((state) =>
+            this.AsyncPost((state) =>
             {
-                OnPropertyChanged(nameof(Count));
-                OnPropertyChanged("Item[]");
-                OnCollectionChanged(NotifyCollectionChangedAction.Remove, oldItem: state.Item1, oldIndex: state.Item2);
+                this.OnPropertyChanged(nameof(this.Count));
+                this.OnPropertyChanged("Item[]");
+                this.OnCollectionChanged(NotifyCollectionChangedAction.Remove, oldItem: state.Item1, oldIndex: state.Item2);
             }, st);
 
             return item;
@@ -193,7 +193,7 @@ namespace IX.Observable
         /// Pops the topmost element from the stack, removing it (internal overridable procedure).
         /// </summary>
         /// <returns>The topmost element in the stack, if any.</returns>
-        protected virtual T PopInternal() => internalContainer.Pop();
+        protected virtual T PopInternal() => this.internalContainer.Pop();
 
         /// <summary>
         /// Pushes an element to the top of the stack.
@@ -201,15 +201,15 @@ namespace IX.Observable
         /// <param name="item">The item to push.</param>
         public void Push(T item)
         {
-            PushInternal(item);
+            this.PushInternal(item);
 
-            var st = new Tuple<T, int>(item, Count - 1);
+            var st = new Tuple<T, int>(item, this.Count - 1);
 
-            AsyncPost((state) =>
+            this.AsyncPost((state) =>
             {
-                OnPropertyChanged(nameof(Count));
-                OnPropertyChanged("Item[]");
-                OnCollectionChanged(NotifyCollectionChangedAction.Add, newItem: state.Item1, newIndex: state.Item2);
+                this.OnPropertyChanged(nameof(this.Count));
+                this.OnPropertyChanged("Item[]");
+                this.OnCollectionChanged(NotifyCollectionChangedAction.Add, newItem: state.Item1, newIndex: state.Item2);
             }, st);
         }
 
@@ -217,18 +217,18 @@ namespace IX.Observable
         /// Pushes an element to the top of the stack (internal overridable procedure).
         /// </summary>
         /// <param name="item">The item to push.</param>
-        protected virtual void PushInternal(T item) => internalContainer.Push(item);
+        protected virtual void PushInternal(T item) => this.internalContainer.Push(item);
 
         /// <summary>
         /// Copies all elements of the stack to a new array.
         /// </summary>
         /// <returns>An array containing all items in the stack.</returns>
-        public virtual T[] ToArray() => internalContainer.ToArray();
+        public virtual T[] ToArray() => this.internalContainer.ToArray();
 
         /// <summary>
         /// Sets the capacity to the actual number of elements in the stack if that number is less than 90 percent of current capacity.
         /// </summary>
-        public virtual void TrimExcess() => internalContainer.TrimExcess();
+        public virtual void TrimExcess() => this.internalContainer.TrimExcess();
     }
 
     internal sealed class StackDebugView<T>
@@ -248,8 +248,8 @@ namespace IX.Observable
         {
             get
             {
-                T[] items = new T[stack.internalContainer.Count];
-                stack.internalContainer.CopyTo(items, 0);
+                T[] items = new T[this.stack.internalContainer.Count];
+                this.stack.internalContainer.CopyTo(items, 0);
                 return items;
             }
         }

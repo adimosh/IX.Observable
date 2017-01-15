@@ -13,7 +13,7 @@ namespace IX.Observable
         /// <param name="exception">The exception that has occurred.</param>
         public ExceptionOccurredEventArgs(Exception exception)
         {
-            Exception = exception;
+            this.Exception = exception;
         }
 
         /// <summary>

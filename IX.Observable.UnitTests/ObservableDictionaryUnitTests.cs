@@ -10,7 +10,7 @@ namespace IX.Observable.UnitTests
             ObservableDictionary<string, int> x = new ObservableDictionary<string, int>
             {
                 ["aaa"] = 1,
-                ["bbb"] = 2
+                ["bbb"] = 2,
             };
 
             Assert.True(x.Count == 2);

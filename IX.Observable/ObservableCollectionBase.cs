@@ -23,7 +23,7 @@ namespace IX.Observable
         /// <param name="context">The synchronization context to use, if any.</param>
         protected ObservableCollectionBase(SynchronizationContext context)
         {
-            syncContext = context;
+            this.syncContext = context;
         }
 
         /// <summary>
@@ -47,7 +47,7 @@ namespace IX.Observable
         /// <returns><c>true</c> if there are no listeners, <c>false</c> otherwise.</returns>
         protected bool PropertyChangedEmpty()
         {
-            return PropertyChanged == null;
+            return this.PropertyChanged == null;
         }
 
         /// <summary>
@@ -59,7 +59,7 @@ namespace IX.Observable
             if (string.IsNullOrWhiteSpace(propertyName))
                 throw new ArgumentNullException(nameof(propertyName));
 
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         /// <summary>
@@ -68,7 +68,7 @@ namespace IX.Observable
         /// <returns><c>true</c> if there are no listeners, <c>false</c> otherwise.</returns>
         protected bool CollectionChangedEmpty()
         {
-            return CollectionChanged == null;
+            return this.CollectionChanged == null;
         }
 
         /// <summary>
@@ -78,7 +78,7 @@ namespace IX.Observable
         {
             var args = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset);
 
-            CollectionChanged?.Invoke(this, args);
+            this.CollectionChanged?.Invoke(this, args);
         }
 
         /// <summary>
@@ -120,13 +120,13 @@ namespace IX.Observable
 
             try
             {
-                CollectionChanged?.Invoke(this, args);
+                this.CollectionChanged?.Invoke(this, args);
             }
             catch (Exception ex)
             {
                 try
                 {
-                    ExceptionOccurredWhileNotifying?.Invoke(this, new ExceptionOccurredEventArgs(ex));
+                    this.ExceptionOccurredWhileNotifying?.Invoke(this, new ExceptionOccurredEventArgs(ex));
                 }
                 catch
                 { }
@@ -172,13 +172,13 @@ namespace IX.Observable
 
             try
             {
-                CollectionChanged?.Invoke(this, args);
+                this.CollectionChanged?.Invoke(this, args);
             }
             catch (Exception ex)
             {
                 try
                 {
-                    ExceptionOccurredWhileNotifying?.Invoke(this, new ExceptionOccurredEventArgs(ex));
+                    this.ExceptionOccurredWhileNotifying?.Invoke(this, new ExceptionOccurredEventArgs(ex));
                 }
                 catch
                 { }
@@ -193,13 +193,13 @@ namespace IX.Observable
         /// <param name="stateTransport">The object used to do state transportation.</param>
         protected void AsyncPost<T>(Action<T> postAction, T stateTransport)
         {
-            if (syncContext == null)
+            if (this.syncContext == null)
             {
                 Task.Run(() => postAction(stateTransport));
             }
             else
             {
-                syncContext.Post((state) =>
+                this.syncContext.Post((state) =>
                 {
                     var st = (T)state;
                     postAction(st);
@@ -213,13 +213,13 @@ namespace IX.Observable
         /// <param name="postAction">The action to post.</param>
         protected void AsyncPost(Action postAction)
         {
-            if (syncContext == null)
+            if (this.syncContext == null)
             {
                 Task.Run(postAction);
             }
             else
             {
-                syncContext.Post((state) =>
+                this.syncContext.Post((state) =>
                 {
                     postAction();
                 }, null);
