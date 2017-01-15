@@ -1,4 +1,8 @@
-﻿using System;
+﻿// <copyright file="ObservableCollectionBase.cs" company="Adrian Mos">
+// Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
+// </copyright>
+
+using System;
 using System.Collections;
 using System.Collections.Specialized;
 using System.ComponentModel;
@@ -57,7 +61,9 @@ namespace IX.Observable
         protected void OnPropertyChanged(string propertyName)
         {
             if (string.IsNullOrWhiteSpace(propertyName))
+            {
                 throw new ArgumentNullException(nameof(propertyName));
+            }
 
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
@@ -97,9 +103,14 @@ namespace IX.Observable
             {
                 case NotifyCollectionChangedAction.Add:
                     if (newIndex != -1)
+                    {
                         args = new NotifyCollectionChangedEventArgs(action, newItems, newIndex);
+                    }
                     else
+                    {
                         args = new NotifyCollectionChangedEventArgs(action, newItems);
+                    }
+
                     break;
                 case NotifyCollectionChangedAction.Remove:
                     args = new NotifyCollectionChangedEventArgs(action, oldItems, oldIndex);
@@ -112,9 +123,14 @@ namespace IX.Observable
                     break;
                 default:
                     if (newIndex != -1 && oldIndex != -1)
+                    {
                         args = new NotifyCollectionChangedEventArgs(action, oldItems, newIndex, oldIndex);
+                    }
                     else
+                    {
                         args = new NotifyCollectionChangedEventArgs(action);
+                    }
+
                     break;
             }
 
@@ -129,7 +145,8 @@ namespace IX.Observable
                     this.ExceptionOccurredWhileNotifying?.Invoke(this, new ExceptionOccurredEventArgs(ex));
                 }
                 catch
-                { }
+                {
+                }
             }
         }
 
@@ -149,9 +166,14 @@ namespace IX.Observable
             {
                 case NotifyCollectionChangedAction.Add:
                     if (newIndex != -1)
+                    {
                         args = new NotifyCollectionChangedEventArgs(action, newItem, newIndex);
+                    }
                     else
+                    {
                         args = new NotifyCollectionChangedEventArgs(action, newItem);
+                    }
+
                     break;
                 case NotifyCollectionChangedAction.Remove:
                     args = new NotifyCollectionChangedEventArgs(action, oldItem, oldIndex);
@@ -164,9 +186,14 @@ namespace IX.Observable
                     break;
                 default:
                     if (newIndex != -1 && oldIndex != -1)
+                    {
                         args = new NotifyCollectionChangedEventArgs(action, oldItem, newIndex, oldIndex);
+                    }
                     else
+                    {
                         args = new NotifyCollectionChangedEventArgs(action);
+                    }
+
                     break;
             }
 
@@ -181,7 +208,8 @@ namespace IX.Observable
                     this.ExceptionOccurredWhileNotifying?.Invoke(this, new ExceptionOccurredEventArgs(ex));
                 }
                 catch
-                { }
+                {
+                }
             }
         }
 
@@ -199,7 +227,8 @@ namespace IX.Observable
             }
             else
             {
-                this.syncContext.Post((state) =>
+                this.syncContext.Post(
+                    (state) =>
                 {
                     var st = (T)state;
                     postAction(st);
@@ -219,7 +248,8 @@ namespace IX.Observable
             }
             else
             {
-                this.syncContext.Post((state) =>
+                this.syncContext.Post(
+                    (state) =>
                 {
                     postAction();
                 }, null);

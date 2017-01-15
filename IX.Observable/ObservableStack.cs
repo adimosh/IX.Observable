@@ -1,4 +1,8 @@
-﻿using System;
+﻿// <copyright file="ObservableStack.cs" company="Adrian Mos">
+// Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
+// </copyright>
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -16,10 +20,12 @@ namespace IX.Observable
     [DebuggerTypeProxy(typeof(StackDebugView<>))]
     public class ObservableStack<T> : ObservableCollectionBase, IStack<T>, IReadOnlyCollection<T>, ICollection
     {
+#pragma warning disable SA1401 // Fields must be private
         /// <summary>
         /// The data container for the observable stack.
         /// </summary>
-        protected internal Stack<T> internalContainer;
+        protected internal Stack<T> InternalContainer;
+#pragma warning restore SA1401 // Fields must be private
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ObservableStack{T}"/> class.
@@ -27,7 +33,7 @@ namespace IX.Observable
         public ObservableStack()
             : base(null)
         {
-            this.internalContainer = new Stack<T>();
+            this.InternalContainer = new Stack<T>();
         }
 
         /// <summary>
@@ -37,7 +43,7 @@ namespace IX.Observable
         public ObservableStack(int capacity)
             : base(null)
         {
-            this.internalContainer = new Stack<T>(capacity);
+            this.InternalContainer = new Stack<T>(capacity);
         }
 
         /// <summary>
@@ -47,7 +53,7 @@ namespace IX.Observable
         public ObservableStack(IEnumerable<T> collection)
             : base(null)
         {
-            this.internalContainer = new Stack<T>(collection);
+            this.InternalContainer = new Stack<T>(collection);
         }
 
         /// <summary>
@@ -57,7 +63,7 @@ namespace IX.Observable
         public ObservableStack(SynchronizationContext context)
             : base(context)
         {
-            this.internalContainer = new Stack<T>();
+            this.InternalContainer = new Stack<T>();
         }
 
         /// <summary>
@@ -68,7 +74,7 @@ namespace IX.Observable
         public ObservableStack(SynchronizationContext context, int capacity)
             : base(context)
         {
-            this.internalContainer = new Stack<T>(capacity);
+            this.InternalContainer = new Stack<T>(capacity);
         }
 
         /// <summary>
@@ -79,20 +85,23 @@ namespace IX.Observable
         public ObservableStack(SynchronizationContext context, IEnumerable<T> collection)
             : base(context)
         {
-            this.internalContainer = new Stack<T>(collection);
+            this.InternalContainer = new Stack<T>(collection);
         }
 
         /// <summary>
-        /// The number of elements in the observable stack.
+        /// Gets the number of elements in the observable stack.
         /// </summary>
         public virtual int Count
         {
             get
             {
-                return this.internalContainer.Count;
+                return this.InternalContainer.Count;
             }
         }
 
+        /// <summary>
+        /// Gets the number of elements in the observable stack.
+        /// </summary>
         int ICollection.Count
         {
             get
@@ -101,19 +110,21 @@ namespace IX.Observable
             }
         }
 
+        /// <inheritdoc/>
         bool ICollection.IsSynchronized
         {
             get
             {
-                return ((ICollection)this.internalContainer).IsSynchronized;
+                return ((ICollection)this.InternalContainer).IsSynchronized;
             }
         }
 
+        /// <inheritdoc/>
         object ICollection.SyncRoot
         {
             get
             {
-                return ((ICollection)this.internalContainer).SyncRoot;
+                return ((ICollection)this.InternalContainer).SyncRoot;
             }
         }
 
@@ -121,10 +132,12 @@ namespace IX.Observable
         /// Gets the enumerator for this collection.
         /// </summary>
         /// <returns>The enumerator.</returns>
-        public virtual IEnumerator<T> GetEnumerator() => this.internalContainer.GetEnumerator();
+        public virtual IEnumerator<T> GetEnumerator() => this.InternalContainer.GetEnumerator();
 
-        void ICollection.CopyTo(Array array, int index) => ((ICollection)this.internalContainer).CopyTo(array, index);
+        /// <inheritdoc/>
+        void ICollection.CopyTo(Array array, int index) => ((ICollection)this.InternalContainer).CopyTo(array, index);
 
+        /// <inheritdoc/>
         IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
 
         /// <summary>
@@ -135,7 +148,9 @@ namespace IX.Observable
             this.ClearInternal();
 
             if (this.CollectionChangedEmpty() && this.PropertyChangedEmpty())
+            {
                 return;
+            }
 
             this.AsyncPost(() =>
             {
@@ -146,28 +161,17 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Clears the observable stack (internal overridable procedure).
-        /// </summary>
-        protected void ClearInternal()
-        {
-            var st = this.internalContainer;
-            this.internalContainer = new Stack<T>();
-
-            Task.Run(() => st.Clear());
-        }
-
-        /// <summary>
         /// Checks whether or not a certain item is in the stack.
         /// </summary>
         /// <param name="item">The item to check for.</param>
         /// <returns><c>true</c> if the item was found, <c>false</c> otherwise.</returns>
-        public virtual bool Contains(T item) => this.internalContainer.Contains(item);
+        public virtual bool Contains(T item) => this.InternalContainer.Contains(item);
 
         /// <summary>
         /// Peeks in the stack to view the topmost item, without removing it.
         /// </summary>
         /// <returns>The topmost element in the stack, if any.</returns>
-        public virtual T Peek() => this.internalContainer.Peek();
+        public virtual T Peek() => this.InternalContainer.Peek();
 
         /// <summary>
         /// Pops the topmost element from the stack, removing it.
@@ -179,7 +183,8 @@ namespace IX.Observable
 
             var st = new Tuple<T, int>(item, this.Count);
 
-            this.AsyncPost((state) =>
+            this.AsyncPost(
+                (state) =>
             {
                 this.OnPropertyChanged(nameof(this.Count));
                 this.OnPropertyChanged("Item[]");
@@ -188,12 +193,6 @@ namespace IX.Observable
 
             return item;
         }
-
-        /// <summary>
-        /// Pops the topmost element from the stack, removing it (internal overridable procedure).
-        /// </summary>
-        /// <returns>The topmost element in the stack, if any.</returns>
-        protected virtual T PopInternal() => this.internalContainer.Pop();
 
         /// <summary>
         /// Pushes an element to the top of the stack.
@@ -205,7 +204,8 @@ namespace IX.Observable
 
             var st = new Tuple<T, int>(item, this.Count - 1);
 
-            this.AsyncPost((state) =>
+            this.AsyncPost(
+                (state) =>
             {
                 this.OnPropertyChanged(nameof(this.Count));
                 this.OnPropertyChanged("Item[]");
@@ -214,44 +214,37 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Pushes an element to the top of the stack (internal overridable procedure).
-        /// </summary>
-        /// <param name="item">The item to push.</param>
-        protected virtual void PushInternal(T item) => this.internalContainer.Push(item);
-
-        /// <summary>
         /// Copies all elements of the stack to a new array.
         /// </summary>
         /// <returns>An array containing all items in the stack.</returns>
-        public virtual T[] ToArray() => this.internalContainer.ToArray();
+        public virtual T[] ToArray() => this.InternalContainer.ToArray();
 
         /// <summary>
         /// Sets the capacity to the actual number of elements in the stack if that number is less than 90 percent of current capacity.
         /// </summary>
-        public virtual void TrimExcess() => this.internalContainer.TrimExcess();
-    }
+        public virtual void TrimExcess() => this.InternalContainer.TrimExcess();
 
-    internal sealed class StackDebugView<T>
-    {
-        private readonly ObservableStack<T> stack;
-
-        public StackDebugView(ObservableStack<T> stack)
+        /// <summary>
+        /// Clears the observable stack (internal overridable procedure).
+        /// </summary>
+        protected void ClearInternal()
         {
-            if (stack == null)
-                throw new ArgumentNullException(nameof(stack));
+            var st = this.InternalContainer;
+            this.InternalContainer = new Stack<T>();
 
-            this.stack = stack;
+            Task.Run(() => st.Clear());
         }
 
-        [DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
-        public T[] Items
-        {
-            get
-            {
-                T[] items = new T[this.stack.internalContainer.Count];
-                this.stack.internalContainer.CopyTo(items, 0);
-                return items;
-            }
-        }
+        /// <summary>
+        /// Pushes an element to the top of the stack (internal overridable procedure).
+        /// </summary>
+        /// <param name="item">The item to push.</param>
+        protected virtual void PushInternal(T item) => this.InternalContainer.Push(item);
+
+        /// <summary>
+        /// Pops the topmost element from the stack, removing it (internal overridable procedure).
+        /// </summary>
+        /// <returns>The topmost element in the stack, if any.</returns>
+        protected virtual T PopInternal() => this.InternalContainer.Pop();
     }
 }

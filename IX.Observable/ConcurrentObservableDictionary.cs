@@ -206,8 +206,8 @@ namespace IX.Observable
 
             try
             {
-                array = new KeyValuePair<TKey, TValue>[this.internalContainer.Count];
-                ((ICollection<KeyValuePair<TKey, TValue>>)this.internalContainer).CopyTo(array, 0);
+                array = new KeyValuePair<TKey, TValue>[this.InternalContainer.Count];
+                ((ICollection<KeyValuePair<TKey, TValue>>)this.InternalContainer).CopyTo(array, 0);
             }
             finally
             {
@@ -319,8 +319,8 @@ namespace IX.Observable
                     this.locker.Dispose();
                 }
 
-                this.internalContainer.Clear();
-                this.internalContainer = null;
+                this.InternalContainer.Clear();
+                this.InternalContainer = null;
 
                 this.disposedValue = true;
             }
@@ -342,7 +342,7 @@ namespace IX.Observable
             {
                 try
                 {
-                    if (this.internalContainer.ContainsKey(key))
+                    if (this.InternalContainer.ContainsKey(key))
                     {
                         throw new ArgumentException(Resources.DictionaryItemAlreadyExists, nameof(key));
                     }
@@ -351,7 +351,7 @@ namespace IX.Observable
                     {
                         try
                         {
-                            this.internalContainer.Add(key, value);
+                            this.InternalContainer.Add(key, value);
                         }
                         finally
                         {
@@ -421,7 +421,7 @@ namespace IX.Observable
             {
                 try
                 {
-                    if (!this.internalContainer.TryGetValue(key, out value))
+                    if (!this.InternalContainer.TryGetValue(key, out value))
                     {
                         return false;
                     }
@@ -430,7 +430,7 @@ namespace IX.Observable
                     {
                         try
                         {
-                            return this.internalContainer.Remove(key);
+                            return this.InternalContainer.Remove(key);
                         }
                         finally
                         {
@@ -466,7 +466,7 @@ namespace IX.Observable
             {
                 try
                 {
-                    return ((ICollection<KeyValuePair<TKey, TValue>>)this.internalContainer).Remove(item);
+                    return ((ICollection<KeyValuePair<TKey, TValue>>)this.InternalContainer).Remove(item);
                 }
                 finally
                 {

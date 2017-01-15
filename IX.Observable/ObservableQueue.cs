@@ -1,4 +1,8 @@
-﻿using System;
+﻿// <copyright file="ObservableQueue.cs" company="Adrian Mos">
+// Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
+// </copyright>
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -16,10 +20,12 @@ namespace IX.Observable
     [DebuggerTypeProxy(typeof(QueueDebugView<>))]
     public class ObservableQueue<T> : ObservableCollectionBase, IQueue<T>, IEnumerable<T>, ICollection
     {
+#pragma warning disable SA1401 // Fields must be private
         /// <summary>
         /// The data container of the observable queue.
         /// </summary>
-        protected internal Queue<T> internalContainer;
+        protected internal Queue<T> InternalContainer;
+#pragma warning restore SA1401 // Fields must be private
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ObservableQueue{T}"/> class.
@@ -27,7 +33,7 @@ namespace IX.Observable
         public ObservableQueue()
             : base(null)
         {
-            this.internalContainer = new Queue<T>();
+            this.InternalContainer = new Queue<T>();
         }
 
         /// <summary>
@@ -37,7 +43,7 @@ namespace IX.Observable
         public ObservableQueue(IEnumerable<T> collection)
             : base(null)
         {
-            this.internalContainer = new Queue<T>(collection);
+            this.InternalContainer = new Queue<T>(collection);
         }
 
         /// <summary>
@@ -47,7 +53,7 @@ namespace IX.Observable
         public ObservableQueue(int capacity)
             : base(null)
         {
-            this.internalContainer = new Queue<T>(capacity);
+            this.InternalContainer = new Queue<T>(capacity);
         }
 
         /// <summary>
@@ -57,7 +63,7 @@ namespace IX.Observable
         public ObservableQueue(SynchronizationContext context)
             : base(context)
         {
-            this.internalContainer = new Queue<T>();
+            this.InternalContainer = new Queue<T>();
         }
 
         /// <summary>
@@ -68,7 +74,7 @@ namespace IX.Observable
         public ObservableQueue(SynchronizationContext context, IEnumerable<T> collection)
             : base(context)
         {
-            this.internalContainer = new Queue<T>(collection);
+            this.InternalContainer = new Queue<T>(collection);
         }
 
         /// <summary>
@@ -79,7 +85,7 @@ namespace IX.Observable
         public ObservableQueue(SynchronizationContext context, int capacity)
             : base(context)
         {
-            this.internalContainer = new Queue<T>(capacity);
+            this.InternalContainer = new Queue<T>(capacity);
         }
 
         /// <summary>
@@ -89,7 +95,25 @@ namespace IX.Observable
         {
             get
             {
-                return this.internalContainer.Count;
+                return this.InternalContainer.Count;
+            }
+        }
+
+        /// <inheritdoc/>
+        bool ICollection.IsSynchronized
+        {
+            get
+            {
+                return ((ICollection)this.InternalContainer).IsSynchronized;
+            }
+        }
+
+        /// <inheritdoc/>
+        object ICollection.SyncRoot
+        {
+            get
+            {
+                return ((ICollection)this.InternalContainer).SyncRoot;
             }
         }
 
@@ -99,27 +123,13 @@ namespace IX.Observable
         /// <returns>The queue enumerator.</returns>
         public virtual IEnumerator<T> GetEnumerator()
         {
-            return this.internalContainer.GetEnumerator();
+            return this.InternalContainer.GetEnumerator();
         }
 
-        bool ICollection.IsSynchronized
-        {
-            get
-            {
-                return ((ICollection)this.internalContainer).IsSynchronized;
-            }
-        }
+        /// <inheritdoc/>
+        void ICollection.CopyTo(Array array, int index) => ((ICollection)this.InternalContainer).CopyTo(array, index);
 
-        object ICollection.SyncRoot
-        {
-            get
-            {
-                return ((ICollection)this.internalContainer).SyncRoot;
-            }
-        }
-
-        void ICollection.CopyTo(Array array, int index) => ((ICollection)this.internalContainer).CopyTo(array, index);
-
+        /// <inheritdoc/>
         IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
 
         /// <summary>
@@ -138,29 +148,18 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Clears the queue of all its objects (internal overridable procedure).
-        /// </summary>
-        protected virtual void ClearInternal()
-        {
-            var st = this.internalContainer;
-            this.internalContainer = new Queue<T>();
-
-            Task.Run(() => st.Clear());
-        }
-
-        /// <summary>
         /// Determines whether the queue contains a specific item.
         /// </summary>
         /// <param name="item">The item to search for.</param>
         /// <returns><c>true</c> if the queue contains a specific item, <c>false</c> otherwise.</returns>
-        public virtual bool Contains(T item) => this.internalContainer.Contains(item);
+        public virtual bool Contains(T item) => this.InternalContainer.Contains(item);
 
         /// <summary>
         /// Copies the contents of the queue to an array, starting at the specified index.
         /// </summary>
         /// <param name="array">The array to copy the items into.</param>
         /// <param name="arrayIndex">The index at which to start in the array.</param>
-        public virtual void CopyTo(T[] array, int arrayIndex) => this.internalContainer.CopyTo(array, arrayIndex);
+        public virtual void CopyTo(T[] array, int arrayIndex) => this.InternalContainer.CopyTo(array, arrayIndex);
 
         /// <summary>
         /// Dequeues and removes an item from the queue.
@@ -170,7 +169,8 @@ namespace IX.Observable
         {
             T item = this.DequeueInternal();
 
-            this.AsyncPost((state) =>
+            this.AsyncPost(
+                (state) =>
             {
                 this.OnPropertyChanged(nameof(this.Count));
                 this.OnPropertyChanged("Item[]");
@@ -179,12 +179,6 @@ namespace IX.Observable
 
             return item;
         }
-
-        /// <summary>
-        /// Dequeues and removes an item from the queue (internal overridable procedure).
-        /// </summary>
-        /// <returns>The dequeued item.</returns>
-        protected virtual T DequeueInternal() => this.internalContainer.Dequeue();
 
         /// <summary>
         /// Enqueues an item into the queue.
@@ -196,7 +190,8 @@ namespace IX.Observable
 
             var st = new Tuple<T, int>(item, this.Count - 1);
 
-            this.AsyncPost((state) =>
+            this.AsyncPost(
+                (state) =>
             {
                 this.OnPropertyChanged(nameof(this.Count));
                 this.OnPropertyChanged("Item[]");
@@ -205,50 +200,43 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Enqueues an item into the queue (internal overridable procedure).
-        /// </summary>
-        /// <param name="item">The item to enqueue.</param>
-        protected virtual void EnqueueInternal(T item) => this.internalContainer.Enqueue(item);
-
-        /// <summary>
         /// Peeks at the topmost item in the queue without dequeueing it.
         /// </summary>
         /// <returns>The topmost item in the queue.</returns>
-        public virtual T Peek() => this.internalContainer.Peek();
+        public virtual T Peek() => this.InternalContainer.Peek();
 
         /// <summary>
         /// Copies the items of the queue into a new array.
         /// </summary>
         /// <returns>An array of items that are contained in the queue.</returns>
-        public virtual T[] ToArray() => this.internalContainer.ToArray();
+        public virtual T[] ToArray() => this.InternalContainer.ToArray();
 
         /// <summary>
         /// Sets the capacity to the actual number of elements in the <see cref="ObservableQueue{T}"/>, if that number is less than 90 percent of current capacity.
         /// </summary>
-        public virtual void TrimExcess() => this.internalContainer.TrimExcess();
-    }
+        public virtual void TrimExcess() => this.InternalContainer.TrimExcess();
 
-    internal sealed class QueueDebugView<T>
-    {
-        private readonly ObservableQueue<T> queue;
-
-        public QueueDebugView(ObservableQueue<T> queue)
+        /// <summary>
+        /// Clears the queue of all its objects (internal overridable procedure).
+        /// </summary>
+        protected virtual void ClearInternal()
         {
-            if (queue == null)
-                throw new ArgumentNullException(nameof(queue));
+            var st = this.InternalContainer;
+            this.InternalContainer = new Queue<T>();
 
-            this.queue = queue;
+            Task.Run(() => st.Clear());
         }
 
-        [DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
-        public T[] Items
-        {
-            get
-            {
-                T[] items = new T[this.queue.internalContainer.Count];
-                this.queue.internalContainer.CopyTo(items, 0);
-                return items;
-            }
-        }
+        /// <summary>
+        /// Enqueues an item into the queue (internal overridable procedure).
+        /// </summary>
+        /// <param name="item">The item to enqueue.</param>
+        protected virtual void EnqueueInternal(T item) => this.InternalContainer.Enqueue(item);
+
+        /// <summary>
+        /// Dequeues and removes an item from the queue (internal overridable procedure).
+        /// </summary>
+        /// <returns>The dequeued item.</returns>
+        protected virtual T DequeueInternal() => this.InternalContainer.Dequeue();
     }
 }

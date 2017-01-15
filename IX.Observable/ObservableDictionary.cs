@@ -1,4 +1,8 @@
-﻿using System;
+﻿// <copyright file="ObservableDictionary.cs" company="Adrian Mos">
+// Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
+// </copyright>
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -18,10 +22,12 @@ namespace IX.Observable
     [DebuggerTypeProxy(typeof(DictionaryDebugView<,>))]
     public class ObservableDictionary<TKey, TValue> : ObservableCollectionBase, IDictionary<TKey, TValue>, IReadOnlyDictionary<TKey, TValue>
     {
+#pragma warning disable SA1401 // Fields must be private
         /// <summary>
         /// The data container of the observable dictionary.
         /// </summary>
-        protected internal Dictionary<TKey, TValue> internalContainer;
+        protected internal Dictionary<TKey, TValue> InternalContainer;
+#pragma warning restore SA1401 // Fields must be private
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ObservableDictionary{TKey, TValue}" /> class.
@@ -29,7 +35,7 @@ namespace IX.Observable
         public ObservableDictionary()
             : base(null)
         {
-            this.internalContainer = new Dictionary<TKey, TValue>();
+            this.InternalContainer = new Dictionary<TKey, TValue>();
         }
 
         /// <summary>
@@ -39,7 +45,7 @@ namespace IX.Observable
         public ObservableDictionary(int capacity)
             : base(null)
         {
-            this.internalContainer = new Dictionary<TKey, TValue>(capacity);
+            this.InternalContainer = new Dictionary<TKey, TValue>(capacity);
         }
 
         /// <summary>
@@ -49,7 +55,7 @@ namespace IX.Observable
         public ObservableDictionary(IEqualityComparer<TKey> equalityComparer)
             : base(null)
         {
-            this.internalContainer = new Dictionary<TKey, TValue>(equalityComparer);
+            this.InternalContainer = new Dictionary<TKey, TValue>(equalityComparer);
         }
 
         /// <summary>
@@ -60,7 +66,7 @@ namespace IX.Observable
         public ObservableDictionary(int capacity, IEqualityComparer<TKey> equalityComparer)
             : base(null)
         {
-            this.internalContainer = new Dictionary<TKey, TValue>(capacity, equalityComparer);
+            this.InternalContainer = new Dictionary<TKey, TValue>(capacity, equalityComparer);
         }
 
         /// <summary>
@@ -70,7 +76,7 @@ namespace IX.Observable
         public ObservableDictionary(IDictionary<TKey, TValue> dictionary)
             : base(null)
         {
-            this.internalContainer = new Dictionary<TKey, TValue>(dictionary);
+            this.InternalContainer = new Dictionary<TKey, TValue>(dictionary);
         }
 
         /// <summary>
@@ -81,7 +87,7 @@ namespace IX.Observable
         public ObservableDictionary(IDictionary<TKey, TValue> dictionary, IEqualityComparer<TKey> comparer)
             : base(null)
         {
-            this.internalContainer = new Dictionary<TKey, TValue>(dictionary, comparer);
+            this.InternalContainer = new Dictionary<TKey, TValue>(dictionary, comparer);
         }
 
         /// <summary>
@@ -91,7 +97,7 @@ namespace IX.Observable
         public ObservableDictionary(SynchronizationContext context)
             : base(context)
         {
-            this.internalContainer = new Dictionary<TKey, TValue>();
+            this.InternalContainer = new Dictionary<TKey, TValue>();
         }
 
         /// <summary>
@@ -102,7 +108,7 @@ namespace IX.Observable
         public ObservableDictionary(SynchronizationContext context, int capacity)
             : base(context)
         {
-            this.internalContainer = new Dictionary<TKey, TValue>(capacity);
+            this.InternalContainer = new Dictionary<TKey, TValue>(capacity);
         }
 
         /// <summary>
@@ -113,7 +119,7 @@ namespace IX.Observable
         public ObservableDictionary(SynchronizationContext context, IEqualityComparer<TKey> equalityComparer)
             : base(context)
         {
-            this.internalContainer = new Dictionary<TKey, TValue>(equalityComparer);
+            this.InternalContainer = new Dictionary<TKey, TValue>(equalityComparer);
         }
 
         /// <summary>
@@ -125,7 +131,7 @@ namespace IX.Observable
         public ObservableDictionary(SynchronizationContext context, int capacity, IEqualityComparer<TKey> equalityComparer)
             : base(context)
         {
-            this.internalContainer = new Dictionary<TKey, TValue>(capacity, equalityComparer);
+            this.InternalContainer = new Dictionary<TKey, TValue>(capacity, equalityComparer);
         }
 
         /// <summary>
@@ -136,7 +142,7 @@ namespace IX.Observable
         public ObservableDictionary(SynchronizationContext context, IDictionary<TKey, TValue> dictionary)
             : base(context)
         {
-            this.internalContainer = new Dictionary<TKey, TValue>(dictionary);
+            this.InternalContainer = new Dictionary<TKey, TValue>(dictionary);
         }
 
         /// <summary>
@@ -148,35 +154,7 @@ namespace IX.Observable
         public ObservableDictionary(SynchronizationContext context, IDictionary<TKey, TValue> dictionary, IEqualityComparer<TKey> comparer)
             : base(context)
         {
-            this.internalContainer = new Dictionary<TKey, TValue>(dictionary, comparer);
-        }
-
-        /// <summary>
-        /// Gets or sets the value associated with a specific key.
-        /// </summary>
-        /// <param name="key">The key.</param>
-        /// <returns>The value associated with the specified key.</returns>
-        public virtual TValue this[TKey key]
-        {
-            get
-            {
-                return this.internalContainer[key];
-            }
-            set
-            {
-                if (this.internalContainer.TryGetValue(key, out var val))
-                {
-                    this.internalContainer[key] = value;
-
-                    this.BroadcastChange(new KeyValuePair<TKey, TValue>(key, val), new KeyValuePair<TKey, TValue>(key, value));
-                }
-                else
-                {
-                    this.internalContainer.Add(key, value);
-
-                    this.BroadcastAdd(new KeyValuePair<TKey, TValue>(key, value));
-                }
-            }
+            this.InternalContainer = new Dictionary<TKey, TValue>(dictionary, comparer);
         }
 
         /// <summary>
@@ -186,13 +164,16 @@ namespace IX.Observable
         {
             get
             {
-                return this.internalContainer.Count;
+                return this.InternalContainer.Count;
             }
         }
 
         /// <summary>
-        /// Gets whether or not this instance of a dictionary is readonly.
+        /// Gets a value indicating whether or not this instance of a dictionary is readonly.
         /// </summary>
+        /// <remarks>
+        /// <para>This will always return <c>false</c>.</para>
+        /// </remarks>
         public bool IsReadOnly
         {
             get
@@ -208,10 +189,13 @@ namespace IX.Observable
         {
             get
             {
-                return this.internalContainer.Keys;
+                return this.InternalContainer.Keys;
             }
         }
 
+        /// <summary>
+        /// Gets the collection of keys in this dictionary.
+        /// </summary>
         IEnumerable<TKey> IReadOnlyDictionary<TKey, TValue>.Keys
         {
             get
@@ -227,15 +211,47 @@ namespace IX.Observable
         {
             get
             {
-                return this.internalContainer.Values;
+                return this.InternalContainer.Values;
             }
         }
 
+        /// <summary>
+        /// Gets the collection of values in this dictionary.
+        /// </summary>
         IEnumerable<TValue> IReadOnlyDictionary<TKey, TValue>.Values
         {
             get
             {
                 return this.Values;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the value associated with a specific key.
+        /// </summary>
+        /// <param name="key">The key.</param>
+        /// <returns>The value associated with the specified key.</returns>
+        public virtual TValue this[TKey key]
+        {
+            get
+            {
+                return this.InternalContainer[key];
+            }
+
+            set
+            {
+                if (this.InternalContainer.TryGetValue(key, out var val))
+                {
+                    this.InternalContainer[key] = value;
+
+                    this.BroadcastChange(new KeyValuePair<TKey, TValue>(key, val), new KeyValuePair<TKey, TValue>(key, value));
+                }
+                else
+                {
+                    this.InternalContainer.Add(key, value);
+
+                    this.BroadcastAdd(new KeyValuePair<TKey, TValue>(key, value));
+                }
             }
         }
 
@@ -263,19 +279,6 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Adds an item to the dictionary (internal overridable procedure).
-        /// </summary>
-        /// <param name="key">The key.</param>
-        /// <param name="value">The value.</param>
-        protected virtual void AddInternal(TKey key, TValue value)
-        {
-            if (this.internalContainer.ContainsKey(key))
-                throw new ArgumentException(Resources.DictionaryItemAlreadyExists, nameof(key));
-
-            this.internalContainer.Add(key, value);
-        }
-
-        /// <summary>
         /// Clears all items from the dictionary.
         /// </summary>
         public void Clear()
@@ -286,24 +289,13 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Clears all items from the dictionary (internal overridable procedure).
-        /// </summary>
-        protected virtual void ClearInternal()
-        {
-            var st = this.internalContainer;
-            this.internalContainer = new Dictionary<TKey, TValue>();
-
-            Task.Run(() => st.Clear());
-        }
-
-        /// <summary>
         /// Determines whether the dictionary contains a specific key/value pair.
         /// </summary>
         /// <param name="item">The key/value pair to look for.</param>
         /// <returns><c>true</c> whether a key has been found, <c>false</c> otherwise.</returns>
         public virtual bool Contains(KeyValuePair<TKey, TValue> item)
         {
-            return this.internalContainer.Contains(item);
+            return this.InternalContainer.Contains(item);
         }
 
         /// <summary>
@@ -313,7 +305,7 @@ namespace IX.Observable
         /// <returns><c>true</c> whether a key has been found, <c>false</c> otherwise.</returns>
         public virtual bool ContainsKey(TKey key)
         {
-            return this.internalContainer.ContainsKey(key);
+            return this.InternalContainer.ContainsKey(key);
         }
 
         /// <summary>
@@ -322,7 +314,7 @@ namespace IX.Observable
         /// <param name="array">The array to copy elements into.</param>
         /// <param name="arrayIndex">The index at which to start copying items.</param>
         public virtual void CopyTo(KeyValuePair<TKey, TValue>[] array, int arrayIndex)
-            => ((ICollection<KeyValuePair<TKey, TValue>>)this.internalContainer).CopyTo(array, arrayIndex);
+            => ((ICollection<KeyValuePair<TKey, TValue>>)this.InternalContainer).CopyTo(array, arrayIndex);
 
         /// <summary>
         /// Gets the enumerator for this collection.
@@ -330,7 +322,7 @@ namespace IX.Observable
         /// <returns>An enumerator of key/value pairs.</returns>
         public virtual IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
         {
-            return this.internalContainer.GetEnumerator();
+            return this.InternalContainer.GetEnumerator();
         }
 
         /// <summary>
@@ -350,41 +342,19 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Attempts to remove a key/value pair (internal overridable procedure).
-        /// </summary>
-        /// <param name="item">The key/value pair to remove.</param>
-        /// <returns><c>true</c> if the removal was successful, <c>false</c> otherwise.</returns>
-        protected virtual bool RemoveInternal(KeyValuePair<TKey, TValue> item)
-        {
-            return ((ICollection<KeyValuePair<TKey, TValue>>)this.internalContainer).Remove(item);
-        }
-
-        /// <summary>
         /// Attempts to remove all info related to a key from the dictionary.
         /// </summary>
         /// <param name="key">The key to remove data from.</param>
         /// <returns><c>true</c> if the removal was successful, <c>false</c> otherwise.</returns>
         public bool Remove(TKey key)
         {
-            TValue value;
-            if (this.RemoveInternal(key, out value))
+            if (this.RemoveInternal(key, out var value))
             {
                 this.BroadcastRemove(new KeyValuePair<TKey, TValue>(key, value), 0);
                 return true;
             }
 
             return false;
-        }
-
-        /// <summary>
-        /// Attempts to remove all info related to a key from the dictionary (internal overridable procedure).
-        /// </summary>
-        /// <param name="key">The key to remove data from.</param>
-        /// <param name="value">The value that was removed, if any.</param>
-        /// <returns><c>true</c> if the removal was successful, <c>false</c> otherwise.</returns>
-        protected virtual bool RemoveInternal(TKey key, out TValue value)
-        {
-            return this.internalContainer.TryGetValue(key, out value) && this.internalContainer.Remove(key);
         }
 
         /// <summary>
@@ -395,12 +365,57 @@ namespace IX.Observable
         /// <returns><c>true</c> if the value was successfully fetched, <c>false</c> otherwise.</returns>
         public virtual bool TryGetValue(TKey key, out TValue value)
         {
-            return this.internalContainer.TryGetValue(key, out value);
+            return this.InternalContainer.TryGetValue(key, out value);
         }
 
+        /// <summary>
+        /// Gets the enumerator for this collection.
+        /// </summary>
+        /// <returns>An enumerator of key/value pairs.</returns>
         IEnumerator IEnumerable.GetEnumerator()
         {
             return this.GetEnumerator();
+        }
+
+        /// <summary>
+        /// Attempts to remove all info related to a key from the dictionary (internal overridable procedure).
+        /// </summary>
+        /// <param name="key">The key to remove data from.</param>
+        /// <param name="value">The value that was removed, if any.</param>
+        /// <returns><c>true</c> if the removal was successful, <c>false</c> otherwise.</returns>
+        protected virtual bool RemoveInternal(TKey key, out TValue value) => this.InternalContainer.TryGetValue(key, out value) && this.InternalContainer.Remove(key);
+
+        /// <summary>
+        /// Attempts to remove a key/value pair (internal overridable procedure).
+        /// </summary>
+        /// <param name="item">The key/value pair to remove.</param>
+        /// <returns><c>true</c> if the removal was successful, <c>false</c> otherwise.</returns>
+        protected virtual bool RemoveInternal(KeyValuePair<TKey, TValue> item) => ((ICollection<KeyValuePair<TKey, TValue>>)this.InternalContainer).Remove(item);
+
+        /// <summary>
+        /// Adds an item to the dictionary (internal overridable procedure).
+        /// </summary>
+        /// <param name="key">The key.</param>
+        /// <param name="value">The value.</param>
+        protected virtual void AddInternal(TKey key, TValue value)
+        {
+            if (this.InternalContainer.ContainsKey(key))
+            {
+                throw new ArgumentException(Resources.DictionaryItemAlreadyExists, nameof(key));
+            }
+
+            this.InternalContainer.Add(key, value);
+        }
+
+        /// <summary>
+        /// Clears all items from the dictionary (internal overridable procedure).
+        /// </summary>
+        protected virtual void ClearInternal()
+        {
+            var st = this.InternalContainer;
+            this.InternalContainer = new Dictionary<TKey, TValue>();
+
+            Task.Run(() => st.Clear());
         }
 
         /// <summary>
@@ -410,11 +425,14 @@ namespace IX.Observable
         protected void BroadcastAdd(KeyValuePair<TKey, TValue> item)
         {
             if (this.CollectionChangedEmpty() && this.PropertyChangedEmpty())
+            {
                 return;
+            }
 
             var st = new Tuple<KeyValuePair<TKey, TValue>, int>(item, 0);
 
-            this.AsyncPost((state) =>
+            this.AsyncPost(
+                (state) =>
             {
                 this.OnPropertyChanged(nameof(this.Keys));
                 this.OnPropertyChanged(nameof(this.Values));
@@ -432,11 +450,14 @@ namespace IX.Observable
         protected void BroadcastRemove(KeyValuePair<TKey, TValue> item, int index)
         {
             if (this.CollectionChangedEmpty() && this.PropertyChangedEmpty())
+            {
                 return;
+            }
 
             var st = new Tuple<KeyValuePair<TKey, TValue>, int>(item, index);
 
-            this.AsyncPost((state) =>
+            this.AsyncPost(
+                (state) =>
             {
                 this.OnPropertyChanged(nameof(this.Keys));
                 this.OnPropertyChanged(nameof(this.Values));
@@ -454,11 +475,14 @@ namespace IX.Observable
         protected void BroadcastChange(KeyValuePair<TKey, TValue> oldItem, KeyValuePair<TKey, TValue> newItem)
         {
             if (this.CollectionChangedEmpty() && this.PropertyChangedEmpty())
+            {
                 return;
+            }
 
             var st = new Tuple<KeyValuePair<TKey, TValue>, KeyValuePair<TKey, TValue>>(oldItem, newItem);
 
-            this.AsyncPost((state) =>
+            this.AsyncPost(
+                (state) =>
             {
                 this.OnPropertyChanged(nameof(this.Keys));
                 this.OnPropertyChanged(nameof(this.Values));
@@ -481,7 +505,9 @@ namespace IX.Observable
         protected void BroadcastReset()
         {
             if (this.CollectionChangedEmpty() && this.PropertyChangedEmpty())
+            {
                 return;
+            }
 
             this.AsyncPost(() =>
             {
@@ -492,39 +518,5 @@ namespace IX.Observable
                 this.OnCollectionChanged();
             });
         }
-    }
-
-    internal sealed class DictionaryDebugView<TKey, TValue>
-    {
-        private readonly ObservableDictionary<TKey, TValue> dict;
-
-        public DictionaryDebugView(ObservableDictionary<TKey, TValue> dictionary)
-        {
-            if (dictionary == null)
-                throw new ArgumentNullException(nameof(dictionary));
-
-            this.dict = dictionary;
-        }
-
-        [DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
-        public KVP<TKey, TValue>[] Items
-        {
-            get
-            {
-                KeyValuePair<TKey, TValue>[] items = new KeyValuePair<TKey, TValue>[this.dict.internalContainer.Count];
-                ((ICollection<KeyValuePair<TKey, TValue>>)this.dict.internalContainer).CopyTo(items, 0);
-                return items.Select(p => new KVP<TKey, TValue> { Key = p.Key, Value = p.Value }).ToArray();
-            }
-        }
-    }
-
-    [DebuggerDisplay("[{Key}] = \"{Value}\"")]
-    internal sealed class KVP<TKey, TValue>
-    {
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public TKey Key { get; internal set; }
-
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public TValue Value { get; internal set; }
     }
 }

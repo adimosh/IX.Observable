@@ -1,4 +1,8 @@
-﻿namespace IX.Observable
+﻿// <copyright file="IStack.cs" company="Adrian Mos">
+// Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
+// </copyright>
+
+namespace IX.Observable
 {
     /// <summary>
     /// A contract for a stack.
@@ -7,7 +11,7 @@
     public interface IStack<T>
     {
         /// <summary>
-        /// The number of elements in the observable stack.
+        /// Gets the number of elements in the observable stack.
         /// </summary>
         int Count { get; }
 

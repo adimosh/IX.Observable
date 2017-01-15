@@ -1,9 +1,13 @@
-﻿using System;
+﻿// <copyright file="ExceptionOccurredEventArgs.cs" company="Adrian Mos">
+// Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
+// </copyright>
+
+using System;
 
 namespace IX.Observable
 {
     /// <summary>
-    /// Event arguments for 
+    /// Event arguments for an exception that occurs during notification.
     /// </summary>
     public class ExceptionOccurredEventArgs : EventArgs
     {
@@ -17,7 +21,7 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Gets or sets the exception that has occurred.
+        /// Gets the exception that has occurred.
         /// </summary>
         public Exception Exception { get; private set; }
     }

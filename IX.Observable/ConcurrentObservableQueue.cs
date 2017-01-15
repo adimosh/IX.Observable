@@ -181,7 +181,7 @@ namespace IX.Observable
             {
                 try
                 {
-                    items = this.internalContainer.ToArray();
+                    items = this.InternalContainer.ToArray();
                 }
                 finally
                 {
@@ -305,8 +305,8 @@ namespace IX.Observable
                     this.locker.Dispose();
                 }
 
-                this.internalContainer.Clear();
-                this.internalContainer = null;
+                this.InternalContainer.Clear();
+                this.InternalContainer = null;
 
                 this.disposedValue = true;
             }

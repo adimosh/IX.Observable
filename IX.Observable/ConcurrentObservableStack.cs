@@ -96,7 +96,7 @@ namespace IX.Observable
                 {
                     try
                     {
-                        return this.internalContainer.Count;
+                        return this.InternalContainer.Count;
                     }
                     finally
                     {
@@ -129,7 +129,7 @@ namespace IX.Observable
             {
                 try
                 {
-                    return this.internalContainer.Contains(item);
+                    return this.InternalContainer.Contains(item);
                 }
                 finally
                 {
@@ -152,7 +152,7 @@ namespace IX.Observable
             {
                 try
                 {
-                    array = this.internalContainer.ToArray();
+                    array = this.InternalContainer.ToArray();
                 }
                 finally
                 {
@@ -182,7 +182,7 @@ namespace IX.Observable
             {
                 try
                 {
-                    return this.internalContainer.ToArray();
+                    return this.InternalContainer.ToArray();
                 }
                 finally
                 {
@@ -205,7 +205,7 @@ namespace IX.Observable
             {
                 try
                 {
-                    return this.internalContainer.Peek();
+                    return this.InternalContainer.Peek();
                 }
                 finally
                 {
@@ -227,7 +227,7 @@ namespace IX.Observable
             {
                 try
                 {
-                    this.internalContainer.TrimExcess();
+                    this.InternalContainer.TrimExcess();
                 }
                 finally
                 {
@@ -250,7 +250,7 @@ namespace IX.Observable
             {
                 try
                 {
-                    return this.internalContainer.Pop();
+                    return this.InternalContainer.Pop();
                 }
                 finally
                 {
@@ -277,8 +277,8 @@ namespace IX.Observable
                     this.locker.Dispose();
                 }
 
-                this.internalContainer.Clear();
-                this.internalContainer = null;
+                this.InternalContainer.Clear();
+                this.InternalContainer = null;
 
                 this.disposedValue = true;
             }
@@ -294,7 +294,7 @@ namespace IX.Observable
             {
                 try
                 {
-                    this.internalContainer.Push(item);
+                    this.InternalContainer.Push(item);
                 }
                 finally
                 {
