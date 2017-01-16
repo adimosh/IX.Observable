@@ -112,6 +112,8 @@ namespace IX.Observable
                     this.OnPropertyChanged(nameof(this.Count));
                     this.ContentsMayHaveChanged();
                 });
+
+                return;
             }
 
             throw new TimeoutException();
@@ -191,6 +193,8 @@ namespace IX.Observable
                     this.OnPropertyChanged(nameof(this.Count));
                     this.ContentsMayHaveChanged();
                 });
+
+                return;
             }
 
             throw new TimeoutException();
@@ -234,6 +238,7 @@ namespace IX.Observable
                 try
                 {
                     this.InternalContainer.CopyTo(array, arrayIndex);
+                    return;
                 }
                 finally
                 {

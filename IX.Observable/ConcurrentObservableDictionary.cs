@@ -219,16 +219,30 @@ namespace IX.Observable
             set
             {
                 var dictionary = ((DictionaryListAdapter<TKey, TValue>)this.InternalContainer).dictionary;
-                if (dictionary.TryGetValue(key, out var val))
+                if (this.Locker.TryEnterWriteLock(Constants.ConcurrentLockAcquisitionTimeout))
                 {
-                    dictionary[key] = value;
-                }
-                else
-                {
-                    dictionary.Add(key, value);
+                    try
+                    {
+                        if (dictionary.TryGetValue(key, out var val))
+                        {
+                            dictionary[key] = value;
+                        }
+                        else
+                        {
+                            dictionary.Add(key, value);
+                        }
+                    }
+                    finally
+                    {
+                        this.Locker.ExitWriteLock();
+                    }
+
+                    this.BroadcastChange();
+
+                    return;
                 }
 
-                this.BroadcastChange();
+                throw new TimeoutException();
             }
         }
 
@@ -244,7 +258,22 @@ namespace IX.Observable
         /// </summary>
         /// <param name="key">The key to look for.</param>
         /// <returns><c>true</c> whether a key has been found, <c>false</c> otherwise.</returns>
-        public bool ContainsKey(TKey key) => ((DictionaryListAdapter<TKey, TValue>)this.InternalContainer).dictionary.ContainsKey(key);
+        public bool ContainsKey(TKey key)
+        {
+            if (this.Locker.TryEnterReadLock(Constants.ConcurrentLockAcquisitionTimeout))
+            {
+                try
+                {
+                    return ((DictionaryListAdapter<TKey, TValue>)this.InternalContainer).dictionary.ContainsKey(key);
+                }
+                finally
+                {
+                    this.Locker.ExitReadLock();
+                }
+            }
+
+            throw new TimeoutException();
+        }
 
         /// <summary>
         /// Attempts to remove all info related to a key from the dictionary.
@@ -253,7 +282,24 @@ namespace IX.Observable
         /// <returns><c>true</c> if the removal was successful, <c>false</c> otherwise.</returns>
         public bool Remove(TKey key)
         {
-            if (((DictionaryListAdapter<TKey, TValue>)this.InternalContainer).dictionary.Remove(key))
+            bool removalResult;
+            if (this.Locker.TryEnterWriteLock(Constants.ConcurrentLockAcquisitionTimeout))
+            {
+                try
+                {
+                    removalResult = ((DictionaryListAdapter<TKey, TValue>)this.InternalContainer).dictionary.Remove(key);
+                }
+                finally
+                {
+                    this.Locker.ExitWriteLock();
+                }
+            }
+            else
+            {
+                throw new TimeoutException();
+            }
+
+            if (removalResult)
             {
                 this.BroadcastChange();
 
@@ -269,7 +315,22 @@ namespace IX.Observable
         /// <param name="key">The key.</param>
         /// <param name="value">The value.</param>
         /// <returns><c>true</c> if the value was successfully fetched, <c>false</c> otherwise.</returns>
-        public bool TryGetValue(TKey key, out TValue value) => ((DictionaryListAdapter<TKey, TValue>)this.InternalContainer).dictionary.TryGetValue(key, out value);
+        public bool TryGetValue(TKey key, out TValue value)
+        {
+            if (this.Locker.TryEnterReadLock(Constants.ConcurrentLockAcquisitionTimeout))
+            {
+                try
+                {
+                    return ((DictionaryListAdapter<TKey, TValue>)this.InternalContainer).dictionary.TryGetValue(key, out value);
+                }
+                finally
+                {
+                    this.Locker.ExitReadLock();
+                }
+            }
+
+            throw new TimeoutException();
+        }
 
         /// <summary>
         /// Called when contents of this dictionary may have changed.

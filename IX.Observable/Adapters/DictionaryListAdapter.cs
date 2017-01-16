@@ -2,8 +2,11 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace IX.Observable.Adapters
 {
@@ -39,7 +42,19 @@ namespace IX.Observable.Adapters
             return -1;
         }
 
-        public override void Clear() => this.dictionary.Clear();
+        public override void Clear()
+        {
+            var tempdict = this.dictionary;
+            this.dictionary = new Dictionary<TKey, TValue>();
+
+            var syncContext = SynchronizationContext.Current;
+            SynchronizationContext.SetSynchronizationContext(null);
+            Task.Run(() =>
+            {
+                this.dictionary.Clear();
+            }).ConfigureAwait(false);
+            SynchronizationContext.SetSynchronizationContext(syncContext);
+        }
 
         public override bool Contains(KeyValuePair<TKey, TValue> item) => ((ICollection<KeyValuePair<TKey, TValue>>)this.dictionary).Contains(item);
 
