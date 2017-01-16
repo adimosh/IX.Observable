@@ -5,7 +5,7 @@
 using System;
 using System.Diagnostics;
 
-namespace IX.Observable
+namespace IX.Observable.DebugAide
 {
     internal sealed class QueueDebugView<T>
     {
@@ -13,12 +13,7 @@ namespace IX.Observable
 
         public QueueDebugView(ObservableQueue<T> queue)
         {
-            if (queue == null)
-            {
-                throw new ArgumentNullException(nameof(queue));
-            }
-
-            this.queue = queue;
+            this.queue = queue ?? throw new ArgumentNullException(nameof(queue));
         }
 
         [DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]

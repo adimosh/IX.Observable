@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
-namespace IX.Observable
+namespace IX.Observable.DebugAide
 {
     internal sealed class DictionaryDebugView<TKey, TValue>
     {

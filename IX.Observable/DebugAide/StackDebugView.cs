@@ -5,7 +5,7 @@
 using System;
 using System.Diagnostics;
 
-namespace IX.Observable
+namespace IX.Observable.DebugAide
 {
     internal sealed class StackDebugView<T>
     {

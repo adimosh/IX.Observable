@@ -9,6 +9,7 @@ using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
+using IX.Observable.DebugAide;
 
 namespace IX.Observable
 {

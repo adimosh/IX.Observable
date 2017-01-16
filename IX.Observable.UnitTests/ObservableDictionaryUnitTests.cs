@@ -1,4 +1,8 @@
-﻿using Xunit;
+﻿// <copyright file="ObservableDictionaryUnitTests.cs" company="Adrian Mos">
+// Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
+// </copyright>
+
+using Xunit;
 
 namespace IX.Observable.UnitTests
 {
