@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
+using IX.Observable.Adapters;
 using IX.Observable.DebugAide;
 
 namespace IX.Observable
@@ -16,18 +17,13 @@ namespace IX.Observable
     /// <typeparam name="T">The type of items in the queue.</typeparam>
     [DebuggerDisplay("Count = {Count}")]
     [DebuggerTypeProxy(typeof(QueueDebugView<>))]
-    public class ConcurrentObservableQueue<T> : ObservableQueue<T>, IDisposable
+    public class ConcurrentObservableQueue<T> : ConcurrentObservableCollectionBase<T>, IQueue<T>
     {
-        private readonly ReaderWriterLockSlim locker = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
-        private readonly TimeSpan timeout = TimeSpan.FromMilliseconds(100);
-
-        private bool disposedValue = false; // To detect redundant calls
-
         /// <summary>
         /// Initializes a new instance of the <see cref="ConcurrentObservableQueue{T}"/> class.
         /// </summary>
         public ConcurrentObservableQueue()
-            : base()
+            : base(new QueueListAdapter<T>(new Queue<T>()), null)
         {
         }
 
@@ -36,7 +32,7 @@ namespace IX.Observable
         /// </summary>
         /// <param name="collection">A collection of items to copy from.</param>
         public ConcurrentObservableQueue(IEnumerable<T> collection)
-            : base(collection)
+            : base(new QueueListAdapter<T>(new Queue<T>(collection)), null)
         {
         }
 
@@ -45,7 +41,7 @@ namespace IX.Observable
         /// </summary>
         /// <param name="capacity">The initial capacity of the queue.</param>
         public ConcurrentObservableQueue(int capacity)
-            : base(capacity)
+            : base(new QueueListAdapter<T>(new Queue<T>(capacity)), null)
         {
         }
 
@@ -54,7 +50,7 @@ namespace IX.Observable
         /// </summary>
         /// <param name="context">The synchronization context top use when posting observable messages.</param>
         public ConcurrentObservableQueue(SynchronizationContext context)
-            : base(context)
+            : base(new QueueListAdapter<T>(new Queue<T>()), context)
         {
         }
 
@@ -64,7 +60,7 @@ namespace IX.Observable
         /// <param name="context">The synchronization context top use when posting observable messages.</param>
         /// <param name="collection">A collection of items to copy from.</param>
         public ConcurrentObservableQueue(SynchronizationContext context, IEnumerable<T> collection)
-            : base(context, collection)
+            : base(new QueueListAdapter<T>(new Queue<T>(collection)), context)
         {
         }
 
@@ -74,289 +70,135 @@ namespace IX.Observable
         /// <param name="context">The synchronization context top use when posting observable messages.</param>
         /// <param name="capacity">The initial capacity of the queue.</param>
         public ConcurrentObservableQueue(SynchronizationContext context, int capacity)
-            : base(context, capacity)
+            : base(new QueueListAdapter<T>(new Queue<T>(capacity)), context)
         {
         }
 
         /// <summary>
-        /// Finalizes an instance of the <see cref="ConcurrentObservableQueue{T}"/> class.
+        /// Dequeues and removes an item from the queue.
         /// </summary>
-        ~ConcurrentObservableQueue()
+        /// <returns>The dequeued item.</returns>
+        public T Dequeue()
         {
-            // Do not change this code. Put cleanup code in Dispose(bool disposing).
-            this.Dispose(false);
-        }
-
-        /// <summary>
-        /// Gets the number of items currently in the queue.
-        /// </summary>
-        public override int Count
-        {
-            get
+            if (this.Locker.TryEnterWriteLock(Constants.ConcurrentLockAcquisitionTimeout))
             {
-                if (this.locker.TryEnterReadLock(this.timeout))
+                T item;
+                try
                 {
-                    try
+                    item = ((QueueListAdapter<T>)this.InternalContainer).queue.Dequeue();
+                }
+                finally
+                {
+                    this.Locker.ExitWriteLock();
+                }
+
+                this.AsyncPost(
+                    (state) =>
                     {
-                        return base.Count;
-                    }
-                    finally
+                        this.OnPropertyChanged(nameof(this.Count));
+                        this.OnPropertyChanged("Item[]");
+                        this.OnCollectionChangedRemove(state, 0);
+                    }, item);
+
+                return item;
+            }
+
+            throw new TimeoutException();
+        }
+
+        /// <summary>
+        /// Enqueues an item into the queue.
+        /// </summary>
+        /// <param name="item">The item to enqueue.</param>
+        public void Enqueue(T item)
+        {
+            if (this.Locker.TryEnterWriteLock(Constants.ConcurrentLockAcquisitionTimeout))
+            {
+                try
+                {
+                    ((QueueListAdapter<T>)this.InternalContainer).queue.Enqueue(item);
+                }
+                finally
+                {
+                    this.Locker.ExitWriteLock();
+                }
+
+                this.AsyncPost(
+                    (state) =>
                     {
-                        this.locker.ExitReadLock();
-                    }
-                }
-                else
-                {
-                    throw new TimeoutException();
-                }
-            }
-        }
+                        this.OnPropertyChanged(nameof(this.Count));
+                        this.OnPropertyChanged("Item[]");
+                        this.OnCollectionChangedAdd(state.item, state.index);
+                    }, new { index = this.Count - 1, item });
 
-        /// <summary>
-        /// Disposes the current instance of the <see cref="ConcurrentObservableDictionary{TKey, TValue}"/> class.
-        /// </summary>
-        public void Dispose()
-        {
-            // Do not change this code. Put cleanup code in Dispose(bool disposing).
-            this.Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        /// <summary>
-        /// Determines whether the queue contains a specific item.
-        /// </summary>
-        /// <param name="item">The item to search for.</param>
-        /// <returns><c>true</c> if the queue contains a specific item, <c>false</c> otherwise.</returns>
-        public override bool Contains(T item)
-        {
-            if (this.locker.TryEnterReadLock(this.timeout))
-            {
-                try
-                {
-                    return base.Contains(item);
-                }
-                finally
-                {
-                    this.locker.ExitReadLock();
-                }
-            }
-            else
-            {
-                throw new TimeoutException();
-            }
-        }
-
-        /// <summary>
-        /// Copies the contents of the queue to an array, starting at the specified index.
-        /// </summary>
-        /// <param name="array">The array to copy the items into.</param>
-        /// <param name="arrayIndex">The index at which to start in the array.</param>
-        public override void CopyTo(T[] array, int arrayIndex)
-        {
-            if (this.locker.TryEnterReadLock(this.timeout))
-            {
-                try
-                {
-                    base.CopyTo(array, arrayIndex);
-                }
-                finally
-                {
-                    this.locker.ExitReadLock();
-                }
-            }
-            else
-            {
-                throw new TimeoutException();
-            }
-        }
-
-        /// <summary>
-        /// Gets an enumerator for the concurrent observable queue.
-        /// </summary>
-        /// <returns>The queue enumerator.</returns>
-        public override IEnumerator<T> GetEnumerator()
-        {
-            T[] items;
-
-            if (this.locker.TryEnterReadLock(this.timeout))
-            {
-                try
-                {
-                    items = this.InternalContainer.ToArray();
-                }
-                finally
-                {
-                    this.locker.ExitReadLock();
-                }
-            }
-            else
-            {
-                throw new TimeoutException();
+                return;
             }
 
-            foreach (var item in items)
-            {
-                yield return item;
-            }
-
-            yield break;
+            throw new TimeoutException();
         }
 
         /// <summary>
         /// Peeks at the topmost item in the queue without dequeueing it.
         /// </summary>
         /// <returns>The topmost item in the queue.</returns>
-        public override T Peek()
+        public virtual T Peek()
         {
-            if (this.locker.TryEnterReadLock(this.timeout))
+            if (this.Locker.TryEnterReadLock(Constants.ConcurrentLockAcquisitionTimeout))
             {
                 try
                 {
-                    return base.Peek();
+                    return ((QueueListAdapter<T>)this.InternalContainer).queue.Peek();
                 }
                 finally
                 {
-                    this.locker.ExitReadLock();
+                    this.Locker.ExitReadLock();
                 }
             }
-            else
-            {
-                throw new TimeoutException();
-            }
+
+            throw new TimeoutException();
         }
 
         /// <summary>
         /// Copies the items of the queue into a new array.
         /// </summary>
         /// <returns>An array of items that are contained in the queue.</returns>
-        public override T[] ToArray()
+        public virtual T[] ToArray()
         {
-            if (this.locker.TryEnterReadLock(this.timeout))
+            if (this.Locker.TryEnterReadLock(Constants.ConcurrentLockAcquisitionTimeout))
             {
                 try
                 {
-                    return base.ToArray();
+                    return ((QueueListAdapter<T>)this.InternalContainer).queue.ToArray();
                 }
                 finally
                 {
-                    this.locker.ExitReadLock();
+                    this.Locker.ExitReadLock();
                 }
             }
-            else
-            {
-                throw new TimeoutException();
-            }
+
+            throw new TimeoutException();
         }
 
         /// <summary>
         /// Sets the capacity to the actual number of elements in the <see cref="ConcurrentObservableQueue{T}"/>, if that number is less than 90 percent of current capacity.
         /// </summary>
-        public override void TrimExcess()
+        public virtual void TrimExcess()
         {
-            if (this.locker.TryEnterWriteLock(this.timeout))
+            if (this.Locker.TryEnterWriteLock(Constants.ConcurrentLockAcquisitionTimeout))
             {
                 try
                 {
-                    base.TrimExcess();
+                    ((QueueListAdapter<T>)this.InternalContainer).queue.TrimExcess();
                 }
                 finally
                 {
-                    this.locker.ExitWriteLock();
-                }
-            }
-            else
-            {
-                throw new TimeoutException();
-            }
-        }
-
-        /// <summary>
-        /// Clears the queue of all its objects (internal overridable procedure).
-        /// </summary>
-        protected override void ClearInternal()
-        {
-            if (this.locker.TryEnterWriteLock(this.timeout))
-            {
-                try
-                {
-                    base.ClearInternal();
-                }
-                finally
-                {
-                    this.locker.ExitWriteLock();
-                }
-            }
-            else
-            {
-                throw new TimeoutException();
-            }
-        }
-
-        /// <summary>
-        /// Disposes the current instance of the <see cref="ConcurrentObservableDictionary{TKey, TValue}"/> class.
-        /// </summary>
-        /// <param name="disposing"><c>true</c> for normal disposal, where normal operation should dispose sub-objects,
-        /// <c>false</c> for a GC disposal without the normal pattern.</param>
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!this.disposedValue)
-            {
-                if (disposing)
-                {
-                    this.locker.Dispose();
+                    this.Locker.ExitWriteLock();
                 }
 
-                this.InternalContainer.Clear();
-                this.InternalContainer = null;
+                return;
+            }
 
-                this.disposedValue = true;
-            }
-        }
-
-        /// <summary>
-        /// Dequeues and removes an item from the queue (internal overridable procedure).
-        /// </summary>
-        /// <returns>The dequeued item.</returns>
-        protected override T DequeueInternal()
-        {
-            if (this.locker.TryEnterWriteLock(this.timeout))
-            {
-                try
-                {
-                    return base.DequeueInternal();
-                }
-                finally
-                {
-                    this.locker.ExitWriteLock();
-                }
-            }
-            else
-            {
-                throw new TimeoutException();
-            }
-        }
-
-        /// <summary>
-        /// Enqueues an item into the queue (internal overridable procedure).
-        /// </summary>
-        /// <param name="item">The item to enqueue.</param>
-        protected override void EnqueueInternal(T item)
-        {
-            if (this.locker.TryEnterWriteLock(this.timeout))
-            {
-                try
-                {
-                    base.EnqueueInternal(item);
-                }
-                finally
-                {
-                    this.locker.ExitWriteLock();
-                }
-            }
-            else
-            {
-                throw new TimeoutException();
-            }
+            throw new TimeoutException();
         }
     }
 }

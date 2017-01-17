@@ -16,13 +16,13 @@ namespace IX.Observable.Adapters
 #pragma warning restore SA1307 // Accessible fields must begin with upper-case letter
 
         internal StackListAdapter()
-            : this(new Stack<T>())
         {
+            this.stack = new Stack<T>();
         }
 
         internal StackListAdapter(Stack<T> stack)
         {
-            this.stack = stack;
+            this.stack = new Stack<T>(stack);
         }
 
         public override int Count => this.stack.Count;

@@ -19,13 +19,13 @@ namespace IX.Observable.Adapters
 #pragma warning restore SA1307 // Accessible fields must begin with upper-case letter
 
         internal DictionaryListAdapter()
-            : this(new Dictionary<TKey, TValue>())
         {
+            this.dictionary = new Dictionary<TKey, TValue>();
         }
 
         internal DictionaryListAdapter(Dictionary<TKey, TValue> dictionary)
         {
-            this.dictionary = dictionary;
+            this.dictionary = new Dictionary<TKey, TValue>(dictionary);
         }
 
         public override int Count => this.dictionary.Count;
