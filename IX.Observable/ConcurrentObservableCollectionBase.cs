@@ -98,20 +98,21 @@ namespace IX.Observable
                     this.Locker.ExitWriteLock();
                 }
 
-                this.AsyncPost(() =>
+                this.AsyncPost(
+                    (state) =>
                 {
-                    if (newIndex == -1)
+                    if (state.index == -1)
                     {
                         this.OnCollectionChanged();
                     }
                     else
                     {
-                        this.OnCollectionChangedAdd(item, newIndex);
+                        this.OnCollectionChangedAdd(state.item, state.index);
                     }
 
                     this.OnPropertyChanged(nameof(this.Count));
                     this.ContentsMayHaveChanged();
-                });
+                }, new { index=newIndex, item });
 
                 return;
             }
@@ -143,12 +144,13 @@ namespace IX.Observable
 
                 if (oldIndex >= 0)
                 {
-                    this.AsyncPost(() =>
+                    this.AsyncPost(
+                        (state) =>
                     {
-                        this.OnCollectionChangedRemove(item, oldIndex);
+                        this.OnCollectionChangedRemove(state.item, state.index);
                         this.OnPropertyChanged(nameof(this.Count));
                         this.ContentsMayHaveChanged();
-                    });
+                    }, new { index=oldIndex, item });
                     return true;
                 }
                 else if (oldIndex < -1)
