@@ -16,6 +16,11 @@ namespace IX.Observable.Adapters
     public abstract class ListAdapter<T> : IListAdapter<T>
     {
         /// <summary>
+        /// Occurs when the owner of this list adapter must reset.
+        /// </summary>
+        public event EventHandler MustReset;
+
+        /// <summary>
         /// Gets the number of items.
         /// </summary>
         /// <value>
@@ -120,6 +125,14 @@ namespace IX.Observable.Adapters
             T[] tempArray = new T[this.Count - index];
             this.CopyTo(tempArray, index);
             tempArray.CopyTo(array, index);
+        }
+
+        /// <summary>
+        /// Triggers the reset.
+        /// </summary>
+        protected void TriggerReset()
+        {
+            this.MustReset?.Invoke(this, EventArgs.Empty);
         }
     }
 }

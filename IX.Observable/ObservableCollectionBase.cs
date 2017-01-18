@@ -301,6 +301,7 @@ namespace IX.Observable
             : base(context)
         {
             this.InternalContainer = internalContainer;
+            internalContainer.MustReset += this.InternalContainer_MustReset;
         }
 
         /// <summary>
@@ -455,6 +456,16 @@ namespace IX.Observable
         /// </summary>
         protected virtual void ContentsMayHaveChanged()
         {
+        }
+
+        private void InternalContainer_MustReset(object sender, EventArgs e)
+        {
+            this.AsyncPost(() =>
+            {
+                this.OnCollectionChanged();
+                this.OnPropertyChanged(nameof(this.Count));
+                this.ContentsMayHaveChanged();
+            });
         }
     }
 }

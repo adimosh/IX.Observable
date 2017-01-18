@@ -49,6 +49,37 @@ namespace IX.Observable.Adapters
 
         public override object SyncRoot => null;
 
+        public T this[int index]
+        {
+            get
+            {
+                if (index < this.master.Count)
+                {
+                    return this.master[index];
+                }
+
+                int idx = index - this.master.Count;
+
+                foreach (var slave in this.slaves)
+                {
+                    if (slave.Count() < idx)
+                    {
+                        idx -= slave.Count();
+                        continue;
+                    }
+
+                    return slave.ElementAt(idx);
+                }
+
+                return default(T);
+            }
+
+            set
+            {
+                this.master[index] = value;
+            }
+        }
+
         public override int Add(T item)
         {
             if (this.master == null)
@@ -137,16 +168,62 @@ namespace IX.Observable.Adapters
             return -1;
         }
 
+        public void Insert(T item, int index)
+        {
+            this.master.Insert(index, item);
+        }
+
+        public int IndexOf(T item)
+        {
+            int offset = 0;
+
+            int foundIndex;
+            if ((foundIndex = this.master.IndexOf(item)) != -1)
+            {
+                return foundIndex;
+            }
+            else
+            {
+                offset += this.master.Count;
+
+                foreach (var slave in this.slaves.Select(p => p.ToList()))
+                {
+                    if ((foundIndex = slave.IndexOf(item)) != -1)
+                    {
+                        return foundIndex + offset;
+                    }
+                    else
+                    {
+                        offset += slave.Count();
+                    }
+                }
+
+                return -1;
+            }
+        }
+
+        public void RemoveAt(int index)
+        {
+            this.master.RemoveAt(index);
+        }
+
         internal void SetMaster<TList>(TList masterList)
             where TList : class, IList<T>, INotifyCollectionChanged
         {
             this.master = masterList ?? throw new ArgumentNullException(nameof(masterList));
+            masterList.CollectionChanged += this.List_CollectionChanged;
         }
 
         internal void SetSlave<TList>(TList slaveList)
             where TList : class, IEnumerable<T>, INotifyCollectionChanged
         {
             this.slaves.Add(slaveList ?? throw new ArgumentNullException(nameof(slaveList)));
+            slaveList.CollectionChanged += this.List_CollectionChanged;
+        }
+
+        private void List_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            this.TriggerReset();
         }
     }
 }

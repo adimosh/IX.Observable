@@ -1,10 +1,10 @@
-﻿<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
+<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
   <PropertyGroup>
     <Description>A library with several collection types (dictionary, stack, etc.) that have been made observable.</Description>
     <Copyright>Adrian Mos, 2016</Copyright>
     <AssemblyName>IX.Observable</AssemblyName>
     <AssemblyTitle>IX.Observable</AssemblyTitle>
-    <VersionPrefix>0.4.0</VersionPrefix>
+    <VersionPrefix>0.4.0-alpha1</VersionPrefix>
     <Authors>Adrian Mos</Authors>
     <TargetFrameworks>netstandard1.0;netstandard1.1</TargetFrameworks>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>

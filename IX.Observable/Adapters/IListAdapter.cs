@@ -2,6 +2,7 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -15,5 +16,9 @@ namespace IX.Observable.Adapters
     /// <seealso cref="System.Collections.Generic.ICollection{T}" />
     public interface IListAdapter<T> : IReadOnlyCollection<T>, ICollection<T>, ICollection
     {
+        /// <summary>
+        /// Occurs when the owner of this list adapter must reset.
+        /// </summary>
+        event EventHandler MustReset;
     }
 }
