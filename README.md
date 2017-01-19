@@ -22,12 +22,18 @@ purpose.
 |:-----:|:------:|:--------------:|
 | `ObservableDictionary<TKey, TValue>` | `Dictionary<TKey, TValue>` | An observable dictionary that advertises both collection changes and various property changes (such as Count) |
 | `ConcurrentObservableDictionary<TKey, TValue>` | `Dictionary<TKey, TValue>` | Same as `ObservableDictionary<TKey, TValue>`, but also thread-safe |
+| `ObservableSortedDictionary<TKey, TValue>` (not yet implemented) | `SortedDictionary<TKey, TValue>` | An observable sorted dictionary |
+| `ConcurrentSortedObservableDictionary<TKey, TValue>` (not yet implemented) | `SortedDictionary<TKey, TValue>` | Same as `ObservableSortedDictionary<TKey, TValue>`, but also thread-safe |
 | `ObservableStack<T>` | `Stack<T>` | A stack that advertises its changes |
 | `ConcurrentObservableStack<T>` | `Stack<T>` | Same as `ObservableStack<T>`, but also thread-safe |
 | `ObservableQueue<T>` | `Queue<T>` | A queue that advertises its changes |
 | `ConcurrentObservableQueue<T>` | `Queue<T>` | Same as `ObservableQueue<T>`, but also thread-safe |
 | `ObservableMasterSlaveCollection<T>` | `CompositeCollection` | A collection that composes multiple collections, in which one of the collections is a master and accepts updates, whereas the others are slave ones and are used for display only (note: the collections are referenced, not copied) |
-| `ObservableMasterSlaveCollection<T>` (not yet implemented) | `CompositeCollection` | Same as `ObservableMasterSlaveCollection<T>`, but also thread-safe |
+| `ConcurrentObservableMasterSlaveCollection<T>` (not yet implemented) | `CompositeCollection` | Same as `ObservableMasterSlaveCollection<T>`, but also thread-safe |
+| `ConcurrentObservableCollection<T>` (not yet implemented) | `List<T>` | A thread-safe observable list |
+| `ObservableSortedList<T>` (not yet implemented) | `SortedList<T>` | An observable sorted list |
+| `ConcurrentObservableSortedList<T>` (not yet implemented) | `SortedList<T>` | Same as `ObservableSortedList<T>`, but also thread-safe |
+| `ObservableReadOnlyCompositeList<T>` (not yet implemented) | `CompositeCollection` | A collection made of multiple collections that all share the same item type that advertises its changes and that does not support changes (also thread-safe by definition) |
 
 This list is currently in progress and will be updated.
 
