@@ -49,6 +49,19 @@ namespace IX.Observable.Adapters
 
         public override object SyncRoot => null;
 
+        internal int MasterCount
+        {
+            get
+            {
+                if (this.master == null)
+                {
+                    throw new InvalidOperationException();
+                }
+
+                return this.master.Count;
+            }
+        }
+
         public T this[int index]
         {
             get
@@ -62,7 +75,7 @@ namespace IX.Observable.Adapters
 
                 foreach (var slave in this.slaves)
                 {
-                    if (slave.Count() < idx)
+                    if (slave.Count() <= idx)
                     {
                         idx -= slave.Count();
                         continue;
@@ -89,7 +102,7 @@ namespace IX.Observable.Adapters
 
             this.master.Add(item);
 
-            return -1;
+            return this.MasterCount - 1;
         }
 
         public override void Clear()
@@ -163,9 +176,11 @@ namespace IX.Observable.Adapters
                 throw new InvalidOperationException();
             }
 
+            int index = this.master.IndexOf(item);
+
             this.master.Remove(item);
 
-            return -1;
+            return index;
         }
 
         public void Insert(T item, int index)
