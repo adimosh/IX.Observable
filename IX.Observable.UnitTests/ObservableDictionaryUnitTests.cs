@@ -1,5 +1,5 @@
 ﻿// <copyright file="ObservableDictionaryUnitTests.cs" company="Adrian Mos">
-// Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
+// Copyright (c) Adrian Mos with all rights reserved. Unit tests framework.
 // </copyright>
 
 using Xunit;
@@ -8,16 +8,41 @@ namespace IX.Observable.UnitTests
 {
     public class ObservableDictionaryUnitTests
     {
-        [Fact]
-        public void ObservableDictionaryStub()
+        [Fact(DisplayName = "ObservableDictionary ctor, Indexer and Count")]
+        public void ObservableDictionaryCount()
         {
-            ObservableDictionary<string, int> x = new ObservableDictionary<string, int>
-            {
-                ["aaa"] = 1,
-                ["bbb"] = 2,
-            };
+            // Arrange
+            int numberOfItems = UnitTestsUtils.Random.Next(UnitTestConstants.TestsGeneralMagnitude);
+            int[] items = new int[numberOfItems];
 
-            Assert.True(x.Count == 2);
+            for (int i = 0; i < numberOfItems; i++)
+            {
+                items[i] = UnitTestsUtils.Random.Next(numberOfItems);
+            }
+
+            int numberOfItemsToCheck = UnitTestsUtils.Random.Next(numberOfItems);
+            int[] itemsToCheck = new int[numberOfItemsToCheck];
+
+            for (int i = 0; i < numberOfItemsToCheck; i++)
+            {
+                itemsToCheck[i] = UnitTestsUtils.Random.Next(numberOfItems);
+            }
+
+            // Act
+            ObservableDictionary<int, int> x = new ObservableDictionary<int, int>(numberOfItems);
+
+            for (int i = 0; i < numberOfItems; i++)
+            {
+                x.Add(i, items[i]);
+            }
+
+            // Assert
+            Assert.True(x.Count == numberOfItems);
+
+            foreach (int i in itemsToCheck)
+            {
+                Assert.Equal(x[i], items[i]);
+            }
         }
     }
 }

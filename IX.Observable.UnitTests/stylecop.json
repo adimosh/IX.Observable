@@ -3,7 +3,7 @@
   "settings": {
     "documentationRules": {
       "companyName": "Adrian Mos",
-      "copyrightText": "Copyright (c) {companyName} with all rights reserved. Part of the IX Framework.",
+      "copyrightText": "Copyright (c) {companyName} with all rights reserved. Unit tests framework.",
       "documentPrivateElements": false,
       "documentExposedElements": false,
       "documentInterfaces": false,

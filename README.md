@@ -37,7 +37,7 @@ purpose.
 | `ConcurrentObservableSortedList<TKey, TValue>` (not yet implemented) | [`SortedList<TKey, TValue>`](https://msdn.microsoft.com/en-us/library/ms132319.aspx) | Same as `ObservableSortedList<T>`, but also thread-safe |
 | `ObservableReadOnlyCompositeList<T>` (not yet implemented) | [`CompositeCollection`](https://msdn.microsoft.com/en-us/library/system.windows.data.compositecollection.aspx) | A collection made of multiple collections that all share the same item type that advertises its changes and that does not support changes (also thread-safe by definition) |
 
-This list is currently in progress and will be updated.
+This list will be updated as new classes are added based on ongoing work and community requests.
 
 ## Documentation
 
@@ -45,13 +45,63 @@ Documentation is currently in progress.
 
 ## Contributing
 
-The contribution guide is currently in progress.
+### Developer instructions
 
-## Giving Thanks
+The project builds in Visual Studio 2017 and uses some of the language enhancements VS2017 brought. The project structure also follows the .NET Core CSPROJ standard.
+
+Since the tooling is very difficult to work with and mostly unavailable, Visual Studio 2017 has been chosen as a suitable IDE with a good-enough project structure
+for the purposes of this project. There are no plans to port this to earlier editions of Visual Studio.
+
+Visual Studio Code should, to the extent of my knowledge, also work (at least for vanilla code changes), but I do not currently work with that IDE, instead focusing
+on development with the familiar IDE that I use in commercial development at my daily job.
+
+### Direct code contributions
+
+This repository accepts direct code contributions in the form of issue-less pull requests.
+
+These contributions should be done through forking the repository and creating pull requests towards the main repository.
+
+### Preferred contribution procedure
+
+Preferred contribution procedure is to take an [up-for-grabs issue from GitHub](https://github.com/adimosh/IX.Observable/issues), create a fork of the code, and
+create a pull request with the changes.
+
+### Acceptance Guidelines
+
+Contribution will be accepted if:
+
+- They make sense (or, if their sense is not immediately noticeable, are explained through comments)
+- They don't break the build or unit tests
+- They are not changing the style and formatting of the code (especially pull requests that focus exclusively on such changes)
+- They pass the standards set by the StyleCop analyzer
+- They introduce an actual useable feature, or new unit tests
+- They don't introduced other dependencies, unless they are discussed first
+- They don't mess around with build/project/tool settings
+
+A few notes about unit test contributions:
+
+- Unit tests use the xunit.net framework - please do not use anything but that
+- Unit test contributions must not rely on magic numbers, unless it is a specific scenario for a magic number that you are testing; instead, please use randomness as much as possible
+
+A few notes about bugfixes:
+
+- Please do not submit bugfix pull requests unless you also explain the bug first
+- A bug fix should also have a unit test dedicated to it
+
+Also, contributions will be accepted if they highlight and fix typos in any part of this repository.
+
+## Acknowledgements
 
 This project uses the following libraries:
 
 - .NET Framework Core, available from the [.NET Foundation](https://github.com/dotnet)
 - StyleCop analyzer, available from [its GitHub page](https://github.com/DotNetAnalyzers/StyleCopAnalyzers)
+- xunit.net, available from [its GitHub page](http://xunit.github.io/)
+
+This project uses the following tools:
+
+- [Visual Studio](https://www.visualstudio.com/) Community Edition [2017 RC](https://www.visualstudio.com/vs/visual-studio-2017-rc/)
+- GhostDoc, available at [SubMain's website](http://submain.com/products/ghostdoc.aspx)
+- Mads Kristensen's fabulous and numerous tools and extensions, which are too many to name and are available at [his GitHub page](https://github.com/madskristensen/)
 
 This list is currently work-in-progress and will be updated to include more.
