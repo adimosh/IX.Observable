@@ -3,6 +3,7 @@
 // </copyright>
 
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using IX.Observable.Adapters;
 
@@ -166,6 +167,44 @@ namespace IX.Observable
                 else
                 {
                     return false;
+                }
+            }
+
+            throw new TimeoutException();
+        }
+
+        /// <summary>
+        /// Returns a locking enumerator that iterates through the collection.
+        /// </summary>
+        /// <returns>
+        /// An enumerator that can be used to iterate through the collection.
+        /// </returns>
+        /// <remarks>
+        /// <para>The enumerator, by default, locks the collection in place and ensures that any attempts to modify from the same thread will result in an exception,
+        /// whereas from a different thread will result in the other thread patiently waiting for its turn to write.</para>
+        /// <para>This implementation focuses on the normal use of enumerators, which is to dispose of their IEnumerator at the end of their enumeration cycle.</para>
+        /// <para>If the enumerator is never disposed of, it will never release the read lock, thus making the other threads time out.</para>
+        /// <para>Please make sure that you dispose the enumerator object at all times in order to avoid deadlocking and timeouts.</para>
+        /// </remarks>
+        public override IEnumerator<T> GetEnumerator()
+        {
+            if (this.Locker.TryEnterReadLock(Constants.ConcurrentLockAcquisitionTimeout))
+            {
+                try
+                {
+                    using (var enumerator = this.InternalContainer.GetEnumerator())
+                    {
+                        while (enumerator.MoveNext())
+                        {
+                            yield return enumerator.Current;
+                        }
+                    }
+
+                    yield break;
+                }
+                finally
+                {
+                    this.Locker.ExitReadLock();
                 }
             }
 
