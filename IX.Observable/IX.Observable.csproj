@@ -4,7 +4,7 @@
     <Copyright>Adrian Mos, 2016</Copyright>
     <AssemblyName>IX.Observable</AssemblyName>
     <AssemblyTitle>IX.Observable</AssemblyTitle>
-    <VersionPrefix>0.4.0-alpha5</VersionPrefix>
+    <VersionPrefix>0.4.0-alpha6</VersionPrefix>
     <Authors>Adrian Mos</Authors>
     <TargetFrameworks>netstandard1.0;netstandard1.1</TargetFrameworks>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
