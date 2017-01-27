@@ -1,4 +1,4 @@
-﻿// <copyright file="StackListAdapter.cs" company="Adrian Mos">
+﻿// <copyright file="StackListAdapter{T}.cs" company="Adrian Mos">
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
