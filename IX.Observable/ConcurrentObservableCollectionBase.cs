@@ -23,7 +23,7 @@ namespace IX.Observable
         /// </summary>
         /// <param name="internalContainer">The internal container.</param>
         /// <param name="synchronizationContext">The synchronization context.</param>
-        protected ConcurrentObservableCollectionBase(ListAdapter<T> internalContainer, SynchronizationContext synchronizationContext)
+        protected ConcurrentObservableCollectionBase(CollectionAdapter<T> internalContainer, SynchronizationContext synchronizationContext)
             : base(internalContainer, synchronizationContext)
         {
             this.Locker = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);

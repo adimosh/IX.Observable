@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace IX.Observable.Adapters
 {
-    internal class StackListAdapter<T> : ListAdapter<T>
+    internal class StackListAdapter<T> : CollectionAdapter<T>
     {
 #pragma warning disable SA1307 // Accessible fields must begin with upper-case letter
 #pragma warning disable SA1401 // Fields must be private

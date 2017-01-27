@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace IX.Observable.Adapters
 {
-    internal class DictionaryListAdapter<TKey, TValue> : ListAdapter<KeyValuePair<TKey, TValue>>
+    internal class DictionaryListAdapter<TKey, TValue> : CollectionAdapter<KeyValuePair<TKey, TValue>>
     {
 #pragma warning disable SA1307 // Accessible fields must begin with upper-case letter
 #pragma warning disable SA1401 // Fields must be private

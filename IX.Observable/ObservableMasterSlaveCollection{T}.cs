@@ -1,4 +1,4 @@
-﻿// <copyright file="ObservableMasterSlaveCollection.cs" company="Adrian Mos">
+﻿// <copyright file="ObservableMasterSlaveCollection{T}.cs" company="Adrian Mos">
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
@@ -34,12 +34,6 @@ namespace IX.Observable
             : base(new MultiListListAdapter<T>(), context)
         {
         }
-
-        /// <inheritdoc />
-        public bool IsSynchronized => this.InternalContainer.IsSynchronized;
-
-        /// <inheritdoc />
-        public object SyncRoot => this.InternalContainer.SyncRoot;
 
         /// <inheritdoc />
         public bool IsFixedSize => false;

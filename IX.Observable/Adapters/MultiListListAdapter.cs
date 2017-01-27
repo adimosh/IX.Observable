@@ -9,7 +9,7 @@ using System.Linq;
 
 namespace IX.Observable.Adapters
 {
-    internal class MultiListListAdapter<T> : ListAdapter<T>
+    internal class MultiListListAdapter<T> : CollectionAdapter<T>
     {
         private IList<T> master;
         private List<IEnumerable<T>> slaves;

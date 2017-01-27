@@ -1,4 +1,4 @@
-﻿// <copyright file="ObservableDictionary.cs" company="Adrian Mos">
+﻿// <copyright file="ObservableDictionary{TKey, TValue}.cs" company="Adrian Mos">
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 

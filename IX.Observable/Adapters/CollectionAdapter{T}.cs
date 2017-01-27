@@ -1,4 +1,4 @@
-﻿// <copyright file="ListAdapter.cs" company="Adrian Mos">
+﻿// <copyright file="CollectionAdapter{T}.cs" company="Adrian Mos">
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
@@ -12,8 +12,8 @@ namespace IX.Observable.Adapters
     /// An adapter class for various collection types.
     /// </summary>
     /// <typeparam name="T">The type of items in the adapter.</typeparam>
-    /// <seealso cref="IX.Observable.Adapters.IListAdapter{T}" />
-    public abstract class ListAdapter<T> : IListAdapter<T>
+    /// <seealso cref="IX.Observable.Adapters.ICollectionAdapter{T}" />
+    public abstract class CollectionAdapter<T> : ICollectionAdapter<T>
     {
         /// <summary>
         /// Occurs when the owner of this list adapter must reset.

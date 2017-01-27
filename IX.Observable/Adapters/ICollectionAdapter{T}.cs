@@ -1,4 +1,4 @@
-﻿// <copyright file="IListAdapter.cs" company="Adrian Mos">
+﻿// <copyright file="ICollectionAdapter{T}.cs" company="Adrian Mos">
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
@@ -14,7 +14,8 @@ namespace IX.Observable.Adapters
     /// <typeparam name="T">The type of item.</typeparam>
     /// <seealso cref="System.Collections.Generic.IReadOnlyCollection{T}" />
     /// <seealso cref="System.Collections.Generic.ICollection{T}" />
-    public interface IListAdapter<T> : IReadOnlyCollection<T>, ICollection<T>, ICollection
+    /// <seealso cref="System.Collections.ICollection" />
+    public interface ICollectionAdapter<T> : IReadOnlyCollection<T>, ICollection<T>, ICollection
     {
         /// <summary>
         /// Occurs when the owner of this list adapter must reset.
