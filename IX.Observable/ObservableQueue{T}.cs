@@ -85,7 +85,7 @@ namespace IX.Observable
                 (state) =>
             {
                 this.OnPropertyChanged(nameof(this.Count));
-                this.OnPropertyChanged("Item[]");
+                this.OnPropertyChanged(Constants.ItemsName);
                 this.OnCollectionChangedRemove(state, 0);
             }, item);
 
@@ -104,7 +104,7 @@ namespace IX.Observable
                 (state) =>
             {
                 this.OnPropertyChanged(nameof(this.Count));
-                this.OnPropertyChanged("Item[]");
+                this.OnPropertyChanged(Constants.ItemsName);
                 this.OnCollectionChangedAdd(state.item, state.index);
             }, new { index = this.Count - 1, item });
         }

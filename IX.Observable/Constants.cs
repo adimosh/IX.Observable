@@ -7,5 +7,6 @@ namespace IX.Observable
     internal static class Constants
     {
         internal const int ConcurrentLockAcquisitionTimeout = 100;
+        internal const string ItemsName = "Item[]";
     }
 }

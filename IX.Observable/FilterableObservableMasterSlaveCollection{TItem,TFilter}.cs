@@ -20,30 +20,37 @@ namespace IX.Observable
     [DebuggerTypeProxy(typeof(CollectionDebugView<>))]
     public class FilterableObservableMasterSlaveCollection<TItem, TFilter> : ObservableMasterSlaveCollection<TItem>
     {
+        private TFilter filter;
+        private Func<TItem, TFilter, bool> filteringPredicate;
+
         /// <summary>
-        /// Initializes a new instance of the <see cref="FilterableObservableMasterSlaveCollection{TItem, TFilter}"/> class.
+        /// Initializes a new instance of the <see cref="FilterableObservableMasterSlaveCollection{TItem, TFilter}" /> class.
         /// </summary>
-        public FilterableObservableMasterSlaveCollection()
+        /// <param name="filteringPredicate">The filtering predicate.</param>
+        public FilterableObservableMasterSlaveCollection(Func<TItem, TFilter, bool> filteringPredicate)
             : base()
         {
+            this.filteringPredicate = filteringPredicate;
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FilterableObservableMasterSlaveCollection{TItem, TFilter}"/> class.
         /// </summary>
+        /// <param name="filteringPredicate">The filtering predicate.</param>
         /// <param name="context">The synchronization context to use, if any.</param>
-        public FilterableObservableMasterSlaveCollection(SynchronizationContext context)
+        public FilterableObservableMasterSlaveCollection(Func<TItem, TFilter, bool> filteringPredicate, SynchronizationContext context)
             : base(context)
         {
+            this.filteringPredicate = filteringPredicate;
         }
 
         /// <summary>
-        /// Gets or sets the filtering predicate.
+        /// Gets the filtering predicate.
         /// </summary>
         /// <value>
         /// The filtering predicate.
         /// </value>
-        public Func<TItem, TFilter, bool> FilteringPredicate { get; set; }
+        public Func<TItem, TFilter, bool> FilteringPredicate => this.filteringPredicate;
 
         /// <summary>
         /// Gets or sets the filter value.
@@ -51,7 +58,20 @@ namespace IX.Observable
         /// <value>
         /// The filter value.
         /// </value>
-        public TFilter Filter { get; set; }
+        public TFilter Filter
+        {
+            get => this.filter;
+            set
+            {
+                this.filter = value;
+
+                this.AsyncPost(() =>
+                {
+                    this.OnCollectionChanged();
+                    this.OnPropertyChanged(Constants.ItemsName);
+                });
+            }
+        }
 
         /// <summary>
         /// Returns an enumerator that iterates through the collection.

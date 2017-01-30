@@ -71,7 +71,7 @@ namespace IX.Observable
                 {
                     this.OnCollectionChanged();
                     this.OnPropertyChanged(nameof(this.Count));
-                    this.OnPropertyChanged("Item[]");
+                    this.OnPropertyChanged(Constants.ItemsName);
                 });
             }
         }
@@ -92,7 +92,7 @@ namespace IX.Observable
             {
                 this.OnCollectionChangedAdd(state.item, state.index);
                 this.OnPropertyChanged(nameof(this.Count));
-                this.OnPropertyChanged("Item[]");
+                this.OnPropertyChanged(Constants.ItemsName);
             }, new { item, index });
         }
 
@@ -108,7 +108,7 @@ namespace IX.Observable
             {
                 this.OnCollectionChangedRemove(state.item, state.index);
                 this.OnPropertyChanged(nameof(this.Count));
-                this.OnPropertyChanged("Item[]");
+                this.OnPropertyChanged(Constants.ItemsName);
             }, new { index, item });
         }
 
@@ -126,7 +126,7 @@ namespace IX.Observable
             {
                 this.OnCollectionChanged();
                 this.OnPropertyChanged(nameof(this.Count));
-                this.OnPropertyChanged("Item[]");
+                this.OnPropertyChanged(Constants.ItemsName);
             });
         }
 
@@ -144,7 +144,7 @@ namespace IX.Observable
             {
                 this.OnCollectionChanged();
                 this.OnPropertyChanged(nameof(this.Count));
-                this.OnPropertyChanged("Item[]");
+                this.OnPropertyChanged(Constants.ItemsName);
             });
         }
 
@@ -210,6 +210,6 @@ namespace IX.Observable
         }
 
         /// <inheritdoc />
-        protected override void ContentsMayHaveChanged() => this.OnPropertyChanged("Item[]");
+        protected override void ContentsMayHaveChanged() => this.OnPropertyChanged(Constants.ItemsName);
     }
 }

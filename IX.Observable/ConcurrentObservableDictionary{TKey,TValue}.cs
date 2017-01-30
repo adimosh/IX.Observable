@@ -339,7 +339,7 @@ namespace IX.Observable
         {
             this.OnPropertyChanged(nameof(this.Keys));
             this.OnPropertyChanged(nameof(this.Values));
-            this.OnPropertyChanged("Item[]");
+            this.OnPropertyChanged(Constants.ItemsName);
         }
 
         private void BroadcastChange() => this.AsyncPost(() =>
@@ -348,7 +348,7 @@ namespace IX.Observable
                 this.OnPropertyChanged(nameof(this.Keys));
                 this.OnPropertyChanged(nameof(this.Values));
                 this.OnPropertyChanged(nameof(this.Count));
-                this.OnPropertyChanged("Item[]");
+                this.OnPropertyChanged(Constants.ItemsName);
             });
     }
 }
