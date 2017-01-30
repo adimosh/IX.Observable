@@ -4,7 +4,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading;
+using IX.Observable.DebugAide;
 
 namespace IX.Observable
 {
@@ -14,6 +16,8 @@ namespace IX.Observable
     /// <typeparam name="TItem">The type of the item.</typeparam>
     /// <typeparam name="TFilter">The type of the filter.</typeparam>
     /// <seealso cref="IX.Observable.ObservableMasterSlaveCollection{T}" />
+    [DebuggerDisplay("Count = {Count}")]
+    [DebuggerTypeProxy(typeof(CollectionDebugView<>))]
     public class FilterableObservableMasterSlaveCollection<TItem, TFilter> : ObservableMasterSlaveCollection<TItem>
     {
         /// <summary>

@@ -6,8 +6,10 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Threading;
 using IX.Observable.Adapters;
+using IX.Observable.DebugAide;
 
 namespace IX.Observable
 {
@@ -16,6 +18,8 @@ namespace IX.Observable
     /// </summary>
     /// <typeparam name="T">The type of the item.</typeparam>
     /// <seealso cref="IX.Observable.ObservableCollectionBase{TItem}" />
+    [DebuggerDisplay("Count = {Count}")]
+    [DebuggerTypeProxy(typeof(CollectionDebugView<>))]
     public class ObservableMasterSlaveCollection<T> : ObservableCollectionBase<T>, IList<T>, IReadOnlyCollection<T>, ICollection<T>, ICollection, IList
     {
         /// <summary>
