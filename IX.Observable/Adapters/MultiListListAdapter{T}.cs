@@ -9,7 +9,7 @@ using System.Linq;
 
 namespace IX.Observable.Adapters
 {
-    internal class MultiListListAdapter<T> : CollectionAdapter<T>
+    internal class MultiListListAdapter<T> : ListAdapter<T>
     {
         private IList<T> master;
         private List<IEnumerable<T>> slaves;
@@ -62,7 +62,7 @@ namespace IX.Observable.Adapters
             }
         }
 
-        public T this[int index]
+        public override T this[int index]
         {
             get
             {
@@ -71,7 +71,7 @@ namespace IX.Observable.Adapters
                     return this.master[index];
                 }
 
-                int idx = index - this.master.Count;
+                var idx = index - this.master.Count;
 
                 foreach (var slave in this.slaves)
                 {
@@ -87,10 +87,7 @@ namespace IX.Observable.Adapters
                 return default(T);
             }
 
-            set
-            {
-                this.master[index] = value;
-            }
+            set => this.master[index] = value;
         }
 
         public override int Add(T item)
@@ -132,10 +129,10 @@ namespace IX.Observable.Adapters
                 throw new InvalidOperationException();
             }
 
-            int totalCount = this.Count + arrayIndex;
+            var totalCount = this.Count + arrayIndex;
             IEnumerator<T> enumerator = this.GetEnumerator();
 
-            for (int i = arrayIndex; i < totalCount; i++)
+            for (var i = arrayIndex; i < totalCount; i++)
             {
                 if (!enumerator.MoveNext())
                 {
@@ -176,21 +173,18 @@ namespace IX.Observable.Adapters
                 throw new InvalidOperationException();
             }
 
-            int index = this.master.IndexOf(item);
+            var index = this.master.IndexOf(item);
 
             this.master.Remove(item);
 
             return index;
         }
 
-        public void Insert(T item, int index)
-        {
-            this.master.Insert(index, item);
-        }
+        public override void Insert(int index, T item) => this.master.Insert(index, item);
 
-        public int IndexOf(T item)
+        public override int IndexOf(T item)
         {
-            int offset = 0;
+            var offset = 0;
 
             int foundIndex;
             if ((foundIndex = this.master.IndexOf(item)) != -1)
@@ -217,10 +211,11 @@ namespace IX.Observable.Adapters
             }
         }
 
-        public void RemoveAt(int index)
-        {
-            this.master.RemoveAt(index);
-        }
+        /// <summary>
+        /// Removes an item at a specific index.
+        /// </summary>
+        /// <param name="index">The index at which to remove from.</param>
+        public override void RemoveAt(int index) => this.master.RemoveAt(index);
 
         internal void SetMaster<TList>(TList masterList)
             where TList : class, IList<T>, INotifyCollectionChanged
@@ -236,9 +231,6 @@ namespace IX.Observable.Adapters
             slaveList.CollectionChanged += this.List_CollectionChanged;
         }
 
-        private void List_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            this.TriggerReset();
-        }
+        private void List_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) => this.TriggerReset();
     }
 }

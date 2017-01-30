@@ -342,9 +342,7 @@ namespace IX.Observable
             this.OnPropertyChanged("Item[]");
         }
 
-        private void BroadcastChange()
-        {
-            this.AsyncPost(() =>
+        private void BroadcastChange() => this.AsyncPost(() =>
             {
                 this.OnCollectionChanged();
                 this.OnPropertyChanged(nameof(this.Keys));
@@ -352,6 +350,5 @@ namespace IX.Observable
                 this.OnPropertyChanged(nameof(this.Count));
                 this.OnPropertyChanged("Item[]");
             });
-        }
     }
 }

@@ -120,4 +120,7 @@
   <data name="DictionaryItemAlreadyExists" xml:space="preserve">
     <value>An item with the same key already exists in this dictionary.</value>
   </data>
+  <data name="OperationItemTypeError" xml:space="preserve">
+    <value>The type of the argument is not a compatible type to the list.</value>
+  </data>
 </root>

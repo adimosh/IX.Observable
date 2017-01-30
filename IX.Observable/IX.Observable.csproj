@@ -6,7 +6,7 @@
     <AssemblyTitle>IX.Observable</AssemblyTitle>
     <VersionPrefix>0.4.0-alpha7</VersionPrefix>
     <Authors>Adrian Mos</Authors>
-    <TargetFrameworks>netstandard1.0;netstandard1.1</TargetFrameworks>
+    <TargetFramework>netstandard1.0</TargetFramework>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <PackageProjectUrl>https://github.com/adimosh/IX.Observable/</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/adimosh/IX.Observable/blob/master/LICENSE.md</PackageLicenseUrl>
@@ -37,6 +37,11 @@
     <DefineTrace>false</DefineTrace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove=".vscode\**" />
+    <EmbeddedResource Remove=".vscode\**" />
+    <None Remove=".vscode\**" />
+  </ItemGroup>
+  <ItemGroup>
     <AdditionalFiles Include="stylecop.json" />
   </ItemGroup>
   <ItemGroup>
@@ -52,12 +57,19 @@
   <ItemGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.0-beta001" Type="build" />
   </ItemGroup>
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.0' ">
-    <DefineConstants>$(DefineConstants);NETSTANDARD10</DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.1' ">
-    <DefineConstants>$(DefineConstants);NETSTANDARD11</DefineConstants>
-  </PropertyGroup>
+  <ItemGroup>
+    <Compile Update="Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Update="Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <WarningsAsErrors>true</WarningsAsErrors>
   </PropertyGroup>

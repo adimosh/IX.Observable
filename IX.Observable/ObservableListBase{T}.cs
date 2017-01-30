@@ -2,7 +2,6 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
-using System;
 using System.Collections.Generic;
 using System.Threading;
 using IX.Observable.Adapters;
@@ -18,26 +17,52 @@ namespace IX.Observable
     /// <seealso cref="System.Collections.Generic.IReadOnlyList{T}" />
     public abstract class ObservableListBase<T> : ObservableCollectionBase<T>, IList<T>, IReadOnlyList<T>
     {
-        public ObservableListBase(CollectionAdapter<T> internalContainer, SynchronizationContext context)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ObservableListBase{T}"/> class.
+        /// </summary>
+        /// <param name="internalContainer">The internal container.</param>
+        /// <param name="context">The context.</param>
+        public ObservableListBase(ListAdapter<T> internalContainer, SynchronizationContext context)
             : base(internalContainer, context)
         {
         }
 
-        public T this[int index] { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        /// <summary>
+        /// Gets the internal list container.
+        /// </summary>
+        /// <value>
+        /// The internal list container.
+        /// </value>
+        protected ListAdapter<T> InternalListContainer => (ListAdapter<T>)this.InternalContainer;
 
-        public int IndexOf(T item)
-        {
-            throw new NotImplementedException();
-        }
+        /// <summary>
+        /// Gets the item at the specified index.
+        /// </summary>
+        /// <value>
+        /// The item.
+        /// </value>
+        /// <param name="index">The index.</param>
+        /// <returns>The item at the specified index.</returns>
+        public T this[int index] { get => this.InternalListContainer[index]; set => this.InternalListContainer[index] = value; }
 
-        public void Insert(int index, T item)
-        {
-            throw new NotImplementedException();
-        }
+        /// <summary>
+        /// Determines the index of a specific item, if any.
+        /// </summary>
+        /// <param name="item">The item.</param>
+        /// <returns>The index of the item, or <c>-1</c> if not found.</returns>
+        public int IndexOf(T item) => this.InternalListContainer.IndexOf(item);
 
-        public void RemoveAt(int index)
-        {
-            throw new NotImplementedException();
-        }
+        /// <summary>
+        /// Inserts an item at the specified index.
+        /// </summary>
+        /// <param name="index">The index at which to insert.</param>
+        /// <param name="item">The item.</param>
+        public void Insert(int index, T item) => this.InternalListContainer.Insert(index, item);
+
+        /// <summary>
+        /// Removes an item at the specified index.
+        /// </summary>
+        /// <param name="index">The index at which to remove an item from.</param>
+        public void RemoveAt(int index) => this.InternalListContainer.RemoveAt(index);
     }
 }

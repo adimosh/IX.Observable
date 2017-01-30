@@ -76,15 +76,12 @@ namespace IX.Observable
         public void CopyTo(Array array, int index) => ((ICollection)this.InternalContainer).CopyTo(array, index);
 
         /// <inheritdoc />
-        public int IndexOf(T item)
-        {
-            return ((MultiListListAdapter<T>)this.InternalContainer).IndexOf(item);
-        }
+        public int IndexOf(T item) => ((MultiListListAdapter<T>)this.InternalContainer).IndexOf(item);
 
         /// <inheritdoc />
         public void Insert(int index, T item)
         {
-            ((MultiListListAdapter<T>)this.InternalContainer).Insert(item, index);
+            ((MultiListListAdapter<T>)this.InternalContainer).Insert(index, item);
 
             this.AsyncPost(
                 (state) =>
@@ -209,9 +206,6 @@ namespace IX.Observable
         }
 
         /// <inheritdoc />
-        protected override void ContentsMayHaveChanged()
-        {
-            this.OnPropertyChanged("Item[]");
-        }
+        protected override void ContentsMayHaveChanged() => this.OnPropertyChanged("Item[]");
     }
 }

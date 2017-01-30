@@ -110,10 +110,7 @@ namespace IX.Observable.Adapters
         /// Returns an enumerator that iterates through the collection.
         /// </summary>
         /// <returns>An enumerator that can be used to iterate through the collection.</returns>
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return this.GetEnumerator();
-        }
+        IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
 
         /// <summary>
         /// Copies the contents of the container to an array.
@@ -130,9 +127,6 @@ namespace IX.Observable.Adapters
         /// <summary>
         /// Triggers the reset.
         /// </summary>
-        protected void TriggerReset()
-        {
-            this.MustReset?.Invoke(this, EventArgs.Empty);
-        }
+        protected void TriggerReset() => this.MustReset?.Invoke(this, EventArgs.Empty);
     }
 }
