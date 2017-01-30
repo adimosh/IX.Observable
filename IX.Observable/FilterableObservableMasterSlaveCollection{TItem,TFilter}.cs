@@ -66,6 +66,45 @@ namespace IX.Observable
             return this.EnumerateFiltered(predicate);
         }
 
+        /// <inheritdoc/>
+        protected override void OnCollectionChangedAdd(TItem addedItem, int index)
+        {
+            if (EqualityComparer<TFilter>.Default.Equals(this.Filter, default(TFilter)))
+            {
+                this.OnCollectionChanged();
+            }
+            else
+            {
+                base.OnCollectionChangedAdd(addedItem, index);
+            }
+        }
+
+        /// <inheritdoc/>
+        protected override void OnCollectionChangedChanged(TItem oldItem, TItem newItem, int index)
+        {
+            if (EqualityComparer<TFilter>.Default.Equals(this.Filter, default(TFilter)))
+            {
+                this.OnCollectionChanged();
+            }
+            else
+            {
+                base.OnCollectionChangedChanged(oldItem, newItem, index);
+            }
+        }
+
+        /// <inheritdoc/>
+        protected override void OnCollectionChangedRemove(TItem removedItem, int index)
+        {
+            if (EqualityComparer<TFilter>.Default.Equals(this.Filter, default(TFilter)))
+            {
+                this.OnCollectionChanged();
+            }
+            else
+            {
+                base.OnCollectionChangedRemove(removedItem, index);
+            }
+        }
+
         private IEnumerator<TItem> EnumerateFiltered(Func<TItem, TFilter, bool> predicate)
         {
             var filter = this.Filter;
