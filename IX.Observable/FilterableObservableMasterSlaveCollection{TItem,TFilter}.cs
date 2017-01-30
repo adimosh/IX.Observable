@@ -73,6 +73,7 @@ namespace IX.Observable
                 this.AsyncPost(() =>
                 {
                     this.OnCollectionChanged();
+                    this.OnPropertyChanged(nameof(this.Count));
                     this.OnPropertyChanged(Constants.ItemsName);
                 });
             }
