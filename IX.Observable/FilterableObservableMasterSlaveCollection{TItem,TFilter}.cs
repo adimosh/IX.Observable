@@ -22,15 +22,17 @@ namespace IX.Observable
     {
         private TFilter filter;
         private Func<TItem, TFilter, bool> filteringPredicate;
+        private IList<TItem> filteredElements;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FilterableObservableMasterSlaveCollection{TItem, TFilter}" /> class.
         /// </summary>
         /// <param name="filteringPredicate">The filtering predicate.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="filteringPredicate"/> is <c>null</c> (<c>Nothing</c>) in Visual Basic.</exception>
         public FilterableObservableMasterSlaveCollection(Func<TItem, TFilter, bool> filteringPredicate)
             : base()
         {
-            this.filteringPredicate = filteringPredicate;
+            this.filteringPredicate = filteringPredicate ?? throw new ArgumentNullException(nameof(filteringPredicate));
         }
 
         /// <summary>
@@ -38,10 +40,11 @@ namespace IX.Observable
         /// </summary>
         /// <param name="filteringPredicate">The filtering predicate.</param>
         /// <param name="context">The synchronization context to use, if any.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="filteringPredicate"/> is <c>null</c> (<c>Nothing</c>) in Visual Basic.</exception>
         public FilterableObservableMasterSlaveCollection(Func<TItem, TFilter, bool> filteringPredicate, SynchronizationContext context)
             : base(context)
         {
-            this.filteringPredicate = filteringPredicate;
+            this.filteringPredicate = filteringPredicate ?? throw new ArgumentNullException(nameof(filteringPredicate));
         }
 
         /// <summary>
@@ -65,11 +68,39 @@ namespace IX.Observable
             {
                 this.filter = value;
 
+                this.ClearCachedContents();
+
                 this.AsyncPost(() =>
                 {
                     this.OnCollectionChanged();
                     this.OnPropertyChanged(Constants.ItemsName);
                 });
+            }
+        }
+
+        /// <summary>
+        /// Gets the number of items in the collection.
+        /// </summary>
+        /// <value>
+        /// The item count.
+        /// </value>
+        public override int Count
+        {
+            get
+            {
+                if (this.IsFilter())
+                {
+                    if (this.filteredElements == null)
+                    {
+                        this.FillCachedList();
+                    }
+
+                    return this.filteredElements.Count;
+                }
+                else
+                {
+                    return base.Count;
+                }
             }
         }
 
@@ -81,19 +112,25 @@ namespace IX.Observable
         /// </returns>
         public override IEnumerator<TItem> GetEnumerator()
         {
-            var predicate = this.FilteringPredicate;
-            if (predicate == null)
+            if (this.IsFilter())
             {
-                return base.GetEnumerator();
+                if (this.filteredElements == null)
+                {
+                    this.FillCachedList();
+                }
+                else
+                {
+                    return this.filteredElements.GetEnumerator();
+                }
             }
 
-            return this.EnumerateFiltered(predicate);
+            return base.GetEnumerator();
         }
 
         /// <inheritdoc/>
         protected override void OnCollectionChangedAdd(TItem addedItem, int index)
         {
-            if (EqualityComparer<TFilter>.Default.Equals(this.Filter, default(TFilter)))
+            if (this.IsFilter())
             {
                 this.OnCollectionChanged();
             }
@@ -106,7 +143,7 @@ namespace IX.Observable
         /// <inheritdoc/>
         protected override void OnCollectionChangedChanged(TItem oldItem, TItem newItem, int index)
         {
-            if (EqualityComparer<TFilter>.Default.Equals(this.Filter, default(TFilter)))
+            if (this.IsFilter())
             {
                 this.OnCollectionChanged();
             }
@@ -119,7 +156,7 @@ namespace IX.Observable
         /// <inheritdoc/>
         protected override void OnCollectionChangedRemove(TItem removedItem, int index)
         {
-            if (EqualityComparer<TFilter>.Default.Equals(this.Filter, default(TFilter)))
+            if (this.IsFilter())
             {
                 this.OnCollectionChanged();
             }
@@ -129,7 +166,7 @@ namespace IX.Observable
             }
         }
 
-        private IEnumerator<TItem> EnumerateFiltered(Func<TItem, TFilter, bool> predicate)
+        private IEnumerator<TItem> EnumerateFiltered()
         {
             var filter = this.Filter;
 
@@ -138,7 +175,7 @@ namespace IX.Observable
                 while (enumerator.MoveNext())
                 {
                     var current = enumerator.Current;
-                    if (predicate(current, filter))
+                    if (this.filteringPredicate(current, filter))
                     {
                         yield return current;
                     }
@@ -147,5 +184,31 @@ namespace IX.Observable
 
             yield break;
         }
+
+        private void FillCachedList()
+        {
+            this.filteredElements = new List<TItem>(base.Count);
+
+            using (var enumerator = this.EnumerateFiltered())
+            {
+                while (enumerator.MoveNext())
+                {
+                    var current = enumerator.Current;
+                    this.filteredElements.Add(current);
+                }
+            }
+        }
+
+        private void ClearCachedContents()
+        {
+            if (this.filteredElements != null)
+            {
+                var coll = this.filteredElements;
+                this.filteredElements = null;
+                coll.Clear();
+            }
+        }
+
+        private bool IsFilter() => !EqualityComparer<TFilter>.Default.Equals(this.Filter, default(TFilter));
     }
 }
