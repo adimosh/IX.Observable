@@ -56,7 +56,7 @@ for the purposes of this project. There are no plans to port this to earlier edi
 Visual Studio Code should, to the extent of my knowledge, also work (at least for vanilla code changes), but I do not currently work with that IDE, instead focusing
 on development with the familiar IDE that I use in commercial development at my daily job.
 
-The project is and will be exclusive to the .NET Standard. For now, there is no point in adding further targets than the .NET Standards 1.0 and 1.1, which provide the
+The project is and will be exclusive to the .NET Standard. For now, there is no point in adding further targets than the .NET Standard 1.0, which provides the
 highest level of compatibility. Should any special build be required in the future, please point it out, as well as giving a reason/scenario in which things did not
 work out with the current targets. Such questions and comments are always welcome, since I cannot commit to developing on all available platforms and operating systems
 at the same time.
@@ -110,4 +110,4 @@ This project uses the following tools:
 - GhostDoc, available at [SubMain's website](http://submain.com/products/ghostdoc.aspx)
 - Mads Kristensen's fabulous and numerous tools and extensions, which are too many to name and are available at [his GitHub page](https://github.com/madskristensen/)
 
-This list is currently work-in-progress and will be updated to include more.
+There is also [EditorConfig](http://editorconfig.org/) support and an .editorconfig file included that works with Visual Studio 2017's baked-in support.
