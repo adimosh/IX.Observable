@@ -186,6 +186,7 @@ namespace IX.Observable
         /// <para>If the enumerator is never disposed of, it will never release the read lock, thus making the other threads time out.</para>
         /// <para>Please make sure that you dispose the enumerator object at all times in order to avoid deadlocking and timeouts.</para>
         /// </remarks>
+        /// <exception cref="System.TimeoutException">There was a timeout acquiring the necessary lock.</exception>
         public override IEnumerator<T> GetEnumerator()
         {
             if (this.Locker.TryEnterReadLock(Constants.ConcurrentLockAcquisitionTimeout))
