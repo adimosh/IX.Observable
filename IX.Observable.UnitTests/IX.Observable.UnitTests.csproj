@@ -18,15 +18,10 @@
     <AdditionalFiles Include="stylecop.json" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0-preview-20170113-02" />
-    <PackageReference Include="Microsoft.TestPlatform.TestHost" Version="15.0.0-preview-20170113-02" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0-preview-20170125-04" />
+    <PackageReference Include="Microsoft.TestPlatform.TestHost" Version="15.0.0-preview-20170125-04" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.2.0-beta5-build1225" />
     <PackageReference Include="xunit" Version="2.2.0-beta5-build3474" />
-    <PackageReference Include="System.Runtime.Extensions" Version="4.3.0" />
-    <PackageReference Include="Microsoft.NETCore.App" Version="1.1.0" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="StyleCop.Analyzers" Version="1.1.0-beta001" Type="build" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\IX.Observable\IX.Observable.csproj" />
