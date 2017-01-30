@@ -22,15 +22,16 @@
     <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateNeutralResourcesLanguageAttribute>false</GenerateNeutralResourcesLanguageAttribute>
+    <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
     <DefineDebug>false</DefineDebug>
@@ -53,9 +54,7 @@
     <PackageReference Include="System.Threading" Version="4.0.11" />
     <PackageReference Include="System.Resources.ResourceManager" Version="4.0.1" />
     <PackageReference Include="System.Threading.Tasks" Version="4.0.11" />
-  </ItemGroup>
-  <ItemGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <PackageReference Include="StyleCop.Analyzers" Version="1.1.0-beta001" Type="build" />
+    <PackageReference Include="StyleCop.Analyzers" Version="1.1.0-beta001" Type="build" Condition=" '$(Configuration)' == 'Debug' " PrivateAssets="all" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Resources.Designer.cs">
