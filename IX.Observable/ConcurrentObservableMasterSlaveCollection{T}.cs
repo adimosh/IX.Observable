@@ -1,4 +1,4 @@
-﻿// <copyright file="ObservableMasterSlaveCollection{T}.cs" company="Adrian Mos">
+﻿// <copyright file="ConcurrentObservableMasterSlaveCollection{T}.cs" company="Adrian Mos">
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
@@ -20,21 +20,21 @@ namespace IX.Observable
     /// <seealso cref="IX.Observable.ObservableCollectionBase{TItem}" />
     [DebuggerDisplay("Count = {Count}")]
     [DebuggerTypeProxy(typeof(CollectionDebugView<>))]
-    public class ObservableMasterSlaveCollection<T> : ObservableListBase<T>, IList<T>, IReadOnlyCollection<T>, ICollection<T>, ICollection, IList
+    public class ConcurrentObservableMasterSlaveCollection<T> : ConcurrentObservableListBase<T>, IList<T>, IReadOnlyCollection<T>, ICollection<T>, ICollection, IList
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="ObservableMasterSlaveCollection{T}"/> class.
+        /// Initializes a new instance of the <see cref="ConcurrentObservableMasterSlaveCollection{T}"/> class.
         /// </summary>
-        public ObservableMasterSlaveCollection()
+        public ConcurrentObservableMasterSlaveCollection()
             : base(new MultiListListAdapter<T>(), null)
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ObservableMasterSlaveCollection{T}"/> class.
+        /// Initializes a new instance of the <see cref="ConcurrentObservableMasterSlaveCollection{T}"/> class.
         /// </summary>
         /// <param name="context">The synchronization context to use, if any.</param>
-        public ObservableMasterSlaveCollection(SynchronizationContext context)
+        public ConcurrentObservableMasterSlaveCollection(SynchronizationContext context)
             : base(new MultiListListAdapter<T>(), context)
         {
         }
@@ -55,14 +55,28 @@ namespace IX.Observable
         public void SetMasterList<TList>(TList list)
                     where TList : class, IList<T>, INotifyCollectionChanged
         {
-            ((MultiListListAdapter<T>)this.InternalContainer).SetMaster(list);
-
-            this.AsyncPost(() =>
+            if (this.Locker.TryEnterWriteLock(Constants.ConcurrentLockAcquisitionTimeout))
             {
-                this.OnCollectionChanged();
-                this.OnPropertyChanged(nameof(this.Count));
-                this.OnPropertyChanged(Constants.ItemsName);
-            });
+                try
+                {
+                    ((MultiListListAdapter<T>)this.InternalContainer).SetMaster(list);
+                }
+                finally
+                {
+                    this.Locker.ExitWriteLock();
+                }
+
+                this.AsyncPost(() =>
+                {
+                    this.OnCollectionChanged();
+                    this.OnPropertyChanged(nameof(this.Count));
+                    this.OnPropertyChanged(Constants.ItemsName);
+                });
+
+                return;
+            }
+
+            throw new TimeoutException();
         }
 
         /// <summary>
@@ -73,14 +87,28 @@ namespace IX.Observable
         public void SetSlaveList<TList>(TList list)
                     where TList : class, IEnumerable<T>, INotifyCollectionChanged
         {
-            ((MultiListListAdapter<T>)this.InternalContainer).SetSlave(list);
-
-            this.AsyncPost(() =>
+            if (this.Locker.TryEnterWriteLock(Constants.ConcurrentLockAcquisitionTimeout))
             {
-                this.OnCollectionChanged();
-                this.OnPropertyChanged(nameof(this.Count));
-                this.OnPropertyChanged(Constants.ItemsName);
-            });
+                try
+                {
+                    ((MultiListListAdapter<T>)this.InternalContainer).SetSlave(list);
+                }
+                finally
+                {
+                    this.Locker.ExitWriteLock();
+                }
+
+                this.AsyncPost(() =>
+                {
+                    this.OnCollectionChanged();
+                    this.OnPropertyChanged(nameof(this.Count));
+                    this.OnPropertyChanged(Constants.ItemsName);
+                });
+
+                return;
+            }
+
+            throw new TimeoutException();
         }
 
         /// <inheritdoc />
