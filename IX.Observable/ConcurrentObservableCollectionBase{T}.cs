@@ -113,7 +113,7 @@ namespace IX.Observable
 
                     this.OnPropertyChanged(nameof(this.Count));
                     this.ContentsMayHaveChanged();
-                }, new { index=newIndex, item });
+                }, new { index = newIndex, item });
 
                 return;
             }
@@ -151,7 +151,7 @@ namespace IX.Observable
                         this.OnCollectionChangedRemove(state.item, state.index);
                         this.OnPropertyChanged(nameof(this.Count));
                         this.ContentsMayHaveChanged();
-                    }, new { index=oldIndex, item });
+                    }, new { index = oldIndex, item });
                     return true;
                 }
                 else if (oldIndex < -1)

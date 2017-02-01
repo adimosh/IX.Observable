@@ -32,13 +32,25 @@ purpose.
 | `ConcurrentObservableQueue<T>` | [`Queue<T>`](https://msdn.microsoft.com/en-us/library/7977ey2c.aspx) | Same as `ObservableQueue<T>`, but also thread-safe |
 | `ObservableMasterSlaveCollection<T>` | [`CompositeCollection`](https://msdn.microsoft.com/en-us/library/system.windows.data.compositecollection.aspx) | A collection that composes multiple collections, in which one of the collections is a master and accepts updates, whereas the others are slave ones and are used for display only (note: the collections are referenced, not copied) |
 | `FilterableObservableMasterSlaveCollection<T>` | [`CompositeCollection`](https://msdn.microsoft.com/en-us/library/system.windows.data.compositecollection.aspx) | Same as `ObservableMasterSlaveCollection<T>`, but also filterable (note: the collections are referenced, not copied) |
-| `ConcurrentObservableMasterSlaveCollection<T>` (not yet implemented) | [`CompositeCollection`](https://msdn.microsoft.com/en-us/library/system.windows.data.compositecollection.aspx) | Same as `ObservableMasterSlaveCollection<T>`, but also thread-safe |
+| `ConcurrentObservableMasterSlaveCollection<T>` | [`CompositeCollection`](https://msdn.microsoft.com/en-us/library/system.windows.data.compositecollection.aspx) | Same as `ObservableMasterSlaveCollection<T>`, but also thread-safe |
 | `ConcurrentObservableCollection<T>` (not yet implemented) | [`List<T>`](https://msdn.microsoft.com/en-us/library/6sh2ey19.aspx) | A thread-safe observable list |
 | `ObservableSortedList<TKey, TValue>` (not yet implemented) | [`SortedList<TKey, TValue>`](https://msdn.microsoft.com/en-us/library/ms132319.aspx) | An observable sorted list |
 | `ConcurrentObservableSortedList<TKey, TValue>` (not yet implemented) | [`SortedList<TKey, TValue>`](https://msdn.microsoft.com/en-us/library/ms132319.aspx) | Same as `ObservableSortedList<T>`, but also thread-safe |
 | `ObservableReadOnlyCompositeList<T>` (not yet implemented) | [`CompositeCollection`](https://msdn.microsoft.com/en-us/library/system.windows.data.compositecollection.aspx) | A collection made of multiple collections that all share the same item type that advertises its changes and that does not support changes (also thread-safe by definition) |
 
 This list will be updated as new classes are added based on ongoing work and community requests.
+
+## How to get
+
+This project is primarily available through NuGet.
+
+The current version is 0.4.0-beta1, and can be accessed by using NuGet commands:
+
+```powershell
+Install-Package IX.Observable -Pre
+```
+
+Please note that the package is currently undergoing a major upgrade and is still in beta mode at this moment.
 
 ## Documentation
 
