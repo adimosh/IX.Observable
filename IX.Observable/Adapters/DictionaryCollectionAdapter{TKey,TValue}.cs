@@ -1,4 +1,4 @@
-﻿// <copyright file="DictionaryListAdapter{TKey,TValue}.cs" company="Adrian Mos">
+﻿// <copyright file="DictionaryCollectionAdapter{TKey,TValue}.cs" company="Adrian Mos">
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace IX.Observable.Adapters
 {
-    internal class DictionaryListAdapter<TKey, TValue> : CollectionAdapter<KeyValuePair<TKey, TValue>>
+    internal class DictionaryCollectionAdapter<TKey, TValue> : CollectionAdapter<KeyValuePair<TKey, TValue>>
     {
 #pragma warning disable SA1307 // Accessible fields must begin with upper-case letter
 #pragma warning disable SA1401 // Fields must be private
@@ -17,12 +17,12 @@ namespace IX.Observable.Adapters
 #pragma warning restore SA1401 // Fields must be private
 #pragma warning restore SA1307 // Accessible fields must begin with upper-case letter
 
-        internal DictionaryListAdapter()
+        internal DictionaryCollectionAdapter()
         {
             this.dictionary = new Dictionary<TKey, TValue>();
         }
 
-        internal DictionaryListAdapter(Dictionary<TKey, TValue> dictionary)
+        internal DictionaryCollectionAdapter(Dictionary<TKey, TValue> dictionary)
         {
             this.dictionary = new Dictionary<TKey, TValue>(dictionary);
         }

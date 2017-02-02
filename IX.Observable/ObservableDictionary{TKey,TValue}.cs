@@ -23,7 +23,7 @@ namespace IX.Observable
         /// Initializes a new instance of the <see cref="ObservableDictionary{TKey, TValue}" /> class.
         /// </summary>
         public ObservableDictionary()
-            : base(new DictionaryListAdapter<TKey, TValue>(), null)
+            : base(new DictionaryCollectionAdapter<TKey, TValue>(), null)
         {
         }
 
@@ -32,7 +32,7 @@ namespace IX.Observable
         /// </summary>
         /// <param name="capacity">The initial capacity of the dictionary.</param>
         public ObservableDictionary(int capacity)
-            : base(new DictionaryListAdapter<TKey, TValue>(new Dictionary<TKey, TValue>(capacity)), null)
+            : base(new DictionaryCollectionAdapter<TKey, TValue>(new Dictionary<TKey, TValue>(capacity)), null)
         {
         }
 
@@ -41,7 +41,7 @@ namespace IX.Observable
         /// </summary>
         /// <param name="equalityComparer">A comparer object to use for equality comparison.</param>
         public ObservableDictionary(IEqualityComparer<TKey> equalityComparer)
-            : base(new DictionaryListAdapter<TKey, TValue>(new Dictionary<TKey, TValue>(equalityComparer)), null)
+            : base(new DictionaryCollectionAdapter<TKey, TValue>(new Dictionary<TKey, TValue>(equalityComparer)), null)
         {
         }
 
@@ -51,7 +51,7 @@ namespace IX.Observable
         /// <param name="capacity">The initial capacity of the dictionary.</param>
         /// <param name="equalityComparer">A comparer object to use for equality comparison.</param>
         public ObservableDictionary(int capacity, IEqualityComparer<TKey> equalityComparer)
-            : base(new DictionaryListAdapter<TKey, TValue>(new Dictionary<TKey, TValue>(capacity, equalityComparer)), null)
+            : base(new DictionaryCollectionAdapter<TKey, TValue>(new Dictionary<TKey, TValue>(capacity, equalityComparer)), null)
         {
         }
 
@@ -60,7 +60,7 @@ namespace IX.Observable
         /// </summary>
         /// <param name="dictionary">A dictionary of items to copy from.</param>
         public ObservableDictionary(IDictionary<TKey, TValue> dictionary)
-            : base(new DictionaryListAdapter<TKey, TValue>(new Dictionary<TKey, TValue>(dictionary)), null)
+            : base(new DictionaryCollectionAdapter<TKey, TValue>(new Dictionary<TKey, TValue>(dictionary)), null)
         {
         }
 
@@ -70,7 +70,7 @@ namespace IX.Observable
         /// <param name="dictionary">A dictionary of items to copy from.</param>
         /// <param name="comparer">A comparer object to use for equality comparison.</param>
         public ObservableDictionary(IDictionary<TKey, TValue> dictionary, IEqualityComparer<TKey> comparer)
-            : base(new DictionaryListAdapter<TKey, TValue>(new Dictionary<TKey, TValue>(dictionary, comparer)), null)
+            : base(new DictionaryCollectionAdapter<TKey, TValue>(new Dictionary<TKey, TValue>(dictionary, comparer)), null)
         {
         }
 
@@ -79,7 +79,7 @@ namespace IX.Observable
         /// </summary>
         /// <param name="context">The synchronization context top use when posting observable messages.</param>
         public ObservableDictionary(SynchronizationContext context)
-            : base(new DictionaryListAdapter<TKey, TValue>(), context)
+            : base(new DictionaryCollectionAdapter<TKey, TValue>(), context)
         {
         }
 
@@ -89,7 +89,7 @@ namespace IX.Observable
         /// <param name="context">The synchronization context top use when posting observable messages.</param>
         /// <param name="capacity">The initial capacity of the dictionary.</param>
         public ObservableDictionary(SynchronizationContext context, int capacity)
-            : base(new DictionaryListAdapter<TKey, TValue>(new Dictionary<TKey, TValue>(capacity)), context)
+            : base(new DictionaryCollectionAdapter<TKey, TValue>(new Dictionary<TKey, TValue>(capacity)), context)
         {
         }
 
@@ -99,7 +99,7 @@ namespace IX.Observable
         /// <param name="context">The synchronization context top use when posting observable messages.</param>
         /// <param name="equalityComparer">A comparer object to use for equality comparison.</param>
         public ObservableDictionary(SynchronizationContext context, IEqualityComparer<TKey> equalityComparer)
-            : base(new DictionaryListAdapter<TKey, TValue>(new Dictionary<TKey, TValue>(equalityComparer)), context)
+            : base(new DictionaryCollectionAdapter<TKey, TValue>(new Dictionary<TKey, TValue>(equalityComparer)), context)
         {
         }
 
@@ -110,7 +110,7 @@ namespace IX.Observable
         /// <param name="capacity">The initial capacity of the dictionary.</param>
         /// <param name="equalityComparer">A comparer object to use for equality comparison.</param>
         public ObservableDictionary(SynchronizationContext context, int capacity, IEqualityComparer<TKey> equalityComparer)
-            : base(new DictionaryListAdapter<TKey, TValue>(new Dictionary<TKey, TValue>(capacity, equalityComparer)), context)
+            : base(new DictionaryCollectionAdapter<TKey, TValue>(new Dictionary<TKey, TValue>(capacity, equalityComparer)), context)
         {
         }
 
@@ -120,7 +120,7 @@ namespace IX.Observable
         /// <param name="context">The synchronization context top use when posting observable messages.</param>
         /// <param name="dictionary">A dictionary of items to copy from.</param>
         public ObservableDictionary(SynchronizationContext context, IDictionary<TKey, TValue> dictionary)
-            : base(new DictionaryListAdapter<TKey, TValue>(new Dictionary<TKey, TValue>(dictionary)), context)
+            : base(new DictionaryCollectionAdapter<TKey, TValue>(new Dictionary<TKey, TValue>(dictionary)), context)
         {
         }
 
@@ -131,7 +131,7 @@ namespace IX.Observable
         /// <param name="dictionary">A dictionary of items to copy from.</param>
         /// <param name="comparer">A comparer object to use for equality comparison.</param>
         public ObservableDictionary(SynchronizationContext context, IDictionary<TKey, TValue> dictionary, IEqualityComparer<TKey> comparer)
-            : base(new DictionaryListAdapter<TKey, TValue>(new Dictionary<TKey, TValue>(dictionary, comparer)), context)
+            : base(new DictionaryCollectionAdapter<TKey, TValue>(new Dictionary<TKey, TValue>(dictionary, comparer)), context)
         {
         }
 
@@ -142,7 +142,7 @@ namespace IX.Observable
         {
             get
             {
-                return ((DictionaryListAdapter<TKey, TValue>)this.InternalContainer).dictionary.Keys;
+                return ((DictionaryCollectionAdapter<TKey, TValue>)this.InternalContainer).dictionary.Keys;
             }
         }
 
@@ -158,7 +158,7 @@ namespace IX.Observable
         {
             get
             {
-                return ((DictionaryListAdapter<TKey, TValue>)this.InternalContainer).dictionary.Values;
+                return ((DictionaryCollectionAdapter<TKey, TValue>)this.InternalContainer).dictionary.Values;
             }
         }
 
@@ -176,12 +176,12 @@ namespace IX.Observable
         {
             get
             {
-                return ((DictionaryListAdapter<TKey, TValue>)this.InternalContainer).dictionary[key];
+                return ((DictionaryCollectionAdapter<TKey, TValue>)this.InternalContainer).dictionary[key];
             }
 
             set
             {
-                var dictionary = ((DictionaryListAdapter<TKey, TValue>)this.InternalContainer).dictionary;
+                var dictionary = ((DictionaryCollectionAdapter<TKey, TValue>)this.InternalContainer).dictionary;
                 if (dictionary.TryGetValue(key, out var val))
                 {
                     dictionary[key] = value;
@@ -207,7 +207,7 @@ namespace IX.Observable
         /// </summary>
         /// <param name="key">The key to look for.</param>
         /// <returns><c>true</c> whether a key has been found, <c>false</c> otherwise.</returns>
-        public bool ContainsKey(TKey key) => ((DictionaryListAdapter<TKey, TValue>)this.InternalContainer).dictionary.ContainsKey(key);
+        public bool ContainsKey(TKey key) => ((DictionaryCollectionAdapter<TKey, TValue>)this.InternalContainer).dictionary.ContainsKey(key);
 
         /// <summary>
         /// Attempts to remove all info related to a key from the dictionary.
@@ -216,7 +216,7 @@ namespace IX.Observable
         /// <returns><c>true</c> if the removal was successful, <c>false</c> otherwise.</returns>
         public bool Remove(TKey key)
         {
-            if (((DictionaryListAdapter<TKey, TValue>)this.InternalContainer).dictionary.Remove(key))
+            if (((DictionaryCollectionAdapter<TKey, TValue>)this.InternalContainer).dictionary.Remove(key))
             {
                 this.BroadcastChange();
 
@@ -232,7 +232,7 @@ namespace IX.Observable
         /// <param name="key">The key.</param>
         /// <param name="value">The value.</param>
         /// <returns><c>true</c> if the value was successfully fetched, <c>false</c> otherwise.</returns>
-        public bool TryGetValue(TKey key, out TValue value) => ((DictionaryListAdapter<TKey, TValue>)this.InternalContainer).dictionary.TryGetValue(key, out value);
+        public bool TryGetValue(TKey key, out TValue value) => ((DictionaryCollectionAdapter<TKey, TValue>)this.InternalContainer).dictionary.TryGetValue(key, out value);
 
         /// <summary>
         /// Called when contents of this dictionary may have changed.

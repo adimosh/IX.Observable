@@ -23,7 +23,7 @@ namespace IX.Observable
         /// Initializes a new instance of the <see cref="ConcurrentObservableStack{T}"/> class.
         /// </summary>
         public ConcurrentObservableStack()
-            : base(new StackListAdapter<T>(new Stack<T>()), null)
+            : base(new StackCollectionAdapter<T>(new Stack<T>()), null)
         {
         }
 
@@ -32,7 +32,7 @@ namespace IX.Observable
         /// </summary>
         /// <param name="capacity">The initial capacity of the stack.</param>
         public ConcurrentObservableStack(int capacity)
-            : base(new StackListAdapter<T>(new Stack<T>(capacity)), null)
+            : base(new StackCollectionAdapter<T>(new Stack<T>(capacity)), null)
         {
         }
 
@@ -41,7 +41,7 @@ namespace IX.Observable
         /// </summary>
         /// <param name="collection">A collection of items to copy into the stack.</param>
         public ConcurrentObservableStack(IEnumerable<T> collection)
-            : base(new StackListAdapter<T>(new Stack<T>(collection)), null)
+            : base(new StackCollectionAdapter<T>(new Stack<T>(collection)), null)
         {
         }
 
@@ -50,7 +50,7 @@ namespace IX.Observable
         /// </summary>
         /// <param name="context">The synchronization context top use when posting observable messages.</param>
         public ConcurrentObservableStack(SynchronizationContext context)
-            : base(new StackListAdapter<T>(new Stack<T>()), context)
+            : base(new StackCollectionAdapter<T>(new Stack<T>()), context)
         {
         }
 
@@ -60,7 +60,7 @@ namespace IX.Observable
         /// <param name="context">The synchronization context top use when posting observable messages.</param>
         /// <param name="capacity">The initial capacity of the stack.</param>
         public ConcurrentObservableStack(SynchronizationContext context, int capacity)
-            : base(new StackListAdapter<T>(new Stack<T>(capacity)), context)
+            : base(new StackCollectionAdapter<T>(new Stack<T>(capacity)), context)
         {
         }
 
@@ -70,7 +70,7 @@ namespace IX.Observable
         /// <param name="context">The synchronization context top use when posting observable messages.</param>
         /// <param name="collection">A collection of items to copy into the stack.</param>
         public ConcurrentObservableStack(SynchronizationContext context, IEnumerable<T> collection)
-            : base(new StackListAdapter<T>(new Stack<T>(collection)), context)
+            : base(new StackCollectionAdapter<T>(new Stack<T>(collection)), context)
         {
         }
 
@@ -84,7 +84,7 @@ namespace IX.Observable
             {
                 try
                 {
-                    return ((StackListAdapter<T>)this.InternalContainer).stack.Peek();
+                    return ((StackCollectionAdapter<T>)this.InternalContainer).stack.Peek();
                 }
                 finally
                 {
@@ -106,7 +106,7 @@ namespace IX.Observable
                 T item;
                 try
                 {
-                    item = ((StackListAdapter<T>)this.InternalContainer).stack.Pop();
+                    item = ((StackCollectionAdapter<T>)this.InternalContainer).stack.Pop();
                 }
                 finally
                 {
@@ -137,7 +137,7 @@ namespace IX.Observable
             {
                 try
                 {
-                    ((StackListAdapter<T>)this.InternalContainer).stack.Push(item);
+                    ((StackCollectionAdapter<T>)this.InternalContainer).stack.Push(item);
                 }
                 finally
                 {
@@ -168,7 +168,7 @@ namespace IX.Observable
             {
                 try
                 {
-                    return ((StackListAdapter<T>)this.InternalContainer).stack.ToArray();
+                    return ((StackCollectionAdapter<T>)this.InternalContainer).stack.ToArray();
                 }
                 finally
                 {
@@ -188,7 +188,7 @@ namespace IX.Observable
             {
                 try
                 {
-                    ((StackListAdapter<T>)this.InternalContainer).stack.TrimExcess();
+                    ((StackCollectionAdapter<T>)this.InternalContainer).stack.TrimExcess();
                 }
                 finally
                 {

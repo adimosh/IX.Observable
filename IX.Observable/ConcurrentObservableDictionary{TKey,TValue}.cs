@@ -24,7 +24,7 @@ namespace IX.Observable
         /// Initializes a new instance of the <see cref="ConcurrentObservableDictionary{TKey, TValue}" /> class.
         /// </summary>
         public ConcurrentObservableDictionary()
-            : base(new DictionaryListAdapter<TKey, TValue>(), null)
+            : base(new DictionaryCollectionAdapter<TKey, TValue>(), null)
         {
         }
 
@@ -33,7 +33,7 @@ namespace IX.Observable
         /// </summary>
         /// <param name="capacity">The initial capacity of the dictionary.</param>
         public ConcurrentObservableDictionary(int capacity)
-            : base(new DictionaryListAdapter<TKey, TValue>(new Dictionary<TKey, TValue>(capacity)), null)
+            : base(new DictionaryCollectionAdapter<TKey, TValue>(new Dictionary<TKey, TValue>(capacity)), null)
         {
         }
 
@@ -42,7 +42,7 @@ namespace IX.Observable
         /// </summary>
         /// <param name="equalityComparer">A comparer object to use for equality comparison.</param>
         public ConcurrentObservableDictionary(IEqualityComparer<TKey> equalityComparer)
-            : base(new DictionaryListAdapter<TKey, TValue>(new Dictionary<TKey, TValue>(equalityComparer)), null)
+            : base(new DictionaryCollectionAdapter<TKey, TValue>(new Dictionary<TKey, TValue>(equalityComparer)), null)
         {
         }
 
@@ -52,7 +52,7 @@ namespace IX.Observable
         /// <param name="capacity">The initial capacity of the dictionary.</param>
         /// <param name="equalityComparer">A comparer object to use for equality comparison.</param>
         public ConcurrentObservableDictionary(int capacity, IEqualityComparer<TKey> equalityComparer)
-            : base(new DictionaryListAdapter<TKey, TValue>(new Dictionary<TKey, TValue>(capacity, equalityComparer)), null)
+            : base(new DictionaryCollectionAdapter<TKey, TValue>(new Dictionary<TKey, TValue>(capacity, equalityComparer)), null)
         {
         }
 
@@ -61,7 +61,7 @@ namespace IX.Observable
         /// </summary>
         /// <param name="dictionary">A dictionary of items to copy from.</param>
         public ConcurrentObservableDictionary(IDictionary<TKey, TValue> dictionary)
-            : base(new DictionaryListAdapter<TKey, TValue>(new Dictionary<TKey, TValue>(dictionary)), null)
+            : base(new DictionaryCollectionAdapter<TKey, TValue>(new Dictionary<TKey, TValue>(dictionary)), null)
         {
         }
 
@@ -71,7 +71,7 @@ namespace IX.Observable
         /// <param name="dictionary">A dictionary of items to copy from.</param>
         /// <param name="comparer">A comparer object to use for equality comparison.</param>
         public ConcurrentObservableDictionary(IDictionary<TKey, TValue> dictionary, IEqualityComparer<TKey> comparer)
-            : base(new DictionaryListAdapter<TKey, TValue>(new Dictionary<TKey, TValue>(dictionary, comparer)), null)
+            : base(new DictionaryCollectionAdapter<TKey, TValue>(new Dictionary<TKey, TValue>(dictionary, comparer)), null)
         {
         }
 
@@ -80,7 +80,7 @@ namespace IX.Observable
         /// </summary>
         /// <param name="context">The synchronization context top use when posting observable messages.</param>
         public ConcurrentObservableDictionary(SynchronizationContext context)
-            : base(new DictionaryListAdapter<TKey, TValue>(), context)
+            : base(new DictionaryCollectionAdapter<TKey, TValue>(), context)
         {
         }
 
@@ -90,7 +90,7 @@ namespace IX.Observable
         /// <param name="context">The synchronization context top use when posting observable messages.</param>
         /// <param name="capacity">The initial capacity of the dictionary.</param>
         public ConcurrentObservableDictionary(SynchronizationContext context, int capacity)
-            : base(new DictionaryListAdapter<TKey, TValue>(new Dictionary<TKey, TValue>(capacity)), context)
+            : base(new DictionaryCollectionAdapter<TKey, TValue>(new Dictionary<TKey, TValue>(capacity)), context)
         {
         }
 
@@ -100,7 +100,7 @@ namespace IX.Observable
         /// <param name="context">The synchronization context top use when posting observable messages.</param>
         /// <param name="equalityComparer">A comparer object to use for equality comparison.</param>
         public ConcurrentObservableDictionary(SynchronizationContext context, IEqualityComparer<TKey> equalityComparer)
-            : base(new DictionaryListAdapter<TKey, TValue>(new Dictionary<TKey, TValue>(equalityComparer)), context)
+            : base(new DictionaryCollectionAdapter<TKey, TValue>(new Dictionary<TKey, TValue>(equalityComparer)), context)
         {
         }
 
@@ -111,7 +111,7 @@ namespace IX.Observable
         /// <param name="capacity">The initial capacity of the dictionary.</param>
         /// <param name="equalityComparer">A comparer object to use for equality comparison.</param>
         public ConcurrentObservableDictionary(SynchronizationContext context, int capacity, IEqualityComparer<TKey> equalityComparer)
-            : base(new DictionaryListAdapter<TKey, TValue>(new Dictionary<TKey, TValue>(capacity, equalityComparer)), context)
+            : base(new DictionaryCollectionAdapter<TKey, TValue>(new Dictionary<TKey, TValue>(capacity, equalityComparer)), context)
         {
         }
 
@@ -121,7 +121,7 @@ namespace IX.Observable
         /// <param name="context">The synchronization context top use when posting observable messages.</param>
         /// <param name="dictionary">A dictionary of items to copy from.</param>
         public ConcurrentObservableDictionary(SynchronizationContext context, IDictionary<TKey, TValue> dictionary)
-            : base(new DictionaryListAdapter<TKey, TValue>(new Dictionary<TKey, TValue>(dictionary)), context)
+            : base(new DictionaryCollectionAdapter<TKey, TValue>(new Dictionary<TKey, TValue>(dictionary)), context)
         {
         }
 
@@ -132,7 +132,7 @@ namespace IX.Observable
         /// <param name="dictionary">A dictionary of items to copy from.</param>
         /// <param name="comparer">A comparer object to use for equality comparison.</param>
         public ConcurrentObservableDictionary(SynchronizationContext context, IDictionary<TKey, TValue> dictionary, IEqualityComparer<TKey> comparer)
-            : base(new DictionaryListAdapter<TKey, TValue>(new Dictionary<TKey, TValue>(dictionary, comparer)), context)
+            : base(new DictionaryCollectionAdapter<TKey, TValue>(new Dictionary<TKey, TValue>(dictionary, comparer)), context)
         {
         }
 
@@ -147,7 +147,7 @@ namespace IX.Observable
                 {
                     try
                     {
-                        return ((DictionaryListAdapter<TKey, TValue>)this.InternalContainer).dictionary.Keys;
+                        return ((DictionaryCollectionAdapter<TKey, TValue>)this.InternalContainer).dictionary.Keys;
                     }
                     finally
                     {
@@ -175,7 +175,7 @@ namespace IX.Observable
                 {
                     try
                     {
-                        return ((DictionaryListAdapter<TKey, TValue>)this.InternalContainer).dictionary.Values;
+                        return ((DictionaryCollectionAdapter<TKey, TValue>)this.InternalContainer).dictionary.Values;
                     }
                     finally
                     {
@@ -205,7 +205,7 @@ namespace IX.Observable
                 {
                     try
                     {
-                        return ((DictionaryListAdapter<TKey, TValue>)this.InternalContainer).dictionary[key];
+                        return ((DictionaryCollectionAdapter<TKey, TValue>)this.InternalContainer).dictionary[key];
                     }
                     finally
                     {
@@ -218,7 +218,7 @@ namespace IX.Observable
 
             set
             {
-                var dictionary = ((DictionaryListAdapter<TKey, TValue>)this.InternalContainer).dictionary;
+                var dictionary = ((DictionaryCollectionAdapter<TKey, TValue>)this.InternalContainer).dictionary;
                 if (this.Locker.TryEnterWriteLock(Constants.ConcurrentLockAcquisitionTimeout))
                 {
                     try
@@ -264,7 +264,7 @@ namespace IX.Observable
             {
                 try
                 {
-                    return ((DictionaryListAdapter<TKey, TValue>)this.InternalContainer).dictionary.ContainsKey(key);
+                    return ((DictionaryCollectionAdapter<TKey, TValue>)this.InternalContainer).dictionary.ContainsKey(key);
                 }
                 finally
                 {
@@ -287,7 +287,7 @@ namespace IX.Observable
             {
                 try
                 {
-                    removalResult = ((DictionaryListAdapter<TKey, TValue>)this.InternalContainer).dictionary.Remove(key);
+                    removalResult = ((DictionaryCollectionAdapter<TKey, TValue>)this.InternalContainer).dictionary.Remove(key);
                 }
                 finally
                 {
@@ -321,7 +321,7 @@ namespace IX.Observable
             {
                 try
                 {
-                    return ((DictionaryListAdapter<TKey, TValue>)this.InternalContainer).dictionary.TryGetValue(key, out value);
+                    return ((DictionaryCollectionAdapter<TKey, TValue>)this.InternalContainer).dictionary.TryGetValue(key, out value);
                 }
                 finally
                 {

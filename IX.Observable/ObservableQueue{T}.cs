@@ -22,7 +22,7 @@ namespace IX.Observable
         /// Initializes a new instance of the <see cref="ObservableQueue{T}"/> class.
         /// </summary>
         public ObservableQueue()
-            : base(new QueueListAdapter<T>(new Queue<T>()), null)
+            : base(new QueueCollectionAdapter<T>(new Queue<T>()), null)
         {
         }
 
@@ -31,7 +31,7 @@ namespace IX.Observable
         /// </summary>
         /// <param name="collection">A collection of items to copy from.</param>
         public ObservableQueue(IEnumerable<T> collection)
-            : base(new QueueListAdapter<T>(new Queue<T>(collection)), null)
+            : base(new QueueCollectionAdapter<T>(new Queue<T>(collection)), null)
         {
         }
 
@@ -40,7 +40,7 @@ namespace IX.Observable
         /// </summary>
         /// <param name="capacity">The initial capacity of the queue.</param>
         public ObservableQueue(int capacity)
-            : base(new QueueListAdapter<T>(new Queue<T>(capacity)), null)
+            : base(new QueueCollectionAdapter<T>(new Queue<T>(capacity)), null)
         {
         }
 
@@ -49,7 +49,7 @@ namespace IX.Observable
         /// </summary>
         /// <param name="context">The synchronization context top use when posting observable messages.</param>
         public ObservableQueue(SynchronizationContext context)
-            : base(new QueueListAdapter<T>(new Queue<T>()), context)
+            : base(new QueueCollectionAdapter<T>(new Queue<T>()), context)
         {
         }
 
@@ -59,7 +59,7 @@ namespace IX.Observable
         /// <param name="context">The synchronization context top use when posting observable messages.</param>
         /// <param name="collection">A collection of items to copy from.</param>
         public ObservableQueue(SynchronizationContext context, IEnumerable<T> collection)
-            : base(new QueueListAdapter<T>(new Queue<T>(collection)), context)
+            : base(new QueueCollectionAdapter<T>(new Queue<T>(collection)), context)
         {
         }
 
@@ -69,7 +69,7 @@ namespace IX.Observable
         /// <param name="context">The synchronization context top use when posting observable messages.</param>
         /// <param name="capacity">The initial capacity of the queue.</param>
         public ObservableQueue(SynchronizationContext context, int capacity)
-            : base(new QueueListAdapter<T>(new Queue<T>(capacity)), context)
+            : base(new QueueCollectionAdapter<T>(new Queue<T>(capacity)), context)
         {
         }
 
@@ -79,7 +79,7 @@ namespace IX.Observable
         /// <returns>The dequeued item.</returns>
         public T Dequeue()
         {
-            T item = ((QueueListAdapter<T>)this.InternalContainer).queue.Dequeue();
+            T item = ((QueueCollectionAdapter<T>)this.InternalContainer).queue.Dequeue();
 
             this.AsyncPost(
                 (state) =>
@@ -98,7 +98,7 @@ namespace IX.Observable
         /// <param name="item">The item to enqueue.</param>
         public void Enqueue(T item)
         {
-            ((QueueListAdapter<T>)this.InternalContainer).queue.Enqueue(item);
+            ((QueueCollectionAdapter<T>)this.InternalContainer).queue.Enqueue(item);
 
             this.AsyncPost(
                 (state) =>
@@ -113,17 +113,17 @@ namespace IX.Observable
         /// Peeks at the topmost item in the queue without dequeueing it.
         /// </summary>
         /// <returns>The topmost item in the queue.</returns>
-        public virtual T Peek() => ((QueueListAdapter<T>)this.InternalContainer).queue.Peek();
+        public virtual T Peek() => ((QueueCollectionAdapter<T>)this.InternalContainer).queue.Peek();
 
         /// <summary>
         /// Copies the items of the queue into a new array.
         /// </summary>
         /// <returns>An array of items that are contained in the queue.</returns>
-        public virtual T[] ToArray() => ((QueueListAdapter<T>)this.InternalContainer).queue.ToArray();
+        public virtual T[] ToArray() => ((QueueCollectionAdapter<T>)this.InternalContainer).queue.ToArray();
 
         /// <summary>
         /// Sets the capacity to the actual number of elements in the <see cref="ObservableQueue{T}"/>, if that number is less than 90 percent of current capacity.
         /// </summary>
-        public virtual void TrimExcess() => ((QueueListAdapter<T>)this.InternalContainer).queue.TrimExcess();
+        public virtual void TrimExcess() => ((QueueCollectionAdapter<T>)this.InternalContainer).queue.TrimExcess();
     }
 }

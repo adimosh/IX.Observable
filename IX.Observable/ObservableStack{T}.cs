@@ -23,7 +23,7 @@ namespace IX.Observable
         /// Initializes a new instance of the <see cref="ObservableStack{T}"/> class.
         /// </summary>
         public ObservableStack()
-            : base(new StackListAdapter<T>(new Stack<T>()), null)
+            : base(new StackCollectionAdapter<T>(new Stack<T>()), null)
         {
         }
 
@@ -32,7 +32,7 @@ namespace IX.Observable
         /// </summary>
         /// <param name="capacity">The initial capacity of the stack.</param>
         public ObservableStack(int capacity)
-            : base(new StackListAdapter<T>(new Stack<T>(capacity)), null)
+            : base(new StackCollectionAdapter<T>(new Stack<T>(capacity)), null)
         {
         }
 
@@ -41,7 +41,7 @@ namespace IX.Observable
         /// </summary>
         /// <param name="collection">A collection of items to copy into the stack.</param>
         public ObservableStack(IEnumerable<T> collection)
-            : base(new StackListAdapter<T>(new Stack<T>(collection)), null)
+            : base(new StackCollectionAdapter<T>(new Stack<T>(collection)), null)
         {
         }
 
@@ -50,7 +50,7 @@ namespace IX.Observable
         /// </summary>
         /// <param name="context">The synchronization context top use when posting observable messages.</param>
         public ObservableStack(SynchronizationContext context)
-            : base(new StackListAdapter<T>(new Stack<T>()), context)
+            : base(new StackCollectionAdapter<T>(new Stack<T>()), context)
         {
         }
 
@@ -60,7 +60,7 @@ namespace IX.Observable
         /// <param name="context">The synchronization context top use when posting observable messages.</param>
         /// <param name="capacity">The initial capacity of the stack.</param>
         public ObservableStack(SynchronizationContext context, int capacity)
-            : base(new StackListAdapter<T>(new Stack<T>(capacity)), context)
+            : base(new StackCollectionAdapter<T>(new Stack<T>(capacity)), context)
         {
         }
 
@@ -70,7 +70,7 @@ namespace IX.Observable
         /// <param name="context">The synchronization context top use when posting observable messages.</param>
         /// <param name="collection">A collection of items to copy into the stack.</param>
         public ObservableStack(SynchronizationContext context, IEnumerable<T> collection)
-            : base(new StackListAdapter<T>(new Stack<T>(collection)), context)
+            : base(new StackCollectionAdapter<T>(new Stack<T>(collection)), context)
         {
         }
 
@@ -78,7 +78,7 @@ namespace IX.Observable
         /// Peeks in the stack to view the topmost item, without removing it.
         /// </summary>
         /// <returns>The topmost element in the stack, if any.</returns>
-        public virtual T Peek() => ((StackListAdapter<T>)this.InternalContainer).stack.Peek();
+        public virtual T Peek() => ((StackCollectionAdapter<T>)this.InternalContainer).stack.Peek();
 
         /// <summary>
         /// Pops the topmost element from the stack, removing it.
@@ -86,7 +86,7 @@ namespace IX.Observable
         /// <returns>The topmost element in the stack, if any.</returns>
         public T Pop()
         {
-            T item = ((StackListAdapter<T>)this.InternalContainer).stack.Pop();
+            T item = ((StackCollectionAdapter<T>)this.InternalContainer).stack.Pop();
 
             this.AsyncPost(
                 (state) =>
@@ -105,7 +105,7 @@ namespace IX.Observable
         /// <param name="item">The item to push.</param>
         public void Push(T item)
         {
-            ((StackListAdapter<T>)this.InternalContainer).stack.Push(item);
+            ((StackCollectionAdapter<T>)this.InternalContainer).stack.Push(item);
 
             this.AsyncPost(
                 (state) =>
@@ -120,11 +120,11 @@ namespace IX.Observable
         /// Copies all elements of the stack to a new array.
         /// </summary>
         /// <returns>An array containing all items in the stack.</returns>
-        public virtual T[] ToArray() => ((StackListAdapter<T>)this.InternalContainer).stack.ToArray();
+        public virtual T[] ToArray() => ((StackCollectionAdapter<T>)this.InternalContainer).stack.ToArray();
 
         /// <summary>
         /// Sets the capacity to the actual number of elements in the stack if that number is less than 90 percent of current capacity.
         /// </summary>
-        public virtual void TrimExcess() => ((StackListAdapter<T>)this.InternalContainer).stack.TrimExcess();
+        public virtual void TrimExcess() => ((StackCollectionAdapter<T>)this.InternalContainer).stack.TrimExcess();
     }
 }

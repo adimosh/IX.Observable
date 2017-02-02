@@ -1,4 +1,4 @@
-﻿// <copyright file="StackListAdapter{T}.cs" company="Adrian Mos">
+﻿// <copyright file="StackCollectionAdapter{T}.cs" company="Adrian Mos">
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace IX.Observable.Adapters
 {
-    internal class StackListAdapter<T> : CollectionAdapter<T>
+    internal class StackCollectionAdapter<T> : CollectionAdapter<T>
     {
 #pragma warning disable SA1307 // Accessible fields must begin with upper-case letter
 #pragma warning disable SA1401 // Fields must be private
@@ -15,12 +15,12 @@ namespace IX.Observable.Adapters
 #pragma warning restore SA1401 // Fields must be private
 #pragma warning restore SA1307 // Accessible fields must begin with upper-case letter
 
-        internal StackListAdapter()
+        internal StackCollectionAdapter()
         {
             this.stack = new Stack<T>();
         }
 
-        internal StackListAdapter(Stack<T> stack)
+        internal StackCollectionAdapter(Stack<T> stack)
         {
             this.stack = new Stack<T>(stack);
         }

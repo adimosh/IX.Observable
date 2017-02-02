@@ -1,4 +1,4 @@
-﻿// <copyright file="QueueListAdapter{T}.cs" company="Adrian Mos">
+﻿// <copyright file="QueueCollectionAdapter{T}.cs" company="Adrian Mos">
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace IX.Observable.Adapters
 {
-    internal class QueueListAdapter<T> : CollectionAdapter<T>
+    internal class QueueCollectionAdapter<T> : CollectionAdapter<T>
     {
 #pragma warning disable SA1307 // Accessible fields must begin with upper-case letter
 #pragma warning disable SA1401 // Fields must be private
@@ -15,12 +15,12 @@ namespace IX.Observable.Adapters
 #pragma warning restore SA1401 // Fields must be private
 #pragma warning restore SA1307 // Accessible fields must begin with upper-case letter
 
-        internal QueueListAdapter()
+        internal QueueCollectionAdapter()
         {
             this.queue = new Queue<T>();
         }
 
-        internal QueueListAdapter(Queue<T> queue)
+        internal QueueCollectionAdapter(Queue<T> queue)
         {
             this.queue = new Queue<T>(queue);
         }

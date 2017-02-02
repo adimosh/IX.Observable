@@ -23,7 +23,7 @@ namespace IX.Observable
         /// Initializes a new instance of the <see cref="ConcurrentObservableQueue{T}"/> class.
         /// </summary>
         public ConcurrentObservableQueue()
-            : base(new QueueListAdapter<T>(new Queue<T>()), null)
+            : base(new QueueCollectionAdapter<T>(new Queue<T>()), null)
         {
         }
 
@@ -32,7 +32,7 @@ namespace IX.Observable
         /// </summary>
         /// <param name="collection">A collection of items to copy from.</param>
         public ConcurrentObservableQueue(IEnumerable<T> collection)
-            : base(new QueueListAdapter<T>(new Queue<T>(collection)), null)
+            : base(new QueueCollectionAdapter<T>(new Queue<T>(collection)), null)
         {
         }
 
@@ -41,7 +41,7 @@ namespace IX.Observable
         /// </summary>
         /// <param name="capacity">The initial capacity of the queue.</param>
         public ConcurrentObservableQueue(int capacity)
-            : base(new QueueListAdapter<T>(new Queue<T>(capacity)), null)
+            : base(new QueueCollectionAdapter<T>(new Queue<T>(capacity)), null)
         {
         }
 
@@ -50,7 +50,7 @@ namespace IX.Observable
         /// </summary>
         /// <param name="context">The synchronization context top use when posting observable messages.</param>
         public ConcurrentObservableQueue(SynchronizationContext context)
-            : base(new QueueListAdapter<T>(new Queue<T>()), context)
+            : base(new QueueCollectionAdapter<T>(new Queue<T>()), context)
         {
         }
 
@@ -60,7 +60,7 @@ namespace IX.Observable
         /// <param name="context">The synchronization context top use when posting observable messages.</param>
         /// <param name="collection">A collection of items to copy from.</param>
         public ConcurrentObservableQueue(SynchronizationContext context, IEnumerable<T> collection)
-            : base(new QueueListAdapter<T>(new Queue<T>(collection)), context)
+            : base(new QueueCollectionAdapter<T>(new Queue<T>(collection)), context)
         {
         }
 
@@ -70,7 +70,7 @@ namespace IX.Observable
         /// <param name="context">The synchronization context top use when posting observable messages.</param>
         /// <param name="capacity">The initial capacity of the queue.</param>
         public ConcurrentObservableQueue(SynchronizationContext context, int capacity)
-            : base(new QueueListAdapter<T>(new Queue<T>(capacity)), context)
+            : base(new QueueCollectionAdapter<T>(new Queue<T>(capacity)), context)
         {
         }
 
@@ -85,7 +85,7 @@ namespace IX.Observable
                 T item;
                 try
                 {
-                    item = ((QueueListAdapter<T>)this.InternalContainer).queue.Dequeue();
+                    item = ((QueueCollectionAdapter<T>)this.InternalContainer).queue.Dequeue();
                 }
                 finally
                 {
@@ -116,7 +116,7 @@ namespace IX.Observable
             {
                 try
                 {
-                    ((QueueListAdapter<T>)this.InternalContainer).queue.Enqueue(item);
+                    ((QueueCollectionAdapter<T>)this.InternalContainer).queue.Enqueue(item);
                 }
                 finally
                 {
@@ -147,7 +147,7 @@ namespace IX.Observable
             {
                 try
                 {
-                    return ((QueueListAdapter<T>)this.InternalContainer).queue.Peek();
+                    return ((QueueCollectionAdapter<T>)this.InternalContainer).queue.Peek();
                 }
                 finally
                 {
@@ -168,7 +168,7 @@ namespace IX.Observable
             {
                 try
                 {
-                    return ((QueueListAdapter<T>)this.InternalContainer).queue.ToArray();
+                    return ((QueueCollectionAdapter<T>)this.InternalContainer).queue.ToArray();
                 }
                 finally
                 {
@@ -188,7 +188,7 @@ namespace IX.Observable
             {
                 try
                 {
-                    ((QueueListAdapter<T>)this.InternalContainer).queue.TrimExcess();
+                    ((QueueCollectionAdapter<T>)this.InternalContainer).queue.TrimExcess();
                 }
                 finally
                 {
