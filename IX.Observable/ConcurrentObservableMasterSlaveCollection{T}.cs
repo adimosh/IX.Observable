@@ -111,6 +111,77 @@ namespace IX.Observable
             throw new TimeoutException();
         }
 
+        /// <inheritdoc/>
+        public override void Add(T item)
+        {
+            this.IncreaseIgnoreMustResetCounter();
+            base.Add(item);
+        }
+
+        /// <inheritdoc/>
+        public override void Clear()
+        {
+            this.IncreaseIgnoreMustResetCounter(((MultiListListAdapter<T>)this.InternalContainer).SlavesCount + 1);
+
+            base.Clear();
+        }
+
+        /// <inheritdoc/>
+        public override void Insert(int index, T item)
+        {
+            this.IncreaseIgnoreMustResetCounter();
+            base.Insert(index, item);
+        }
+
+        /// <inheritdoc/>
+        public override bool Remove(T item)
+        {
+            this.IncreaseIgnoreMustResetCounter();
+            if (!base.Remove(item))
+            {
+                this.IncreaseIgnoreMustResetCounter(-1);
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <inheritdoc/>
+        public override void RemoveAt(int index)
+        {
+            if (index >= this.Count)
+            {
+                return;
+            }
+
+            if (this.Locker.TryEnterWriteLock(Constants.ConcurrentLockAcquisitionTimeout))
+            {
+                T item;
+                try
+                {
+                    item = this.InternalListContainer[index];
+                    this.IncreaseIgnoreMustResetCounter();
+                    this.InternalListContainer.RemoveAt(index);
+                }
+                finally
+                {
+                    this.Locker.ExitWriteLock();
+                }
+
+                this.AsyncPost(
+                    (state) =>
+                    {
+                        this.OnCollectionChangedRemove(state.NewValue, state.Index);
+                        this.OnPropertyChanged(nameof(this.Count));
+                        this.ContentsMayHaveChanged();
+                    }, new { NewValue = item, Index = index });
+
+                return;
+            }
+
+            throw new TimeoutException();
+        }
+
         /// <inheritdoc />
         protected override void ContentsMayHaveChanged() => this.OnPropertyChanged(Constants.ItemsName);
     }

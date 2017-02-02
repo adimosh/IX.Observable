@@ -23,6 +23,7 @@ namespace IX.Observable
 #pragma warning restore SA1402 // File may only contain a single type
     {
         private CollectionAdapter<T> internalContainer;
+        private object resetCountLocker;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ObservableCollectionBase{T}"/> class.
@@ -33,6 +34,7 @@ namespace IX.Observable
             : base(context)
         {
             this.InternalContainer = internalContainer;
+            this.resetCountLocker = new object();
         }
 
         /// <summary>
@@ -85,6 +87,18 @@ namespace IX.Observable
                 }
             }
         }
+
+        /// <summary>
+        /// Gets the ignore reset count.
+        /// </summary>
+        /// <value>
+        /// The ignore reset count.
+        /// </value>
+        /// <remarks>
+        /// <para>If this count is any number greater than zero, the <see cref="CollectionAdapter{T}.MustReset"/> event will be ignored.</para>
+        /// <para>Each invocation of the collection adapter's <see cref="CollectionAdapter{T}.MustReset"/> event will decrease this counter by one until zero.</para>
+        /// </remarks>
+        protected int IgnoreResetCount { get; private set; }
 
         /// <summary>
         /// Adds an item to the <see cref="ObservableCollectionBase{T}" />.
@@ -209,6 +223,29 @@ namespace IX.Observable
         }
 
         /// <summary>
+        /// Increases the <see cref="IgnoreResetCount"/> by one.
+        /// </summary>
+        protected void IncreaseIgnoreMustResetCounter()
+        {
+            lock (this.resetCountLocker)
+            {
+                this.IgnoreResetCount++;
+            }
+        }
+
+        /// <summary>
+        /// Increases the <see cref="IgnoreResetCount"/> by one.
+        /// </summary>
+        /// <param name="increaseBy">The amount to increase by.</param>
+        protected void IncreaseIgnoreMustResetCounter(int increaseBy)
+        {
+            lock (this.resetCountLocker)
+            {
+                this.IgnoreResetCount += increaseBy;
+            }
+        }
+
+        /// <summary>
         /// Called when an item is added to a collection.
         /// </summary>
         /// <param name="addedItem">The added item.</param>
@@ -242,9 +279,26 @@ namespace IX.Observable
 
         private void InternalContainer_MustReset(object sender, EventArgs e) => this.AsyncPost(() =>
         {
-            this.OnCollectionChanged();
-            this.OnPropertyChanged(nameof(this.Count));
-            this.ContentsMayHaveChanged();
+            bool shouldReset;
+            lock (this.resetCountLocker)
+            {
+                if (this.IgnoreResetCount > 0)
+                {
+                    this.IgnoreResetCount--;
+                    shouldReset = false;
+                }
+                else
+                {
+                    shouldReset = true;
+                }
+            }
+
+            if (shouldReset)
+            {
+                this.OnCollectionChanged();
+                this.OnPropertyChanged(nameof(this.Count));
+                this.ContentsMayHaveChanged();
+            }
         });
     }
 }

@@ -33,6 +33,8 @@ namespace IX.Observable.Adapters
             }
         }
 
+        public int SlavesCount => slaves.Count;
+
         public override bool IsReadOnly
         {
             get
