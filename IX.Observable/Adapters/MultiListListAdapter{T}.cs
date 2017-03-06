@@ -12,126 +12,54 @@ namespace IX.Observable.Adapters
 {
     internal class MultiListListAdapter<T> : ListAdapter<T>
     {
-        private IList<T> master;
-        private List<IEnumerable<T>> slaves;
+        private List<IEnumerable<T>> lists;
 
         internal MultiListListAdapter()
         {
-            this.slaves = new List<IEnumerable<T>>();
+            this.lists = new List<IEnumerable<T>>();
         }
 
-        public override int Count
-        {
-            get
-            {
-                if (this.master == null)
-                {
-                    throw new InvalidOperationException();
-                }
+        public override int Count => this.lists.Sum(p => p.Count());
 
-                return this.master.Count + this.slaves.Sum(p => p.Count());
-            }
-        }
+        public int SlavesCount => this.lists.Count;
 
-        public int SlavesCount => this.slaves.Count;
-
-        public override bool IsReadOnly
-        {
-            get
-            {
-                if (this.master == null)
-                {
-                    throw new InvalidOperationException();
-                }
-
-                return this.master.IsReadOnly;
-            }
-        }
+        public override bool IsReadOnly => true;
 
         public override bool IsSynchronized => false;
 
-        public override object SyncRoot => (this.master as ICollection)?.SyncRoot;
-
-        internal int MasterCount
-        {
-            get
-            {
-                if (this.master == null)
-                {
-                    throw new InvalidOperationException();
-                }
-
-                return this.master.Count;
-            }
-        }
+        public override object SyncRoot => this.lists.Select(p => (p as ICollection)?.SyncRoot).FirstOrDefault(p => p != null);
 
         public override T this[int index]
         {
             get
             {
-                if (index < this.master.Count)
-                {
-                    return this.master[index];
-                }
+                var idx = index;
 
-                var idx = index - this.master.Count;
-
-                foreach (IEnumerable<T> slave in this.slaves)
+                foreach (IEnumerable<T> list in this.lists)
                 {
-                    if (slave.Count() <= idx)
+                    if (list.Count() <= idx)
                     {
-                        idx -= slave.Count();
+                        idx -= list.Count();
                         continue;
                     }
 
-                    return slave.ElementAt(idx);
+                    return list.ElementAt(idx);
                 }
 
                 return default(T);
             }
 
-            set => this.master[index] = value;
+            set => throw new InvalidOperationException();
         }
 
-        public override int Add(T item)
-        {
-            if (this.master == null)
-            {
-                throw new InvalidOperationException();
-            }
+        public override int Add(T item) => throw new InvalidOperationException();
 
-            this.master.Add(item);
+        public override void Clear() => throw new InvalidOperationException();
 
-            return this.MasterCount - 1;
-        }
-
-        public override void Clear()
-        {
-            if (this.master == null)
-            {
-                throw new InvalidOperationException();
-            }
-
-            this.master.Clear();
-        }
-
-        public override bool Contains(T item)
-        {
-            if (this.master == null)
-            {
-                throw new InvalidOperationException();
-            }
-
-            return this.master.Contains(item) || this.slaves.Any(p => p.Contains(item));
-        }
+        public override bool Contains(T item) => this.lists.Any(p => p.Contains(item));
 
         public override void CopyTo(T[] array, int arrayIndex)
         {
-            if (this.master == null)
-            {
-                throw new InvalidOperationException();
-            }
-
             var totalCount = this.Count + arrayIndex;
             IEnumerator<T> enumerator = this.GetEnumerator();
 
@@ -148,17 +76,7 @@ namespace IX.Observable.Adapters
 
         public override IEnumerator<T> GetEnumerator()
         {
-            if (this.master == null)
-            {
-                throw new InvalidOperationException();
-            }
-
-            foreach (T var in this.master)
-            {
-                yield return var;
-            }
-
-            foreach (IEnumerable<T> lst in this.slaves)
+            foreach (IEnumerable<T> lst in this.lists)
             {
                 foreach (T var in lst)
                 {
@@ -169,83 +87,51 @@ namespace IX.Observable.Adapters
             yield break;
         }
 
-        public override int Remove(T item)
-        {
-            if (this.master == null)
-            {
-                throw new InvalidOperationException();
-            }
+        public override int Remove(T item) => throw new InvalidOperationException();
 
-            var index = this.master.IndexOf(item);
-
-            this.master.Remove(item);
-
-            return index;
-        }
-
-        public override void Insert(int index, T item) => this.master.Insert(index, item);
+        public override void Insert(int index, T item) => throw new InvalidOperationException();
 
         public override int IndexOf(T item)
         {
             var offset = 0;
 
             int foundIndex;
-            if ((foundIndex = this.master.IndexOf(item)) != -1)
+            foreach (List<T> list in this.lists.Select(p => p.ToList()))
             {
-                return foundIndex;
-            }
-            else
-            {
-                offset += this.master.Count;
-
-                foreach (List<T> slave in this.slaves.Select(p => p.ToList()))
+                if ((foundIndex = list.IndexOf(item)) != -1)
                 {
-                    if ((foundIndex = slave.IndexOf(item)) != -1)
-                    {
-                        return foundIndex + offset;
-                    }
-                    else
-                    {
-                        offset += slave.Count();
-                    }
+                    return foundIndex + offset;
                 }
-
-                return -1;
+                else
+                {
+                    offset += list.Count();
+                }
             }
+
+            return -1;
         }
 
-        /// <summary>
-        /// Removes an item at a specific index.
-        /// </summary>
-        /// <param name="index">The index at which to remove from.</param>
-        public override void RemoveAt(int index) => this.master.RemoveAt(index);
+        public override void RemoveAt(int index) => throw new InvalidOperationException();
 
-        internal void SetMaster<TList>(TList masterList)
-            where TList : class, IList<T>, INotifyCollectionChanged
-        {
-            this.master = masterList ?? throw new ArgumentNullException(nameof(masterList));
-            masterList.CollectionChanged += this.List_CollectionChanged;
-        }
-
-        internal void SetSlave<TList>(TList slaveList)
+        internal void SetList<TList>(TList list)
             where TList : class, IEnumerable<T>, INotifyCollectionChanged
         {
-            this.slaves.Add(slaveList ?? throw new ArgumentNullException(nameof(slaveList)));
-            slaveList.CollectionChanged += this.List_CollectionChanged;
+            this.lists.Add(list ?? throw new ArgumentNullException(nameof(list)));
+            list.CollectionChanged += this.List_CollectionChanged;
         }
 
-        internal void RemoveSlave<TList>(TList slaveList)
+        internal void RemoveList<TList>(TList list)
             where TList : class, IEnumerable<T>, INotifyCollectionChanged
         {
             try
             {
-                slaveList.CollectionChanged -= this.List_CollectionChanged;
+                list.CollectionChanged -= this.List_CollectionChanged;
             }
             catch
             {
             }
 
-            this.slaves.Remove(slaveList ?? throw new ArgumentNullException(nameof(slaveList)));
+            this.lists.Remove(list ?? throw new ArgumentNullException(nameof(list)));
         }
 
         private void List_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) => this.TriggerReset();

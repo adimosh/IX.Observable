@@ -26,7 +26,7 @@ namespace IX.Observable
         /// Initializes a new instance of the <see cref="ConcurrentObservableMasterSlaveCollection{T}"/> class.
         /// </summary>
         public ConcurrentObservableMasterSlaveCollection()
-            : base(new MultiListListAdapter<T>(), null)
+            : base(new MultiListMasterSlaveListAdapter<T>(), null)
         {
         }
 
@@ -35,7 +35,7 @@ namespace IX.Observable
         /// </summary>
         /// <param name="context">The synchronization context to use, if any.</param>
         public ConcurrentObservableMasterSlaveCollection(SynchronizationContext context)
-            : base(new MultiListListAdapter<T>(), context)
+            : base(new MultiListMasterSlaveListAdapter<T>(), context)
         {
         }
 
@@ -45,7 +45,7 @@ namespace IX.Observable
         /// <value>
         /// The count after add.
         /// </value>
-        protected override int CountAfterAdd => ((MultiListListAdapter<T>)this.InternalContainer).MasterCount;
+        protected override int CountAfterAdd => ((MultiListMasterSlaveListAdapter<T>)this.InternalContainer).MasterCount;
 
         /// <summary>
         /// Sets the master list.
@@ -59,7 +59,7 @@ namespace IX.Observable
             {
                 try
                 {
-                    ((MultiListListAdapter<T>)this.InternalContainer).SetMaster(list);
+                    ((MultiListMasterSlaveListAdapter<T>)this.InternalContainer).SetMaster(list);
                 }
                 finally
                 {
@@ -91,7 +91,7 @@ namespace IX.Observable
             {
                 try
                 {
-                    ((MultiListListAdapter<T>)this.InternalContainer).SetSlave(list);
+                    ((MultiListMasterSlaveListAdapter<T>)this.InternalContainer).SetSlave(list);
                 }
                 finally
                 {
@@ -123,7 +123,7 @@ namespace IX.Observable
             {
                 try
                 {
-                    ((MultiListListAdapter<T>)this.InternalContainer).RemoveSlave(list);
+                    ((MultiListMasterSlaveListAdapter<T>)this.InternalContainer).RemoveSlave(list);
                 }
                 finally
                 {
@@ -153,7 +153,7 @@ namespace IX.Observable
         /// <inheritdoc/>
         public override void Clear()
         {
-            this.IncreaseIgnoreMustResetCounter(((MultiListListAdapter<T>)this.InternalContainer).SlavesCount + 1);
+            this.IncreaseIgnoreMustResetCounter(((MultiListMasterSlaveListAdapter<T>)this.InternalContainer).SlavesCount + 1);
 
             base.Clear();
         }

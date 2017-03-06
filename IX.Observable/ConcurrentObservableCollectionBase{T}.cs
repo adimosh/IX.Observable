@@ -16,7 +16,7 @@ namespace IX.Observable
     /// <seealso cref="IX.Observable.ObservableCollectionBase{T}" />
     public abstract class ConcurrentObservableCollectionBase<T> : ObservableCollectionBase<T>, IDisposable
     {
-        private bool disposedValue; // To detect redundant calls
+        private bool disposedValue;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ConcurrentObservableCollectionBase{T}"/> class.
