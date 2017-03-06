@@ -218,7 +218,7 @@ namespace IX.Observable
 
             set
             {
-                var dictionary = ((DictionaryCollectionAdapter<TKey, TValue>)this.InternalContainer).dictionary;
+                Dictionary<TKey, TValue> dictionary = ((DictionaryCollectionAdapter<TKey, TValue>)this.InternalContainer).dictionary;
                 if (this.Locker.TryEnterWriteLock(Constants.ConcurrentLockAcquisitionTimeout))
                 {
                     try

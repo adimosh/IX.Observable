@@ -43,10 +43,10 @@ namespace IX.Observable.Adapters
 
         public override void Clear()
         {
-            var tempdict = this.dictionary;
+            Dictionary<TKey, TValue> tempdict = this.dictionary;
             this.dictionary = new Dictionary<TKey, TValue>();
 
-            var syncContext = SynchronizationContext.Current;
+            SynchronizationContext syncContext = SynchronizationContext.Current;
             SynchronizationContext.SetSynchronizationContext(null);
             Task.Run(() =>
             {

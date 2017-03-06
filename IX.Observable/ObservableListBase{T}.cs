@@ -69,7 +69,7 @@ namespace IX.Observable
                     throw new IndexOutOfRangeException();
                 }
 
-                var oldValue = this.InternalListContainer[index];
+                T oldValue = this.InternalListContainer[index];
                 this.InternalListContainer[index] = value;
                 this.AsyncPost(
                     (state) =>
@@ -141,7 +141,7 @@ namespace IX.Observable
                 return;
             }
 
-            var item = this.InternalListContainer[index];
+            T item = this.InternalListContainer[index];
             this.InternalListContainer.RemoveAt(index);
 
             this.AsyncPost(

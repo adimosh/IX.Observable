@@ -169,13 +169,13 @@ namespace IX.Observable
 
         private IEnumerator<TItem> EnumerateFiltered()
         {
-            var filter = this.Filter;
+            TFilter filter = this.Filter;
 
-            using (var enumerator = base.GetEnumerator())
+            using (IEnumerator<TItem> enumerator = base.GetEnumerator())
             {
                 while (enumerator.MoveNext())
                 {
-                    var current = enumerator.Current;
+                    TItem current = enumerator.Current;
                     if (this.filteringPredicate(current, filter))
                     {
                         yield return current;
@@ -190,11 +190,11 @@ namespace IX.Observable
         {
             this.filteredElements = new List<TItem>(base.Count);
 
-            using (var enumerator = this.EnumerateFiltered())
+            using (IEnumerator<TItem> enumerator = this.EnumerateFiltered())
             {
                 while (enumerator.MoveNext())
                 {
-                    var current = enumerator.Current;
+                    TItem current = enumerator.Current;
                     this.filteredElements.Add(current);
                 }
             }
@@ -204,7 +204,7 @@ namespace IX.Observable
         {
             if (this.filteredElements != null)
             {
-                var coll = this.filteredElements;
+                IList<TItem> coll = this.filteredElements;
                 this.filteredElements = null;
                 coll.Clear();
             }

@@ -138,13 +138,7 @@ namespace IX.Observable
         /// <summary>
         /// Gets the collection of keys in this dictionary.
         /// </summary>
-        public ICollection<TKey> Keys
-        {
-            get
-            {
-                return ((DictionaryCollectionAdapter<TKey, TValue>)this.InternalContainer).dictionary.Keys;
-            }
-        }
+        public ICollection<TKey> Keys => ((DictionaryCollectionAdapter<TKey, TValue>)this.InternalContainer).dictionary.Keys;
 
         /// <summary>
         /// Gets the collection of keys in this dictionary.
@@ -154,13 +148,7 @@ namespace IX.Observable
         /// <summary>
         /// Gets the collection of values in this dictionary.
         /// </summary>
-        public ICollection<TValue> Values
-        {
-            get
-            {
-                return ((DictionaryCollectionAdapter<TKey, TValue>)this.InternalContainer).dictionary.Values;
-            }
-        }
+        public ICollection<TValue> Values => ((DictionaryCollectionAdapter<TKey, TValue>)this.InternalContainer).dictionary.Values;
 
         /// <summary>
         /// Gets the collection of values in this dictionary.
@@ -174,14 +162,11 @@ namespace IX.Observable
         /// <returns>The value associated with the specified key.</returns>
         public TValue this[TKey key]
         {
-            get
-            {
-                return ((DictionaryCollectionAdapter<TKey, TValue>)this.InternalContainer).dictionary[key];
-            }
+            get => ((DictionaryCollectionAdapter<TKey, TValue>)this.InternalContainer).dictionary[key];
 
             set
             {
-                var dictionary = ((DictionaryCollectionAdapter<TKey, TValue>)this.InternalContainer).dictionary;
+                Dictionary<TKey, TValue> dictionary = ((DictionaryCollectionAdapter<TKey, TValue>)this.InternalContainer).dictionary;
                 if (dictionary.TryGetValue(key, out var val))
                 {
                     dictionary[key] = value;
@@ -244,9 +229,7 @@ namespace IX.Observable
             this.OnPropertyChanged(Constants.ItemsName);
         }
 
-        private void BroadcastChange()
-        {
-            this.AsyncPost(() =>
+        private void BroadcastChange() => this.AsyncPost(() =>
             {
                 this.OnCollectionChanged();
                 this.OnPropertyChanged(nameof(this.Keys));
@@ -254,6 +237,5 @@ namespace IX.Observable
                 this.OnPropertyChanged(nameof(this.Count));
                 this.OnPropertyChanged(Constants.ItemsName);
             });
-        }
     }
 }

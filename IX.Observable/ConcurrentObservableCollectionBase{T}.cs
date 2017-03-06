@@ -193,7 +193,7 @@ namespace IX.Observable
             {
                 try
                 {
-                    using (var enumerator = this.InternalContainer.GetEnumerator())
+                    using (IEnumerator<T> enumerator = this.InternalContainer.GetEnumerator())
                     {
                         while (enumerator.MoveNext())
                         {

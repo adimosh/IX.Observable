@@ -80,7 +80,7 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Sets a master list.
+        /// Sets a slave list.
         /// </summary>
         /// <typeparam name="TList">The type of the list.</typeparam>
         /// <param name="list">The list.</param>
@@ -92,6 +92,38 @@ namespace IX.Observable
                 try
                 {
                     ((MultiListListAdapter<T>)this.InternalContainer).SetSlave(list);
+                }
+                finally
+                {
+                    this.Locker.ExitWriteLock();
+                }
+
+                this.AsyncPost(() =>
+                {
+                    this.OnCollectionChanged();
+                    this.OnPropertyChanged(nameof(this.Count));
+                    this.OnPropertyChanged(Constants.ItemsName);
+                });
+
+                return;
+            }
+
+            throw new TimeoutException();
+        }
+
+        /// <summary>
+        /// Removes a slave list.
+        /// </summary>
+        /// <typeparam name="TList">The type of the list.</typeparam>
+        /// <param name="list">The list.</param>
+        public void RemoveSlaveList<TList>(TList list)
+                    where TList : class, IEnumerable<T>, INotifyCollectionChanged
+        {
+            if (this.Locker.TryEnterWriteLock(Constants.ConcurrentLockAcquisitionTimeout))
+            {
+                try
+                {
+                    ((MultiListListAdapter<T>)this.InternalContainer).RemoveSlave(list);
                 }
                 finally
                 {

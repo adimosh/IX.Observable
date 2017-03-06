@@ -158,13 +158,13 @@ namespace IX.Observable
 
         private IEnumerator<TItem> EnumerateFiltered()
         {
-            var filter = this.Filter;
+            TFilter filter = this.Filter;
 
-            using (var enumerator = base.GetEnumerator())
+            using (IEnumerator<TItem> enumerator = base.GetEnumerator())
             {
                 while (enumerator.MoveNext())
                 {
-                    var current = enumerator.Current;
+                    TItem current = enumerator.Current;
                     if (this.filteringPredicate(current, filter))
                     {
                         yield return current;
@@ -193,11 +193,11 @@ namespace IX.Observable
                             {
                                 this.cachedFilteredElements = new List<TItem>(this.InternalListContainer.Count);
 
-                                using (var enumerator = this.EnumerateFiltered())
+                                using (IEnumerator<TItem> enumerator = this.EnumerateFiltered())
                                 {
                                     while (enumerator.MoveNext())
                                     {
-                                        var current = enumerator.Current;
+                                        TItem current = enumerator.Current;
                                         this.cachedFilteredElements.Add(current);
                                     }
                                 }
@@ -237,7 +237,7 @@ namespace IX.Observable
                 {
                     if (this.cachedFilteredElements != null)
                     {
-                        var coll = this.cachedFilteredElements;
+                        IList<TItem> coll = this.cachedFilteredElements;
                         this.cachedFilteredElements = null;
                         coll.Clear();
                     }

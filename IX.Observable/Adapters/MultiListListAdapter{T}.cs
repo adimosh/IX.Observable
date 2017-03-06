@@ -33,7 +33,7 @@ namespace IX.Observable.Adapters
             }
         }
 
-        public int SlavesCount => slaves.Count;
+        public int SlavesCount => this.slaves.Count;
 
         public override bool IsReadOnly
         {
@@ -76,7 +76,7 @@ namespace IX.Observable.Adapters
 
                 var idx = index - this.master.Count;
 
-                foreach (var slave in this.slaves)
+                foreach (IEnumerable<T> slave in this.slaves)
                 {
                     if (slave.Count() <= idx)
                     {
@@ -198,7 +198,7 @@ namespace IX.Observable.Adapters
             {
                 offset += this.master.Count;
 
-                foreach (var slave in this.slaves.Select(p => p.ToList()))
+                foreach (List<T> slave in this.slaves.Select(p => p.ToList()))
                 {
                     if ((foundIndex = slave.IndexOf(item)) != -1)
                     {
@@ -232,6 +232,20 @@ namespace IX.Observable.Adapters
         {
             this.slaves.Add(slaveList ?? throw new ArgumentNullException(nameof(slaveList)));
             slaveList.CollectionChanged += this.List_CollectionChanged;
+        }
+
+        internal void RemoveSlave<TList>(TList slaveList)
+            where TList : class, IEnumerable<T>, INotifyCollectionChanged
+        {
+            try
+            {
+                slaveList.CollectionChanged -= this.List_CollectionChanged;
+            }
+            catch
+            {
+            }
+
+            this.slaves.Remove(slaveList ?? throw new ArgumentNullException(nameof(slaveList)));
         }
 
         private void List_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) => this.TriggerReset();
