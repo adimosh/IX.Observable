@@ -44,7 +44,7 @@ This list will be updated as new classes are added based on ongoing work and com
 
 This project is primarily available through NuGet.
 
-The current version is 0.4.0-beta1, and can be accessed by using NuGet commands:
+The current version is 0.4.0-beta3, and can be accessed by using NuGet commands:
 
 ```powershell
 Install-Package IX.Observable -Pre
