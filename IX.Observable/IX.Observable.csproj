@@ -3,8 +3,8 @@
   <PropertyGroup>
     <TargetFramework>netstandard1.0</TargetFramework>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <Version>0.4.0-beta3</Version>
-    <FileVersion>0.4.0.3</FileVersion>
+    <Version>0.4.0</Version>
+    <FileVersion>0.4.0.4</FileVersion>
     <AssemblyVersion>0.4.0</AssemblyVersion>
     <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
   </PropertyGroup>
