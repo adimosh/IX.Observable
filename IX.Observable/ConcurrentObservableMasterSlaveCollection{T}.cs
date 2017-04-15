@@ -55,7 +55,7 @@ namespace IX.Observable
         public void SetMasterList<TList>(TList list)
                     where TList : class, IList<T>, INotifyCollectionChanged
         {
-            if (this.Locker.TryEnterWriteLock(Constants.ConcurrentLockAcquisitionTimeout))
+            if (this.SynchronizationLock.TryEnterWriteLock(Constants.ConcurrentLockAcquisitionTimeout))
             {
                 try
                 {
@@ -63,7 +63,7 @@ namespace IX.Observable
                 }
                 finally
                 {
-                    this.Locker.ExitWriteLock();
+                    this.SynchronizationLock.ExitWriteLock();
                 }
 
                 this.AsyncPost(() =>
@@ -87,7 +87,7 @@ namespace IX.Observable
         public void SetSlaveList<TList>(TList list)
                     where TList : class, IEnumerable<T>, INotifyCollectionChanged
         {
-            if (this.Locker.TryEnterWriteLock(Constants.ConcurrentLockAcquisitionTimeout))
+            if (this.SynchronizationLock.TryEnterWriteLock(Constants.ConcurrentLockAcquisitionTimeout))
             {
                 try
                 {
@@ -95,7 +95,7 @@ namespace IX.Observable
                 }
                 finally
                 {
-                    this.Locker.ExitWriteLock();
+                    this.SynchronizationLock.ExitWriteLock();
                 }
 
                 this.AsyncPost(() =>
@@ -119,7 +119,7 @@ namespace IX.Observable
         public void RemoveSlaveList<TList>(TList list)
                     where TList : class, IEnumerable<T>, INotifyCollectionChanged
         {
-            if (this.Locker.TryEnterWriteLock(Constants.ConcurrentLockAcquisitionTimeout))
+            if (this.SynchronizationLock.TryEnterWriteLock(Constants.ConcurrentLockAcquisitionTimeout))
             {
                 try
                 {
@@ -127,7 +127,7 @@ namespace IX.Observable
                 }
                 finally
                 {
-                    this.Locker.ExitWriteLock();
+                    this.SynchronizationLock.ExitWriteLock();
                 }
 
                 this.AsyncPost(() =>
@@ -186,7 +186,7 @@ namespace IX.Observable
                 return;
             }
 
-            if (this.Locker.TryEnterWriteLock(Constants.ConcurrentLockAcquisitionTimeout))
+            if (this.SynchronizationLock.TryEnterWriteLock(Constants.ConcurrentLockAcquisitionTimeout))
             {
                 T item;
                 try
@@ -197,7 +197,7 @@ namespace IX.Observable
                 }
                 finally
                 {
-                    this.Locker.ExitWriteLock();
+                    this.SynchronizationLock.ExitWriteLock();
                 }
 
                 this.AsyncPost(

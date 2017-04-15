@@ -49,6 +49,16 @@ namespace IX.Observable
         public event EventHandler<ExceptionOccurredEventArgs> ExceptionOccurredWhileNotifying;
 
         /// <summary>
+        /// A synchronization lock item to be used when trying to synchronize read/write operations between threads.
+        /// </summary>
+        /// <remarks>
+        /// <para>On non-concurrent collections, this should be left <c>null</c> (<c>Nothing</c> in Visual Basic).</para>
+        /// <para>On concurrent collections, this should be overridden to return an instance. All read/write operations on the underlying constructs should rely on
+        /// the same instance of <see cref="ReaderWriterLockSlim"/> that is returned here to synchronize.</para>
+        /// </remarks>
+        protected virtual ReaderWriterLockSlim SynchronizationLock => null;
+
+        /// <summary>
         /// In a child class, triggers a property changed event.
         /// </summary>
         /// <param name="propertyName">The name of the property.</param>
@@ -238,13 +248,49 @@ namespace IX.Observable
             }
         }
 
-        protected virtual ReaderWriterLockSlim SynchronizationLock => null;
+        /// <summary>
+        /// Produces a reader lock in concurrent collections.
+        /// </summary>
+        /// <returns>A disposable object representing the lock.</returns>
+        protected ReadOnlySynchronizationLocker ReadLock() => new ReadOnlySynchronizationLocker(this.SynchronizationLock);
 
-        protected ReadOnlySynchronizationLocker ReadLock() => new ReadOnlySynchronizationLocker(SynchronizationLock);
+        /// <summary>
+        /// Invokes using a reader lock.
+        /// </summary>
+        /// <param name="invoker">An invoker that is called.</param>
+        protected void ReadLock(Action invoker)
+        {
+            using (new ReadOnlySynchronizationLocker(this.SynchronizationLock))
+            {
+                invoker();
+            }
+        }
 
-        protected WriteOnlySynchronizationLocker WriteLock() => new WriteOnlySynchronizationLocker(SynchronizationLock);
+        /// <summary>
+        /// Gets a result from an invoker using a reader lock.
+        /// </summary>
+        /// <param name="invoker">An invoker that is called to get the result.</param>
+        /// <typeparam name="T">The type of the object to return.</typeparam>
+        /// <returns>A disposable object representing the lock.</returns>
+        protected T ReadLock<T>(Func<T> invoker)
+        {
+            using (new ReadOnlySynchronizationLocker(this.SynchronizationLock))
+            {
+                return invoker();
+            }
+        }
 
-        protected ReadWriteSynchronizationLocker ReadWriteLock() => new ReadWriteSynchronizationLocker(SynchronizationLock);
+        /// <summary>
+        /// Produces a writer lock in concurrent collections.
+        /// </summary>
+        /// <returns>A disposable object representing the lock.</returns>
+        protected WriteOnlySynchronizationLocker WriteLock() => new WriteOnlySynchronizationLocker(this.SynchronizationLock);
+
+        /// <summary>
+        /// Produces an upgradeable reader lock in concurrent collections.
+        /// </summary>
+        /// <returns>A disposable object representing the lock.</returns>
+        protected ReadWriteSynchronizationLocker ReadWriteLock() => new ReadWriteSynchronizationLocker(this.SynchronizationLock);
 
         private void InvokeCollectionChanged(NotifyCollectionChangedEventArgs args) => this.AsyncPost(
             (state) =>

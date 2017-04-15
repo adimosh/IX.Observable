@@ -63,7 +63,7 @@ namespace IX.Observable
         {
             get
             {
-                if (this.Locker.TryEnterReadLock(Constants.ConcurrentLockAcquisitionTimeout))
+                if (this.SynchronizationLock.TryEnterReadLock(Constants.ConcurrentLockAcquisitionTimeout))
                 {
                     try
                     {
@@ -71,7 +71,7 @@ namespace IX.Observable
                     }
                     finally
                     {
-                        this.Locker.ExitReadLock();
+                        this.SynchronizationLock.ExitReadLock();
                     }
                 }
 
@@ -85,7 +85,7 @@ namespace IX.Observable
                     throw new IndexOutOfRangeException();
                 }
 
-                if (this.Locker.TryEnterWriteLock(Constants.ConcurrentLockAcquisitionTimeout))
+                if (this.SynchronizationLock.TryEnterWriteLock(Constants.ConcurrentLockAcquisitionTimeout))
                 {
                     T oldValue;
                     try
@@ -95,7 +95,7 @@ namespace IX.Observable
                     }
                     finally
                     {
-                        this.Locker.ExitWriteLock();
+                        this.SynchronizationLock.ExitWriteLock();
                     }
 
                     this.AsyncPost(
@@ -144,7 +144,7 @@ namespace IX.Observable
         /// <returns>The index of the item, or <c>-1</c> if not found.</returns>
         public virtual int IndexOf(T item)
         {
-            if (this.Locker.TryEnterReadLock(Constants.ConcurrentLockAcquisitionTimeout))
+            if (this.SynchronizationLock.TryEnterReadLock(Constants.ConcurrentLockAcquisitionTimeout))
             {
                 try
                 {
@@ -152,7 +152,7 @@ namespace IX.Observable
                 }
                 finally
                 {
-                    this.Locker.ExitReadLock();
+                    this.SynchronizationLock.ExitReadLock();
                 }
             }
 
@@ -166,7 +166,7 @@ namespace IX.Observable
         /// <param name="item">The item.</param>
         public virtual void Insert(int index, T item)
         {
-            if (this.Locker.TryEnterWriteLock(Constants.ConcurrentLockAcquisitionTimeout))
+            if (this.SynchronizationLock.TryEnterWriteLock(Constants.ConcurrentLockAcquisitionTimeout))
             {
                 try
                 {
@@ -174,7 +174,7 @@ namespace IX.Observable
                 }
                 finally
                 {
-                    this.Locker.ExitWriteLock();
+                    this.SynchronizationLock.ExitWriteLock();
                 }
 
                 this.AsyncPost(
@@ -202,7 +202,7 @@ namespace IX.Observable
                 return;
             }
 
-            if (this.Locker.TryEnterWriteLock(Constants.ConcurrentLockAcquisitionTimeout))
+            if (this.SynchronizationLock.TryEnterWriteLock(Constants.ConcurrentLockAcquisitionTimeout))
             {
                 T item;
                 try
@@ -212,7 +212,7 @@ namespace IX.Observable
                 }
                 finally
                 {
-                    this.Locker.ExitWriteLock();
+                    this.SynchronizationLock.ExitWriteLock();
                 }
 
                 this.AsyncPost(

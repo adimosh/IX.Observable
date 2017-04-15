@@ -80,7 +80,7 @@ namespace IX.Observable
         /// <returns>The dequeued item.</returns>
         public T Dequeue()
         {
-            if (this.Locker.TryEnterWriteLock(Constants.ConcurrentLockAcquisitionTimeout))
+            if (this.SynchronizationLock.TryEnterWriteLock(Constants.ConcurrentLockAcquisitionTimeout))
             {
                 T item;
                 try
@@ -89,7 +89,7 @@ namespace IX.Observable
                 }
                 finally
                 {
-                    this.Locker.ExitWriteLock();
+                    this.SynchronizationLock.ExitWriteLock();
                 }
 
                 this.AsyncPost(
@@ -112,7 +112,7 @@ namespace IX.Observable
         /// <param name="item">The item to enqueue.</param>
         public void Enqueue(T item)
         {
-            if (this.Locker.TryEnterWriteLock(Constants.ConcurrentLockAcquisitionTimeout))
+            if (this.SynchronizationLock.TryEnterWriteLock(Constants.ConcurrentLockAcquisitionTimeout))
             {
                 try
                 {
@@ -120,7 +120,7 @@ namespace IX.Observable
                 }
                 finally
                 {
-                    this.Locker.ExitWriteLock();
+                    this.SynchronizationLock.ExitWriteLock();
                 }
 
                 this.AsyncPost(
@@ -143,7 +143,7 @@ namespace IX.Observable
         /// <returns>The topmost item in the queue.</returns>
         public virtual T Peek()
         {
-            if (this.Locker.TryEnterReadLock(Constants.ConcurrentLockAcquisitionTimeout))
+            if (this.SynchronizationLock.TryEnterReadLock(Constants.ConcurrentLockAcquisitionTimeout))
             {
                 try
                 {
@@ -151,7 +151,7 @@ namespace IX.Observable
                 }
                 finally
                 {
-                    this.Locker.ExitReadLock();
+                    this.SynchronizationLock.ExitReadLock();
                 }
             }
 
@@ -164,7 +164,7 @@ namespace IX.Observable
         /// <returns>An array of items that are contained in the queue.</returns>
         public virtual T[] ToArray()
         {
-            if (this.Locker.TryEnterReadLock(Constants.ConcurrentLockAcquisitionTimeout))
+            if (this.SynchronizationLock.TryEnterReadLock(Constants.ConcurrentLockAcquisitionTimeout))
             {
                 try
                 {
@@ -172,7 +172,7 @@ namespace IX.Observable
                 }
                 finally
                 {
-                    this.Locker.ExitReadLock();
+                    this.SynchronizationLock.ExitReadLock();
                 }
             }
 
@@ -184,7 +184,7 @@ namespace IX.Observable
         /// </summary>
         public virtual void TrimExcess()
         {
-            if (this.Locker.TryEnterWriteLock(Constants.ConcurrentLockAcquisitionTimeout))
+            if (this.SynchronizationLock.TryEnterWriteLock(Constants.ConcurrentLockAcquisitionTimeout))
             {
                 try
                 {
@@ -192,7 +192,7 @@ namespace IX.Observable
                 }
                 finally
                 {
-                    this.Locker.ExitWriteLock();
+                    this.SynchronizationLock.ExitWriteLock();
                 }
 
                 return;

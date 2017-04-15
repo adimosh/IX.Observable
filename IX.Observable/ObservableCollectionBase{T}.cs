@@ -36,7 +36,7 @@ namespace IX.Observable
         /// </summary>
         /// <param name="item">The object to add to the <see cref="ObservableCollectionBase{T}" />.</param>
         /// <remarks>
-        /// <para>On concurrent collections, this property is write-synchronized.</para>
+        /// <para>On concurrent collections, this method is write-synchronized.</para>
         /// </remarks>
         public virtual void Add(T item)
         {
@@ -63,7 +63,7 @@ namespace IX.Observable
         /// Removes all items from the <see cref="ObservableCollectionBase{T}" />.
         /// </summary>
         /// <remarks>
-        /// <para>On concurrent collections, this property is write-synchronized.</para>
+        /// <para>On concurrent collections, this method is write-synchronized.</para>
         /// </remarks>
         public virtual void Clear()
         {
@@ -82,10 +82,11 @@ namespace IX.Observable
         /// </summary>
         /// <param name="item">The object to remove from the <see cref="ObservableCollectionBase{T}" />.</param>
         /// <returns>
-        /// <c>true</c> if <paramref name="item" /> was successfully removed from the <see cref="ObservableCollectionBase{T}" />; otherwise, <c>false</c>. This method also returns false if <paramref name="item" /> is not found in the original <see cref="ObservableCollectionBase{T}" />.
+        /// <c>true</c> if <paramref name="item" /> was successfully removed from the <see cref="ObservableCollectionBase{T}" />; otherwise, <c>false</c>.
+        /// This method also returns false if <paramref name="item" /> is not found in the original <see cref="ObservableCollectionBase{T}" />.
         /// </returns>
         /// <remarks>
-        /// <para>On concurrent collections, this property is write-synchronized.</para>
+        /// <para>On concurrent collections, this method is write-synchronized.</para>
         /// </remarks>
         public virtual bool Remove(T item)
         {

@@ -41,21 +41,12 @@ namespace IX.Observable
         /// <remarks>
         /// <para>On concurrent collections, this property is read-synchronized.</para>
         /// </remarks>
-        public virtual int Count
-        {
-            get
-            {
-                using (this.ReadLock())
-                {
-                    return ((IReadOnlyCollection<T>)this.InternalContainer).Count;
-                }
-            }
-        }
+        public virtual int Count => this.ReadLock(() => ((IReadOnlyCollection<T>)this.InternalContainer).Count);
 
         /// <summary>
         /// Gets a value indicating whether the <see cref="ObservableCollectionBase{T}" /> is read-only.
         /// </summary>
-        public bool IsReadOnly => this.InternalContainer.IsReadOnly;
+        public bool IsReadOnly => this.ReadLock(() => this.InternalContainer.IsReadOnly);
 
         /// <summary>
         /// Gets a value indicating whether this instance is synchronized.
@@ -63,7 +54,7 @@ namespace IX.Observable
         /// <value>
         ///   <c>true</c> if this instance is synchronized; otherwise, <c>false</c>.
         /// </value>
-        public bool IsSynchronized => this.InternalContainer.IsSynchronized;
+        public bool IsSynchronized => this.SynchronizationLock != null;
 
         /// <summary>
         /// Gets the synchronize root.
@@ -71,7 +62,16 @@ namespace IX.Observable
         /// <value>
         /// The synchronize root.
         /// </value>
-        public object SyncRoot => this.InternalContainer.SyncRoot;
+        public object SyncRoot
+        {
+            get
+            {
+                using (this.ReadLock())
+                {
+                    return this.InternalContainer.SyncRoot;
+                }
+            }
+        }
 
         /// <summary>
         /// Gets or sets the internal object container.
@@ -118,15 +118,9 @@ namespace IX.Observable
         /// <c>true</c> if <paramref name="item" /> is found in the <see cref="ObservableCollectionBase{T}" />; otherwise, <c>false</c>.
         /// </returns>
         /// <remarks>
-        /// <para>On concurrent collections, this property is read-synchronized.</para>
+        /// <para>On concurrent collections, this method is read-synchronized.</para>
         /// </remarks>
-        public virtual bool Contains(T item)
-        {
-            using (this.ReadLock())
-            {
-                return this.InternalContainer.Contains(item);
-            }
-        }
+        public virtual bool Contains(T item) => this.ReadLock(() => this.InternalContainer.Contains(item));
 
         /// <summary>
         /// Copies the elements of the <see cref="ObservableCollectionBase{T}" /> to an <see cref="T:System.Array" />, starting at a particular <see cref="T:System.Array" /> index.
@@ -134,23 +128,39 @@ namespace IX.Observable
         /// <param name="array">The one-dimensional <see cref="T:System.Array" /> that is the destination of the elements copied from <see cref="ObservableCollectionBase{T}" />. The <see cref="T:System.Array" /> must have zero-based indexing.</param>
         /// <param name="arrayIndex">The zero-based index in <paramref name="array" /> at which copying begins.</param>
         /// <remarks>
-        /// <para>On concurrent collections, this property is read-synchronized.</para>
+        /// <para>On concurrent collections, this method is read-synchronized.</para>
         /// </remarks>
-        public virtual void CopyTo(T[] array, int arrayIndex)
-        {
-            using (this.ReadLock())
-            {
-                this.InternalContainer.CopyTo(array, arrayIndex);
-            }
-        }
+        public virtual void CopyTo(T[] array, int arrayIndex) => this.ReadLock(() => this.InternalContainer.CopyTo(array, arrayIndex));
 
         /// <summary>
-        /// Returns an enumerator that iterates through the collection.
+        /// Returns a locking enumerator that iterates through the collection.
         /// </summary>
         /// <returns>
         /// An enumerator that can be used to iterate through the collection.
         /// </returns>
-        public virtual IEnumerator<T> GetEnumerator() => this.InternalContainer.GetEnumerator();
+        /// <remarks>
+        /// <para>In concurrent collections, the enumerator, by default, locks the collection in place and ensures that any attempts to modify from the same thread will
+        /// result in an exception, whereas from a different thread will result in the other thread patiently waiting for its turn to write.</para>
+        /// <para>This implementation focuses on the normal use of enumerators, which is to dispose of their IEnumerator at the end of their enumeration cycle.</para>
+        /// <para>If the enumerator is never disposed of, it will never release the read lock, thus making the other threads time out.</para>
+        /// <para>Please make sure that you dispose the enumerator object at all times in order to avoid deadlocking and timeouts.</para>
+        /// </remarks>
+        /// <exception cref="System.TimeoutException">There was a timeout acquiring the necessary lock.</exception>
+        public IEnumerator<T> GetEnumerator()
+        {
+            using (this.ReadLock())
+            {
+                using (IEnumerator<T> enumerator = this.InternalContainer.GetEnumerator())
+                {
+                    while (enumerator.MoveNext())
+                    {
+                        yield return enumerator.Current;
+                    }
+                }
+
+                yield break;
+            }
+        }
 
         /// <summary>
         /// Returns an enumerator that iterates through a collection.

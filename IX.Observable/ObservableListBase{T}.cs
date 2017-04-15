@@ -61,7 +61,14 @@ namespace IX.Observable
         /// <returns>The item at the specified index.</returns>
         public virtual T this[int index]
         {
-            get => this.InternalListContainer[index];
+            get
+            {
+                using (this.ReadLock())
+                {
+                    return this.InternalListContainer[index];
+                }
+            }
+
             set
             {
                 if (index >= this.Count)
@@ -69,15 +76,17 @@ namespace IX.Observable
                     throw new IndexOutOfRangeException();
                 }
 
-                T oldValue = this.InternalListContainer[index];
-                this.InternalListContainer[index] = value;
-                this.AsyncPost(
-                    (state) =>
-                    {
-                        this.RaiseCollectionChangedChanged(state.OldValue, state.NewValue, state.Index);
-                        this.RaisePropertyChanged(nameof(this.Count));
-                        this.ContentsMayHaveChanged();
-                    }, new { OldValue=oldValue, NewValue = value, Index = index });
+                T oldValue;
+
+                using (this.WriteLock())
+                {
+                    oldValue = this.InternalListContainer[index];
+                    this.InternalListContainer[index] = value;
+                }
+
+                this.RaiseCollectionChangedChanged(oldValue, value, index);
+                this.RaisePropertyChanged(nameof(this.Count));
+                this.ContentsMayHaveChanged();
             }
         }
 

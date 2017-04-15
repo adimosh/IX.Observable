@@ -80,7 +80,7 @@ namespace IX.Observable
         /// <returns>The topmost element in the stack, if any.</returns>
         public virtual T Peek()
         {
-            if (this.Locker.TryEnterReadLock(Constants.ConcurrentLockAcquisitionTimeout))
+            if (this.SynchronizationLock.TryEnterReadLock(Constants.ConcurrentLockAcquisitionTimeout))
             {
                 try
                 {
@@ -88,7 +88,7 @@ namespace IX.Observable
                 }
                 finally
                 {
-                    this.Locker.ExitReadLock();
+                    this.SynchronizationLock.ExitReadLock();
                 }
             }
 
@@ -101,7 +101,7 @@ namespace IX.Observable
         /// <returns>The topmost element in the stack, if any.</returns>
         public T Pop()
         {
-            if (this.Locker.TryEnterWriteLock(Constants.ConcurrentLockAcquisitionTimeout))
+            if (this.SynchronizationLock.TryEnterWriteLock(Constants.ConcurrentLockAcquisitionTimeout))
             {
                 T item;
                 try
@@ -110,7 +110,7 @@ namespace IX.Observable
                 }
                 finally
                 {
-                    this.Locker.ExitWriteLock();
+                    this.SynchronizationLock.ExitWriteLock();
                 }
 
                 this.AsyncPost(
@@ -133,7 +133,7 @@ namespace IX.Observable
         /// <param name="item">The item to push.</param>
         public void Push(T item)
         {
-            if (this.Locker.TryEnterWriteLock(Constants.ConcurrentLockAcquisitionTimeout))
+            if (this.SynchronizationLock.TryEnterWriteLock(Constants.ConcurrentLockAcquisitionTimeout))
             {
                 try
                 {
@@ -141,7 +141,7 @@ namespace IX.Observable
                 }
                 finally
                 {
-                    this.Locker.ExitWriteLock();
+                    this.SynchronizationLock.ExitWriteLock();
                 }
 
                 this.AsyncPost(
@@ -164,7 +164,7 @@ namespace IX.Observable
         /// <returns>An array containing all items in the stack.</returns>
         public virtual T[] ToArray()
         {
-            if (this.Locker.TryEnterReadLock(Constants.ConcurrentLockAcquisitionTimeout))
+            if (this.SynchronizationLock.TryEnterReadLock(Constants.ConcurrentLockAcquisitionTimeout))
             {
                 try
                 {
@@ -172,7 +172,7 @@ namespace IX.Observable
                 }
                 finally
                 {
-                    this.Locker.ExitReadLock();
+                    this.SynchronizationLock.ExitReadLock();
                 }
             }
 
@@ -184,7 +184,7 @@ namespace IX.Observable
         /// </summary>
         public virtual void TrimExcess()
         {
-            if (this.Locker.TryEnterWriteLock(Constants.ConcurrentLockAcquisitionTimeout))
+            if (this.SynchronizationLock.TryEnterWriteLock(Constants.ConcurrentLockAcquisitionTimeout))
             {
                 try
                 {
@@ -192,7 +192,7 @@ namespace IX.Observable
                 }
                 finally
                 {
-                    this.Locker.ExitWriteLock();
+                    this.SynchronizationLock.ExitWriteLock();
                 }
 
                 return;

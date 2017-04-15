@@ -143,7 +143,7 @@ namespace IX.Observable
         {
             get
             {
-                if (this.Locker.TryEnterReadLock(Constants.ConcurrentLockAcquisitionTimeout))
+                if (this.SynchronizationLock.TryEnterReadLock(Constants.ConcurrentLockAcquisitionTimeout))
                 {
                     try
                     {
@@ -151,7 +151,7 @@ namespace IX.Observable
                     }
                     finally
                     {
-                        this.Locker.ExitReadLock();
+                        this.SynchronizationLock.ExitReadLock();
                     }
                 }
 
@@ -171,7 +171,7 @@ namespace IX.Observable
         {
             get
             {
-                if (this.Locker.TryEnterReadLock(Constants.ConcurrentLockAcquisitionTimeout))
+                if (this.SynchronizationLock.TryEnterReadLock(Constants.ConcurrentLockAcquisitionTimeout))
                 {
                     try
                     {
@@ -179,7 +179,7 @@ namespace IX.Observable
                     }
                     finally
                     {
-                        this.Locker.ExitReadLock();
+                        this.SynchronizationLock.ExitReadLock();
                     }
                 }
 
@@ -201,7 +201,7 @@ namespace IX.Observable
         {
             get
             {
-                if (this.Locker.TryEnterReadLock(Constants.ConcurrentLockAcquisitionTimeout))
+                if (this.SynchronizationLock.TryEnterReadLock(Constants.ConcurrentLockAcquisitionTimeout))
                 {
                     try
                     {
@@ -209,7 +209,7 @@ namespace IX.Observable
                     }
                     finally
                     {
-                        this.Locker.ExitReadLock();
+                        this.SynchronizationLock.ExitReadLock();
                     }
                 }
 
@@ -219,7 +219,7 @@ namespace IX.Observable
             set
             {
                 Dictionary<TKey, TValue> dictionary = ((DictionaryCollectionAdapter<TKey, TValue>)this.InternalContainer).dictionary;
-                if (this.Locker.TryEnterWriteLock(Constants.ConcurrentLockAcquisitionTimeout))
+                if (this.SynchronizationLock.TryEnterWriteLock(Constants.ConcurrentLockAcquisitionTimeout))
                 {
                     try
                     {
@@ -234,7 +234,7 @@ namespace IX.Observable
                     }
                     finally
                     {
-                        this.Locker.ExitWriteLock();
+                        this.SynchronizationLock.ExitWriteLock();
                     }
 
                     this.BroadcastChange();
@@ -260,7 +260,7 @@ namespace IX.Observable
         /// <returns><c>true</c> whether a key has been found, <c>false</c> otherwise.</returns>
         public bool ContainsKey(TKey key)
         {
-            if (this.Locker.TryEnterReadLock(Constants.ConcurrentLockAcquisitionTimeout))
+            if (this.SynchronizationLock.TryEnterReadLock(Constants.ConcurrentLockAcquisitionTimeout))
             {
                 try
                 {
@@ -268,7 +268,7 @@ namespace IX.Observable
                 }
                 finally
                 {
-                    this.Locker.ExitReadLock();
+                    this.SynchronizationLock.ExitReadLock();
                 }
             }
 
@@ -283,7 +283,7 @@ namespace IX.Observable
         public bool Remove(TKey key)
         {
             bool removalResult;
-            if (this.Locker.TryEnterWriteLock(Constants.ConcurrentLockAcquisitionTimeout))
+            if (this.SynchronizationLock.TryEnterWriteLock(Constants.ConcurrentLockAcquisitionTimeout))
             {
                 try
                 {
@@ -291,7 +291,7 @@ namespace IX.Observable
                 }
                 finally
                 {
-                    this.Locker.ExitWriteLock();
+                    this.SynchronizationLock.ExitWriteLock();
                 }
             }
             else
@@ -317,7 +317,7 @@ namespace IX.Observable
         /// <returns><c>true</c> if the value was successfully fetched, <c>false</c> otherwise.</returns>
         public bool TryGetValue(TKey key, out TValue value)
         {
-            if (this.Locker.TryEnterReadLock(Constants.ConcurrentLockAcquisitionTimeout))
+            if (this.SynchronizationLock.TryEnterReadLock(Constants.ConcurrentLockAcquisitionTimeout))
             {
                 try
                 {
@@ -325,7 +325,7 @@ namespace IX.Observable
                 }
                 finally
                 {
-                    this.Locker.ExitReadLock();
+                    this.SynchronizationLock.ExitReadLock();
                 }
             }
 
