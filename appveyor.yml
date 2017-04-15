@@ -2,6 +2,9 @@ version: 0.4.0.{build}
 skip_tags: true
 image: Visual Studio 2017
 clone_depth: 1
+environment:
+  NUGET_SECURE_TOKEN:
+    secure: eF0Mu+Ky+FtngFJN7u4unv9l2ebEvlvfim9hPpWkRAc=
 install:
 - cmd: dotnet restore
 nuget:
@@ -9,7 +12,7 @@ nuget:
   project_feed: true
 build_script:
 - cmd: >-
-    dotnet tools\CSProjAutoVersionIncrementer.dll IX.Observable\IX.Observable.csproj {version}
+    dotnet tools\CSProjAutoVersionIncrementer.dll IX.Observable\IX.Observable.csproj %APPVEYOR_BUILD_VERSION%
 
     dotnet build IX.Observable\IX.Observable.csproj -c Release
 test_script:
@@ -18,4 +21,4 @@ deploy_script:
 - cmd: >-
     dotnet pack IX.Observable\IX.Observable.csproj -c Release
 
-    nuget push IX.Observable.{version}.nupkg -ApiKey 78sx6009432ldyhlltvnc4y4 -Source https://ci.appveyor.com/nuget/adimosh-b98lew0twdrh/api/v2/package
+    nuget push IX.Observable.{version}.nupkg -ApiKey %NUGET_SECURE_TOKEN% -Source https://ci.appveyor.com/nuget/adimosh-at-live-dot-com/api/v2/package
