@@ -5,6 +5,9 @@ clone_depth: 1
 environment:
   NUGET_SECURE_TOKEN:
     secure: eF0Mu+Ky+FtngFJN7u4unv9l2ebEvlvfim9hPpWkRAc=
+  nuget_user: adimosh@gmail.com
+  nuget_password:
+    secure: uBvWMFhy9DPgv2TIksG2FQ==
 install:
 - cmd: dotnet restore
 nuget:
