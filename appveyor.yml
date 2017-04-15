@@ -21,4 +21,4 @@ deploy_script:
 - cmd: >-
     dotnet pack IX.Observable\IX.Observable.csproj -c Release
 
-    nuget push IX.Observable.{version}.nupkg -ApiKey %NUGET_SECURE_TOKEN% -Source https://ci.appveyor.com/nuget/adimosh-at-live-dot-com/api/v2/package
+    nuget push IX.Observable\bin\Release\IX.Observable.%APPVEYOR_BUILD_VERSION%.nupkg -ApiKey %NUGET_SECURE_TOKEN% -Source https://ci.appveyor.com/nuget/adimosh-at-live-dot-com/api/v2/package
