@@ -20,12 +20,12 @@
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-    <DocumentationFile>bin\Debug\netstandard1.0\.xml</DocumentationFile>
+    <DocumentationFile>bin\Debug\netstandard1.0\IX.Observable.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <WarningsAsErrors>true</WarningsAsErrors>
     <DefineConstants>RELEASE;NETSTANDARD1_0</DefineConstants>
-    <DocumentationFile>bin\Release\netstandard1.0\.xml</DocumentationFile>
+    <DocumentationFile>bin\Release\netstandard1.0\IX.Observable.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -47,7 +47,7 @@
     <PackageReference Include="System.Threading" Version="4.3.0" />
     <PackageReference Include="System.Resources.ResourceManager" Version="4.3.0" />
     <PackageReference Include="System.Threading.Tasks" Version="4.3.0" />
-    <PackageReference Include="StyleCop.Analyzers" Version="1.1.0-beta001" Type="build" PrivateAssets="all" />
+    <PackageReference Include="StyleCop.Analyzers" Version="1.1.0-beta001" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>

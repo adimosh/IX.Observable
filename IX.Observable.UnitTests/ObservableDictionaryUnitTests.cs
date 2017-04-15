@@ -12,15 +12,15 @@ namespace IX.Observable.UnitTests
         public void ObservableDictionaryCount()
         {
             // Arrange
-            int numberOfItems = UnitTestsUtils.Random.Next(UnitTestConstants.TestsGeneralMagnitude);
+            var numberOfItems = UnitTestsUtils.Random.Next(UnitTestConstants.TestsGeneralMagnitude);
             int[] items = new int[numberOfItems];
 
-            for (int i = 0; i < numberOfItems; i++)
+            for (var i = 0; i < numberOfItems; i++)
             {
                 items[i] = UnitTestsUtils.Random.Next(numberOfItems);
             }
 
-            int numberOfItemsToCheck = UnitTestsUtils.Random.Next(numberOfItems);
+            var numberOfItemsToCheck = UnitTestsUtils.Random.Next(numberOfItems);
             int[] itemsToCheck = new int[numberOfItemsToCheck];
 
             for (int i = 0; i < numberOfItemsToCheck; i++)
@@ -29,9 +29,9 @@ namespace IX.Observable.UnitTests
             }
 
             // Act
-            ObservableDictionary<int, int> x = new ObservableDictionary<int, int>(numberOfItems);
+            var x = new ObservableDictionary<int, int>(numberOfItems);
 
-            for (int i = 0; i < numberOfItems; i++)
+            for (var i = 0; i < numberOfItems; i++)
             {
                 x.Add(i, items[i]);
             }
@@ -39,7 +39,7 @@ namespace IX.Observable.UnitTests
             // Assert
             Assert.True(x.Count == numberOfItems);
 
-            foreach (int i in itemsToCheck)
+            foreach (var i in itemsToCheck)
             {
                 Assert.Equal(x[i], items[i]);
             }
