@@ -2,15 +2,20 @@ version: 0.4.0.{build}
 skip_tags: true
 image: Visual Studio 2017
 clone_depth: 1
-install:
+init:
 - cmd: dotnet restore
 nuget:
   account_feed: true
   project_feed: true
 build_script:
 - cmd: >-
+    dotnet tools\CSProjAutoVersionIncrementer.dll IX.Observable\IX.Observable.csproj {version}
+
     dotnet build IX.Observable\IX.Observable.csproj -c Release
 test_script:
 - cmd: dotnet test IX.Observable.UnitTests\IX.Observable.UnitTests.csproj
-before_deploy:
-- cmd: dotnet pack IX.Observable\IX.Observable.csproj -c Release
+deploy_script:
+- cmd: >-
+    dotnet pack IX.Observable\IX.Observable.csproj -c Release
+
+    nuget push IX.Observable.{version}.nupkg -ApiKey 78sx6009432ldyhlltvnc4y4 -Source https://ci.appveyor.com/nuget/adimosh-b98lew0twdrh/api/v2/package
