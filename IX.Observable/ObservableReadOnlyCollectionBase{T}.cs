@@ -171,7 +171,7 @@ namespace IX.Observable
         /// <param name="addedItem">The added item.</param>
         /// <param name="index">The index.</param>
         protected virtual void OnCollectionChangedAdd(T addedItem, int index)
-            => this.OnCollectionChanged(NotifyCollectionChangedAction.Add, newItem: addedItem, newIndex: index);
+            => this.RaiseCollectionChanged(NotifyCollectionChangedAction.Add, newItem: addedItem, newIndex: index);
 
         /// <summary>
         /// Called when an item in a collection is changed.
@@ -180,7 +180,7 @@ namespace IX.Observable
         /// <param name="newItem">The new item.</param>
         /// <param name="index">The index.</param>
         protected virtual void OnCollectionChangedChanged(T oldItem, T newItem, int index)
-            => this.OnCollectionChanged(NotifyCollectionChangedAction.Replace, oldItem, newItem, index, index);
+            => this.RaiseCollectionChanged(NotifyCollectionChangedAction.Replace, oldItem, newItem, index, index);
 
         /// <summary>
         /// Called when an item is removed from a collection.
@@ -188,7 +188,7 @@ namespace IX.Observable
         /// <param name="removedItem">The removed item.</param>
         /// <param name="index">The index.</param>
         protected virtual void OnCollectionChangedRemove(T removedItem, int index)
-            => this.OnCollectionChanged(NotifyCollectionChangedAction.Remove, oldItem: removedItem, oldIndex: index);
+            => this.RaiseCollectionChanged(NotifyCollectionChangedAction.Remove, oldItem: removedItem, oldIndex: index);
 
         /// <summary>
         /// Called when the contents may have changed so that proper notifications can happen.
@@ -215,8 +215,8 @@ namespace IX.Observable
 
             if (shouldReset)
             {
-                this.OnCollectionChanged();
-                this.OnPropertyChanged(nameof(this.Count));
+                this.RaiseCollectionChanged();
+                this.RaisePropertyChanged(nameof(this.Count));
                 this.ContentsMayHaveChanged();
             }
         });

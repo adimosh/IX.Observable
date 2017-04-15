@@ -44,14 +44,14 @@ namespace IX.Observable
                 {
                     if (state.index == -1)
                     {
-                        this.OnCollectionChanged();
+                        this.RaiseCollectionChanged();
                     }
                     else
                     {
                         this.OnCollectionChangedAdd(state.item, state.index);
                     }
 
-                    this.OnPropertyChanged(nameof(this.Count));
+                    this.RaisePropertyChanged(nameof(this.Count));
                     this.ContentsMayHaveChanged();
                 }, new { index = newIndex, item });
         }
@@ -65,8 +65,8 @@ namespace IX.Observable
 
             this.AsyncPost(() =>
             {
-                this.OnCollectionChanged();
-                this.OnPropertyChanged(nameof(this.Count));
+                this.RaiseCollectionChanged();
+                this.RaisePropertyChanged(nameof(this.Count));
                 this.ContentsMayHaveChanged();
             });
         }
@@ -88,7 +88,7 @@ namespace IX.Observable
                     (state) =>
                     {
                         this.OnCollectionChangedRemove(state.item, state.index);
-                        this.OnPropertyChanged(nameof(this.Count));
+                        this.RaisePropertyChanged(nameof(this.Count));
                         this.ContentsMayHaveChanged();
                     }, new { index = oldIndex, item });
                 return true;
@@ -97,8 +97,8 @@ namespace IX.Observable
             {
                 this.AsyncPost(() =>
                 {
-                    this.OnCollectionChanged();
-                    this.OnPropertyChanged(nameof(this.Count));
+                    this.RaiseCollectionChanged();
+                    this.RaisePropertyChanged(nameof(this.Count));
                     this.ContentsMayHaveChanged();
                 });
                 return true;

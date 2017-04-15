@@ -337,18 +337,18 @@ namespace IX.Observable
         /// </summary>
         protected sealed override void ContentsMayHaveChanged()
         {
-            this.OnPropertyChanged(nameof(this.Keys));
-            this.OnPropertyChanged(nameof(this.Values));
-            this.OnPropertyChanged(Constants.ItemsName);
+            this.RaisePropertyChanged(nameof(this.Keys));
+            this.RaisePropertyChanged(nameof(this.Values));
+            this.RaisePropertyChanged(Constants.ItemsName);
         }
 
         private void BroadcastChange() => this.AsyncPost(() =>
             {
-                this.OnCollectionChanged();
-                this.OnPropertyChanged(nameof(this.Keys));
-                this.OnPropertyChanged(nameof(this.Values));
-                this.OnPropertyChanged(nameof(this.Count));
-                this.OnPropertyChanged(Constants.ItemsName);
+                this.RaiseCollectionChanged();
+                this.RaisePropertyChanged(nameof(this.Keys));
+                this.RaisePropertyChanged(nameof(this.Values));
+                this.RaisePropertyChanged(nameof(this.Count));
+                this.RaisePropertyChanged(Constants.ItemsName);
             });
     }
 }

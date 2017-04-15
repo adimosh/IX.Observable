@@ -84,8 +84,8 @@ namespace IX.Observable
             this.AsyncPost(
                 (state) =>
             {
-                this.OnPropertyChanged(nameof(this.Count));
-                this.OnPropertyChanged(Constants.ItemsName);
+                this.RaisePropertyChanged(nameof(this.Count));
+                this.RaisePropertyChanged(Constants.ItemsName);
                 this.OnCollectionChangedRemove(state, 0);
             }, item);
 
@@ -103,8 +103,8 @@ namespace IX.Observable
             this.AsyncPost(
                 (state) =>
             {
-                this.OnPropertyChanged(nameof(this.Count));
-                this.OnPropertyChanged(Constants.ItemsName);
+                this.RaisePropertyChanged(nameof(this.Count));
+                this.RaisePropertyChanged(Constants.ItemsName);
                 this.OnCollectionChangedAdd(state.item, state.index);
             }, new { index = this.Count - 1, item });
         }

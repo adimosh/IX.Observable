@@ -59,9 +59,9 @@ namespace IX.Observable
 
             this.AsyncPost(() =>
             {
-                this.OnCollectionChanged();
-                this.OnPropertyChanged(nameof(this.Count));
-                this.OnPropertyChanged(Constants.ItemsName);
+                this.RaiseCollectionChanged();
+                this.RaisePropertyChanged(nameof(this.Count));
+                this.RaisePropertyChanged(Constants.ItemsName);
             });
         }
 
@@ -77,9 +77,9 @@ namespace IX.Observable
 
             this.AsyncPost(() =>
             {
-                this.OnCollectionChanged();
-                this.OnPropertyChanged(nameof(this.Count));
-                this.OnPropertyChanged(Constants.ItemsName);
+                this.RaiseCollectionChanged();
+                this.RaisePropertyChanged(nameof(this.Count));
+                this.RaisePropertyChanged(Constants.ItemsName);
             });
         }
 
@@ -95,9 +95,9 @@ namespace IX.Observable
 
             this.AsyncPost(() =>
             {
-                this.OnCollectionChanged();
-                this.OnPropertyChanged(nameof(this.Count));
-                this.OnPropertyChanged(Constants.ItemsName);
+                this.RaiseCollectionChanged();
+                this.RaisePropertyChanged(nameof(this.Count));
+                this.RaisePropertyChanged(Constants.ItemsName);
             });
         }
 
@@ -152,12 +152,12 @@ namespace IX.Observable
                 (state) =>
                 {
                     this.OnCollectionChangedRemove(state.NewValue, state.Index);
-                    this.OnPropertyChanged(nameof(this.Count));
+                    this.RaisePropertyChanged(nameof(this.Count));
                     this.ContentsMayHaveChanged();
                 }, new { NewValue = item, Index = index });
         }
 
         /// <inheritdoc />
-        protected override void ContentsMayHaveChanged() => this.OnPropertyChanged(Constants.ItemsName);
+        protected override void ContentsMayHaveChanged() => this.RaisePropertyChanged(Constants.ItemsName);
     }
 }

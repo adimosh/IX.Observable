@@ -48,16 +48,10 @@ namespace IX.Observable
         public event EventHandler<ExceptionOccurredEventArgs> ExceptionOccurredWhileNotifying;
 
         /// <summary>
-        /// Determines whether or not there are listeners to the <see cref="PropertyChanged"/> event.
-        /// </summary>
-        /// <returns><c>true</c> if there are no listeners, <c>false</c> otherwise.</returns>
-        protected bool PropertyChangedEmpty() => this.PropertyChanged == null;
-
-        /// <summary>
         /// In a child class, triggers a property changed event.
         /// </summary>
         /// <param name="propertyName">The name of the property.</param>
-        protected void OnPropertyChanged(string propertyName)
+        protected void RaisePropertyChanged(string propertyName)
         {
             if (string.IsNullOrWhiteSpace(propertyName))
             {
@@ -69,19 +63,13 @@ namespace IX.Observable
                 return;
             }
 
-            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            this.AsyncPost((state) => this.PropertyChanged?.Invoke(state.sender, state.args), new { sender = this, args = new PropertyChangedEventArgs(propertyName) });
         }
-
-        /// <summary>
-        /// Determines whether or not there are listeners to the <see cref="CollectionChanged"/> event.
-        /// </summary>
-        /// <returns><c>true</c> if there are no listeners, <c>false</c> otherwise.</returns>
-        protected bool CollectionChangedEmpty() => this.CollectionChanged == null;
 
         /// <summary>
         /// In a child class, triggers a collection changed event for a reset change.
         /// </summary>
-        protected void OnCollectionChanged()
+        protected void RaiseCollectionChanged()
         {
             if (this.CollectionChanged == null)
             {
@@ -90,7 +78,7 @@ namespace IX.Observable
 
             var args = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset);
 
-            this.CollectionChanged?.Invoke(this, args);
+            this.AsyncPost((state) => this.CollectionChanged?.Invoke(state.sender, state.args), new { sender = this, args });
         }
 
         /// <summary>
@@ -104,7 +92,7 @@ namespace IX.Observable
         /// <remarks>
         /// <para>The developer is solely responsible for the calling of this method.</para>
         /// </remarks>
-        protected void OnCollectionChanged(NotifyCollectionChangedAction action, IList oldItems = null, IList newItems = null, int oldIndex = -1, int newIndex = -1)
+        protected void RaiseCollectionChanged(NotifyCollectionChangedAction action, IList oldItems = null, IList newItems = null, int oldIndex = -1, int newIndex = -1)
         {
             if (this.CollectionChanged == null)
             {
@@ -148,20 +136,7 @@ namespace IX.Observable
                     break;
             }
 
-            try
-            {
-                this.CollectionChanged?.Invoke(this, args);
-            }
-            catch (Exception ex)
-            {
-                try
-                {
-                    this.ExceptionOccurredWhileNotifying?.Invoke(this, new ExceptionOccurredEventArgs(ex));
-                }
-                catch
-                {
-                }
-            }
+            this.InvokeCollectionChanged(args);
         }
 
         /// <summary>
@@ -172,7 +147,7 @@ namespace IX.Observable
         /// <param name="newItem">The new item.</param>
         /// <param name="oldIndex">The old index of the change, if any.</param>
         /// <param name="newIndex">The new index of the change, if any.</param>
-        protected void OnCollectionChanged(NotifyCollectionChangedAction action, object oldItem = null, object newItem = null, int oldIndex = -1, int newIndex = -1)
+        protected void RaiseCollectionChanged(NotifyCollectionChangedAction action, object oldItem = null, object newItem = null, int oldIndex = -1, int newIndex = -1)
         {
             if (this.CollectionChanged == null)
             {
@@ -216,20 +191,7 @@ namespace IX.Observable
                     break;
             }
 
-            try
-            {
-                this.CollectionChanged?.Invoke(this, args);
-            }
-            catch (Exception ex)
-            {
-                try
-                {
-                    this.ExceptionOccurredWhileNotifying?.Invoke(this, new ExceptionOccurredEventArgs(ex));
-                }
-                catch
-                {
-                }
-            }
+            this.InvokeCollectionChanged(args);
         }
 
         /// <summary>
@@ -242,7 +204,7 @@ namespace IX.Observable
         {
             if (this.syncContext == null)
             {
-                Task.Run(() => postAction(stateTransport));
+                Task.Run(() => postAction(stateTransport)).ConfigureAwait(false);
             }
             else
             {
@@ -274,5 +236,28 @@ namespace IX.Observable
                 }, null);
             }
         }
+
+        private void InvokeCollectionChanged(NotifyCollectionChangedEventArgs args) => this.AsyncPost(
+            (state) =>
+            {
+                try
+                {
+                    this.CollectionChanged?.Invoke(state.sender, state.args);
+                }
+                catch (Exception ex)
+                {
+                    this.AsyncPost(
+                        (errorState) =>
+                        {
+                            try
+                            {
+                                this.ExceptionOccurredWhileNotifying?.Invoke(errorState.sender, errorState.args);
+                            }
+                            catch
+                            {
+                            }
+                        }, new { sender = state.sender, args = new ExceptionOccurredEventArgs(ex) });
+                }
+            }, new { sender = this, args });
     }
 }

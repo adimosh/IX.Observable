@@ -72,9 +72,9 @@ namespace IX.Observable
 
                 this.AsyncPost(() =>
                 {
-                    this.OnCollectionChanged();
-                    this.OnPropertyChanged(nameof(this.Count));
-                    this.OnPropertyChanged(Constants.ItemsName);
+                    this.RaiseCollectionChanged();
+                    this.RaisePropertyChanged(nameof(this.Count));
+                    this.RaisePropertyChanged(Constants.ItemsName);
                 });
             }
         }
@@ -133,7 +133,7 @@ namespace IX.Observable
         {
             if (this.IsFilter())
             {
-                this.OnCollectionChanged();
+                this.RaiseCollectionChanged();
             }
             else
             {
@@ -146,7 +146,7 @@ namespace IX.Observable
         {
             if (this.IsFilter())
             {
-                this.OnCollectionChanged();
+                this.RaiseCollectionChanged();
             }
             else
             {
@@ -159,7 +159,7 @@ namespace IX.Observable
         {
             if (this.IsFilter())
             {
-                this.OnCollectionChanged();
+                this.RaiseCollectionChanged();
             }
             else
             {
