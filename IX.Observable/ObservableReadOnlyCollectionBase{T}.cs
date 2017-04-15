@@ -38,7 +38,19 @@ namespace IX.Observable
         /// <summary>
         /// Gets the number of elements in the collection.
         /// </summary>
-        public virtual int Count => ((IReadOnlyCollection<T>)this.InternalContainer).Count;
+        /// <remarks>
+        /// <para>On concurrent collections, this property is read-synchronized.</para>
+        /// </remarks>
+        public virtual int Count
+        {
+            get
+            {
+                using (this.ReadLock())
+                {
+                    return ((IReadOnlyCollection<T>)this.InternalContainer).Count;
+                }
+            }
+        }
 
         /// <summary>
         /// Gets a value indicating whether the <see cref="ObservableCollectionBase{T}" /> is read-only.
@@ -103,16 +115,34 @@ namespace IX.Observable
         /// </summary>
         /// <param name="item">The object to locate in the <see cref="ObservableCollectionBase{T}" />.</param>
         /// <returns>
-        /// true if <paramref name="item" /> is found in the <see cref="ObservableCollectionBase{T}" />; otherwise, false.
+        /// <c>true</c> if <paramref name="item" /> is found in the <see cref="ObservableCollectionBase{T}" />; otherwise, <c>false</c>.
         /// </returns>
-        public virtual bool Contains(T item) => this.InternalContainer.Contains(item);
+        /// <remarks>
+        /// <para>On concurrent collections, this property is read-synchronized.</para>
+        /// </remarks>
+        public virtual bool Contains(T item)
+        {
+            using (this.ReadLock())
+            {
+                return this.InternalContainer.Contains(item);
+            }
+        }
 
         /// <summary>
         /// Copies the elements of the <see cref="ObservableCollectionBase{T}" /> to an <see cref="T:System.Array" />, starting at a particular <see cref="T:System.Array" /> index.
         /// </summary>
         /// <param name="array">The one-dimensional <see cref="T:System.Array" /> that is the destination of the elements copied from <see cref="ObservableCollectionBase{T}" />. The <see cref="T:System.Array" /> must have zero-based indexing.</param>
         /// <param name="arrayIndex">The zero-based index in <paramref name="array" /> at which copying begins.</param>
-        public virtual void CopyTo(T[] array, int arrayIndex) => this.InternalContainer.CopyTo(array, arrayIndex);
+        /// <remarks>
+        /// <para>On concurrent collections, this property is read-synchronized.</para>
+        /// </remarks>
+        public virtual void CopyTo(T[] array, int arrayIndex)
+        {
+            using (this.ReadLock())
+            {
+                this.InternalContainer.CopyTo(array, arrayIndex);
+            }
+        }
 
         /// <summary>
         /// Returns an enumerator that iterates through the collection.
@@ -135,10 +165,19 @@ namespace IX.Observable
         /// </summary>
         /// <param name="array">The array.</param>
         /// <param name="index">Index of the array.</param>
+        /// <remarks>
+        /// <para>On concurrent collections, this property is read-synchronized.</para>
+        /// </remarks>
         void ICollection.CopyTo(Array array, int index)
         {
-            T[] tempArray = new T[this.Count - index];
-            this.CopyTo(tempArray, index);
+            T[] tempArray;
+
+            using (this.ReadLock())
+            {
+                tempArray = new T[this.InternalContainer.Count - index];
+                this.InternalContainer.CopyTo(tempArray, index);
+            }
+
             tempArray.CopyTo(array, index);
         }
 
@@ -170,7 +209,7 @@ namespace IX.Observable
         /// </summary>
         /// <param name="addedItem">The added item.</param>
         /// <param name="index">The index.</param>
-        protected virtual void OnCollectionChangedAdd(T addedItem, int index)
+        protected virtual void RaiseCollectionChangedAdd(T addedItem, int index)
             => this.RaiseCollectionChanged(NotifyCollectionChangedAction.Add, newItem: addedItem, newIndex: index);
 
         /// <summary>
@@ -179,7 +218,7 @@ namespace IX.Observable
         /// <param name="oldItem">The old item.</param>
         /// <param name="newItem">The new item.</param>
         /// <param name="index">The index.</param>
-        protected virtual void OnCollectionChangedChanged(T oldItem, T newItem, int index)
+        protected virtual void RaiseCollectionChangedChanged(T oldItem, T newItem, int index)
             => this.RaiseCollectionChanged(NotifyCollectionChangedAction.Replace, oldItem, newItem, index, index);
 
         /// <summary>
@@ -187,7 +226,7 @@ namespace IX.Observable
         /// </summary>
         /// <param name="removedItem">The removed item.</param>
         /// <param name="index">The index.</param>
-        protected virtual void OnCollectionChangedRemove(T removedItem, int index)
+        protected virtual void RaiseCollectionChangedRemove(T removedItem, int index)
             => this.RaiseCollectionChanged(NotifyCollectionChangedAction.Remove, oldItem: removedItem, oldIndex: index);
 
         /// <summary>

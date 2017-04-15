@@ -35,40 +35,46 @@ namespace IX.Observable
         /// Adds an item to the <see cref="ObservableCollectionBase{T}" />.
         /// </summary>
         /// <param name="item">The object to add to the <see cref="ObservableCollectionBase{T}" />.</param>
+        /// <remarks>
+        /// <para>On concurrent collections, this property is write-synchronized.</para>
+        /// </remarks>
         public virtual void Add(T item)
         {
-            var newIndex = this.InternalContainer.Add(item);
+            int newIndex;
+            using (this.WriteLock())
+            {
+                newIndex = this.InternalContainer.Add(item);
+            }
 
-            this.AsyncPost(
-                (state) =>
-                {
-                    if (state.index == -1)
-                    {
-                        this.RaiseCollectionChanged();
-                    }
-                    else
-                    {
-                        this.OnCollectionChangedAdd(state.item, state.index);
-                    }
+            if (newIndex == -1)
+            {
+                this.RaiseCollectionChanged();
+            }
+            else
+            {
+                this.RaiseCollectionChangedAdd(item, newIndex);
+            }
 
-                    this.RaisePropertyChanged(nameof(this.Count));
-                    this.ContentsMayHaveChanged();
-                }, new { index = newIndex, item });
+            this.RaisePropertyChanged(nameof(this.Count));
+            this.ContentsMayHaveChanged();
         }
 
         /// <summary>
         /// Removes all items from the <see cref="ObservableCollectionBase{T}" />.
         /// </summary>
+        /// <remarks>
+        /// <para>On concurrent collections, this property is write-synchronized.</para>
+        /// </remarks>
         public virtual void Clear()
         {
-            this.InternalContainer.Clear();
-
-            this.AsyncPost(() =>
+            using (this.WriteLock())
             {
-                this.RaiseCollectionChanged();
-                this.RaisePropertyChanged(nameof(this.Count));
-                this.ContentsMayHaveChanged();
-            });
+                this.InternalContainer.Clear();
+            }
+
+            this.RaiseCollectionChanged();
+            this.RaisePropertyChanged(nameof(this.Count));
+            this.ContentsMayHaveChanged();
         }
 
         /// <summary>
@@ -78,29 +84,31 @@ namespace IX.Observable
         /// <returns>
         /// <c>true</c> if <paramref name="item" /> was successfully removed from the <see cref="ObservableCollectionBase{T}" />; otherwise, <c>false</c>. This method also returns false if <paramref name="item" /> is not found in the original <see cref="ObservableCollectionBase{T}" />.
         /// </returns>
+        /// <remarks>
+        /// <para>On concurrent collections, this property is write-synchronized.</para>
+        /// </remarks>
         public virtual bool Remove(T item)
         {
-            var oldIndex = this.InternalContainer.Remove(item);
+            int oldIndex;
+            using (this.WriteLock())
+            {
+                oldIndex = this.InternalContainer.Remove(item);
+            }
 
             if (oldIndex >= 0)
             {
-                this.AsyncPost(
-                    (state) =>
-                    {
-                        this.OnCollectionChangedRemove(state.item, state.index);
-                        this.RaisePropertyChanged(nameof(this.Count));
-                        this.ContentsMayHaveChanged();
-                    }, new { index = oldIndex, item });
+                this.RaiseCollectionChangedRemove(item, oldIndex);
+                this.RaisePropertyChanged(nameof(this.Count));
+                this.ContentsMayHaveChanged();
+
                 return true;
             }
             else if (oldIndex < -1)
             {
-                this.AsyncPost(() =>
-                {
-                    this.RaiseCollectionChanged();
-                    this.RaisePropertyChanged(nameof(this.Count));
-                    this.ContentsMayHaveChanged();
-                });
+                this.RaiseCollectionChanged();
+                this.RaisePropertyChanged(nameof(this.Count));
+                this.ContentsMayHaveChanged();
+
                 return true;
             }
             else

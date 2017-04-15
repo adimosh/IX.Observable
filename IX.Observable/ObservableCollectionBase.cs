@@ -8,6 +8,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Threading;
 using System.Threading.Tasks;
+using IX.Observable.SynchronizationLockers;
 
 namespace IX.Observable
 {
@@ -236,6 +237,14 @@ namespace IX.Observable
                 }, null);
             }
         }
+
+        protected virtual ReaderWriterLockSlim SynchronizationLock => null;
+
+        protected ReadOnlySynchronizationLocker ReadLock() => new ReadOnlySynchronizationLocker(SynchronizationLock);
+
+        protected WriteOnlySynchronizationLocker WriteLock() => new WriteOnlySynchronizationLocker(SynchronizationLock);
+
+        protected ReadWriteSynchronizationLocker ReadWriteLock() => new ReadWriteSynchronizationLocker(SynchronizationLock);
 
         private void InvokeCollectionChanged(NotifyCollectionChangedEventArgs args) => this.AsyncPost(
             (state) =>

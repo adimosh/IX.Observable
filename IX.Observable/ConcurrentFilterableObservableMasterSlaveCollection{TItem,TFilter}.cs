@@ -118,7 +118,7 @@ namespace IX.Observable
         }
 
         /// <inheritdoc/>
-        protected override void OnCollectionChangedAdd(TItem addedItem, int index)
+        protected override void RaiseCollectionChangedAdd(TItem addedItem, int index)
         {
             if (this.IsFilter())
             {
@@ -126,12 +126,12 @@ namespace IX.Observable
             }
             else
             {
-                base.OnCollectionChangedAdd(addedItem, index);
+                base.RaiseCollectionChangedAdd(addedItem, index);
             }
         }
 
         /// <inheritdoc/>
-        protected override void OnCollectionChangedChanged(TItem oldItem, TItem newItem, int index)
+        protected override void RaiseCollectionChangedChanged(TItem oldItem, TItem newItem, int index)
         {
             if (this.IsFilter())
             {
@@ -139,12 +139,12 @@ namespace IX.Observable
             }
             else
             {
-                base.OnCollectionChangedChanged(oldItem, newItem, index);
+                base.RaiseCollectionChangedChanged(oldItem, newItem, index);
             }
         }
 
         /// <inheritdoc/>
-        protected override void OnCollectionChangedRemove(TItem removedItem, int index)
+        protected override void RaiseCollectionChangedRemove(TItem removedItem, int index)
         {
             if (this.IsFilter())
             {
@@ -152,7 +152,7 @@ namespace IX.Observable
             }
             else
             {
-                base.OnCollectionChangedRemove(removedItem, index);
+                base.RaiseCollectionChangedRemove(removedItem, index);
             }
         }
 

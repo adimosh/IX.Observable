@@ -118,7 +118,7 @@ namespace IX.Observable
                     {
                         this.RaisePropertyChanged(nameof(this.Count));
                         this.RaisePropertyChanged(Constants.ItemsName);
-                        this.OnCollectionChangedRemove(state.item, state.index);
+                        this.RaiseCollectionChangedRemove(state.item, state.index);
                     }, new { index = this.Count, item });
 
                 return item;
@@ -149,7 +149,7 @@ namespace IX.Observable
                     {
                         this.RaisePropertyChanged(nameof(this.Count));
                         this.RaisePropertyChanged(Constants.ItemsName);
-                        this.OnCollectionChangedRemove(state.item, state.index);
+                        this.RaiseCollectionChangedRemove(state.item, state.index);
                     }, new { index = this.Count - 1, item });
 
                 return;

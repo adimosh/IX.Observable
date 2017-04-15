@@ -151,7 +151,7 @@ namespace IX.Observable
             this.AsyncPost(
                 (state) =>
                 {
-                    this.OnCollectionChangedRemove(state.NewValue, state.Index);
+                    this.RaiseCollectionChangedRemove(state.NewValue, state.Index);
                     this.RaisePropertyChanged(nameof(this.Count));
                     this.ContentsMayHaveChanged();
                 }, new { NewValue = item, Index = index });
