@@ -56,6 +56,19 @@ Install-Package IX.Observable
 
 The package is available at its [NuGet page](https://www.nuget.org/packages/IX.Observable).
 
+## Localization
+
+The project is too small to have an effective satellite localization, so, for now, the resources are available locally.
+
+Currently, resources are available for:
+
+- English (en) - also used as neutral
+- Romanian (ro)
+- French (fr) - auto-translated
+- German (de) - auto-translated
+
+Contributions are welcome for any other language that you would like this library to be translated into.
+
 ## Documentation
 
 Documentation is currently in progress.
@@ -122,8 +135,8 @@ This project uses the following libraries:
 
 This project uses the following tools:
 
-- [Visual Studio](https://www.visualstudio.com/) Community Edition [2017 RC](https://www.visualstudio.com/vs/visual-studio-2017-rc/)
+- [Visual Studio](https://www.visualstudio.com/) Community Edition 2017
 - GhostDoc, available at [SubMain's website](http://submain.com/products/ghostdoc.aspx)
-- Mads Kristensen's fabulous and numerous tools and extensions, which are too many to name and are available at [his GitHub page](https://github.com/madskristensen/)
+- [Mads Kristensen](http://madskristensen.net/)'s fabulous and numerous tools and extensions, which are too many to name and are available at [his GitHub page](https://github.com/madskristensen/)
 
 There is also [EditorConfig](http://editorconfig.org/) support and an .editorconfig file included that works with Visual Studio 2017's baked-in support.
