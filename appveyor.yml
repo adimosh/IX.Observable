@@ -3,7 +3,10 @@ skip_tags: true
 image: Visual Studio 2017
 clone_depth: 1
 init:
-- cmd: dotnet restore
+- cmd: >-
+    dir
+
+    dotnet restore IX.Observable.sln
 nuget:
   account_feed: true
   project_feed: true
