@@ -15,6 +15,10 @@ actual software applications, but overlooked in available libraries. For instanc
 [`CompositeCollection`](https://msdn.microsoft.com/en-us/library/system.windows.data.compositecollection.aspx) combines multiple collections in one bindable collection,
 but is only available in the WPF libraries.
 
+## Code health
+- Build status: [![Build status](https://ci.appveyor.com/api/projects/status/ir1tqpxdo9gkqj70?svg=true)](https://ci.appveyor.com/project/adimosh/ix-observable)
+- Master branch status: [![Build status](https://ci.appveyor.com/api/projects/status/ir1tqpxdo9gkqj70/branch/master?svg=true)](https://ci.appveyor.com/project/adimosh/ix-observable/branch/master)
+
 ## Usage
 
 Use the available classes provided by the library as you would use the standard collection types in .NET, keeping in mind their equivalence and their special
