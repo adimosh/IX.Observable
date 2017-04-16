@@ -15,9 +15,6 @@ install:
     nuget sources add -Name MyAccountFeed -Source https://ci.appveyor.com/nuget/adimosh-at-live-dot-com -UserName %nuget_user% -Password %nuget_password%
 
     nuget restore
-nuget:
-  account_feed: true
-  project_feed: true
 build_script:
 - cmd: >-
     cd IX.Observable
