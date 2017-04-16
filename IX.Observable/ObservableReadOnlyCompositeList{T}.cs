@@ -2,7 +2,6 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
-using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Threading;
@@ -16,9 +15,8 @@ namespace IX.Observable
     /// <typeparam name="T">The type of the list item.</typeparam>
     /// <seealso cref="System.IDisposable" />
     /// <seealso cref="IX.Observable.ObservableReadOnlyCollectionBase{T}" />
-    public class ObservableReadOnlyCompositeList<T> : ObservableReadOnlyCollectionBase<T>, IDisposable
+    public class ObservableReadOnlyCompositeList<T> : ObservableReadOnlyCollectionBase<T>
     {
-        private bool disposedValue;
         private ReaderWriterLockSlim locker;
 
         /// <summary>
@@ -38,25 +36,6 @@ namespace IX.Observable
             : base(new MultiListListAdapter<T>(), context)
         {
             this.locker = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
-        }
-
-        /// <summary>
-        /// Finalizes an instance of the <see cref="ObservableReadOnlyCompositeList{T}"/> class.
-        /// </summary>
-        ~ObservableReadOnlyCompositeList()
-        {
-            // Do not change this code. Put cleanup code in Dispose(bool disposing).
-            this.Dispose(false);
-        }
-
-        /// <summary>
-        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
-        /// </summary>
-        public void Dispose()
-        {
-            // Do not change this code. Put cleanup code in Dispose(bool disposing).
-            this.Dispose(true);
-            GC.SuppressFinalize(this);
         }
 
         /// <summary>
@@ -96,24 +75,19 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Releases unmanaged and - optionally - managed resources.
+        /// Disposes of this instance and performs necessary cleanup.
         /// </summary>
-        /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
-        private void Dispose(bool disposing)
+        /// <param name="managedDispose">Indicates whether or not the call came from <see cref="System.IDisposable"/> or from the destructor.</param>
+        protected override void Dispose(bool managedDispose)
         {
-            if (!this.disposedValue)
+            if (managedDispose)
             {
-                if (disposing)
-                {
-                    this.locker.Dispose();
-                    this.InternalContainer.Clear();
-                }
-
-                this.locker = null;
-                this.InternalContainer = null;
-
-                this.disposedValue = true;
+                this.locker.Dispose();
             }
+
+            base.Dispose(managedDispose);
+
+            this.locker = null;
         }
     }
 }

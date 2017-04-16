@@ -15,7 +15,7 @@ namespace IX.Observable
     /// <typeparam name="T">The type of items in the queue.</typeparam>
     [DebuggerDisplay("Count = {Count}")]
     [DebuggerTypeProxy(typeof(QueueDebugView<>))]
-    public class ConcurrentObservableQueue<T> : ObservableQueue<T>, IQueue<T>
+    public class ConcurrentObservableQueue<T> : ObservableQueue<T>
     {
         private ReaderWriterLockSlim locker;
 
@@ -84,5 +84,21 @@ namespace IX.Observable
         /// Gets a synchronization lock item to be used when trying to synchronize read/write operations between threads.
         /// </summary>
         protected override ReaderWriterLockSlim SynchronizationLock => this.locker;
+
+        /// <summary>
+        /// Disposes of this instance and performs necessary cleanup.
+        /// </summary>
+        /// <param name="managedDispose">Indicates whether or not the call came from <see cref="System.IDisposable"/> or from the destructor.</param>
+        protected override void Dispose(bool managedDispose)
+        {
+            if (managedDispose)
+            {
+                this.locker.Dispose();
+            }
+
+            base.Dispose(managedDispose);
+
+            this.locker = null;
+        }
     }
 }

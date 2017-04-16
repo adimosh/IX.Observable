@@ -77,6 +77,11 @@ namespace IX.Observable
         /// </summary>
         public void Dispose()
         {
+            if (this.isDisposed)
+            {
+                return;
+            }
+
             GC.SuppressFinalize(this);
             this.Dispose(false);
             this.isDisposed = true;

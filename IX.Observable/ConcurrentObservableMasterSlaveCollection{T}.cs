@@ -2,13 +2,8 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Threading;
-using IX.Observable.Adapters;
 using IX.Observable.DebugAide;
 
 namespace IX.Observable
@@ -20,14 +15,17 @@ namespace IX.Observable
     /// <seealso cref="IX.Observable.ObservableCollectionBase{TItem}" />
     [DebuggerDisplay("Count = {Count}")]
     [DebuggerTypeProxy(typeof(CollectionDebugView<>))]
-    public class ConcurrentObservableMasterSlaveCollection<T> : ConcurrentObservableListBase<T>, IList<T>, IReadOnlyCollection<T>, ICollection<T>, ICollection, IList
+    public class ConcurrentObservableMasterSlaveCollection<T> : ObservableMasterSlaveCollection<T>
     {
+        private ReaderWriterLockSlim locker;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ConcurrentObservableMasterSlaveCollection{T}"/> class.
         /// </summary>
         public ConcurrentObservableMasterSlaveCollection()
-            : base(new MultiListMasterSlaveListAdapter<T>(), null)
+            : base()
         {
+            this.locker = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
         }
 
         /// <summary>
@@ -35,186 +33,30 @@ namespace IX.Observable
         /// </summary>
         /// <param name="context">The synchronization context to use, if any.</param>
         public ConcurrentObservableMasterSlaveCollection(SynchronizationContext context)
-            : base(new MultiListMasterSlaveListAdapter<T>(), context)
+            : base(context)
         {
+            this.locker = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
         }
 
         /// <summary>
-        /// Gets the count after an add operation. Used internally.
+        /// Gets a synchronization lock item to be used when trying to synchronize read/write operations between threads.
         /// </summary>
-        /// <value>
-        /// The count after add.
-        /// </value>
-        protected override int CountAfterAdd => ((MultiListMasterSlaveListAdapter<T>)this.InternalContainer).MasterCount;
+        protected override ReaderWriterLockSlim SynchronizationLock => this.locker;
 
         /// <summary>
-        /// Sets the master list.
+        /// Disposes of this instance and performs necessary cleanup.
         /// </summary>
-        /// <typeparam name="TList">The type of the list.</typeparam>
-        /// <param name="list">The list.</param>
-        public void SetMasterList<TList>(TList list)
-                    where TList : class, IList<T>, INotifyCollectionChanged
+        /// <param name="managedDispose">Indicates whether or not the call came from <see cref="System.IDisposable"/> or from the destructor.</param>
+        protected override void Dispose(bool managedDispose)
         {
-            if (this.SynchronizationLock.TryEnterWriteLock(Constants.ConcurrentLockAcquisitionTimeout))
+            if (managedDispose)
             {
-                try
-                {
-                    ((MultiListMasterSlaveListAdapter<T>)this.InternalContainer).SetMaster(list);
-                }
-                finally
-                {
-                    this.SynchronizationLock.ExitWriteLock();
-                }
-
-                this.AsyncPost(() =>
-                {
-                    this.RaiseCollectionChanged();
-                    this.RaisePropertyChanged(nameof(this.Count));
-                    this.RaisePropertyChanged(Constants.ItemsName);
-                });
-
-                return;
+                this.locker.Dispose();
             }
 
-            throw new TimeoutException();
+            base.Dispose(managedDispose);
+
+            this.locker = null;
         }
-
-        /// <summary>
-        /// Sets a slave list.
-        /// </summary>
-        /// <typeparam name="TList">The type of the list.</typeparam>
-        /// <param name="list">The list.</param>
-        public void SetSlaveList<TList>(TList list)
-                    where TList : class, IEnumerable<T>, INotifyCollectionChanged
-        {
-            if (this.SynchronizationLock.TryEnterWriteLock(Constants.ConcurrentLockAcquisitionTimeout))
-            {
-                try
-                {
-                    ((MultiListMasterSlaveListAdapter<T>)this.InternalContainer).SetSlave(list);
-                }
-                finally
-                {
-                    this.SynchronizationLock.ExitWriteLock();
-                }
-
-                this.AsyncPost(() =>
-                {
-                    this.RaiseCollectionChanged();
-                    this.RaisePropertyChanged(nameof(this.Count));
-                    this.RaisePropertyChanged(Constants.ItemsName);
-                });
-
-                return;
-            }
-
-            throw new TimeoutException();
-        }
-
-        /// <summary>
-        /// Removes a slave list.
-        /// </summary>
-        /// <typeparam name="TList">The type of the list.</typeparam>
-        /// <param name="list">The list.</param>
-        public void RemoveSlaveList<TList>(TList list)
-                    where TList : class, IEnumerable<T>, INotifyCollectionChanged
-        {
-            if (this.SynchronizationLock.TryEnterWriteLock(Constants.ConcurrentLockAcquisitionTimeout))
-            {
-                try
-                {
-                    ((MultiListMasterSlaveListAdapter<T>)this.InternalContainer).RemoveSlave(list);
-                }
-                finally
-                {
-                    this.SynchronizationLock.ExitWriteLock();
-                }
-
-                this.AsyncPost(() =>
-                {
-                    this.RaiseCollectionChanged();
-                    this.RaisePropertyChanged(nameof(this.Count));
-                    this.RaisePropertyChanged(Constants.ItemsName);
-                });
-
-                return;
-            }
-
-            throw new TimeoutException();
-        }
-
-        /// <inheritdoc/>
-        public override void Add(T item)
-        {
-            this.IncreaseIgnoreMustResetCounter();
-            base.Add(item);
-        }
-
-        /// <inheritdoc/>
-        public override void Clear()
-        {
-            this.IncreaseIgnoreMustResetCounter(((MultiListMasterSlaveListAdapter<T>)this.InternalContainer).SlavesCount + 1);
-
-            base.Clear();
-        }
-
-        /// <inheritdoc/>
-        public override void Insert(int index, T item)
-        {
-            this.IncreaseIgnoreMustResetCounter();
-            base.Insert(index, item);
-        }
-
-        /// <inheritdoc/>
-        public override bool Remove(T item)
-        {
-            this.IncreaseIgnoreMustResetCounter();
-            if (!base.Remove(item))
-            {
-                this.IncreaseIgnoreMustResetCounter(-1);
-                return false;
-            }
-
-            return true;
-        }
-
-        /// <inheritdoc/>
-        public override void RemoveAt(int index)
-        {
-            if (index >= this.Count)
-            {
-                return;
-            }
-
-            if (this.SynchronizationLock.TryEnterWriteLock(Constants.ConcurrentLockAcquisitionTimeout))
-            {
-                T item;
-                try
-                {
-                    item = this.InternalListContainer[index];
-                    this.IncreaseIgnoreMustResetCounter();
-                    this.InternalListContainer.RemoveAt(index);
-                }
-                finally
-                {
-                    this.SynchronizationLock.ExitWriteLock();
-                }
-
-                this.AsyncPost(
-                    (state) =>
-                    {
-                        this.RaiseCollectionChangedRemove(state.NewValue, state.Index);
-                        this.RaisePropertyChanged(nameof(this.Count));
-                        this.ContentsMayHaveChanged();
-                    }, new { NewValue = item, Index = index });
-
-                return;
-            }
-
-            throw new TimeoutException();
-        }
-
-        /// <inheritdoc />
-        protected override void ContentsMayHaveChanged() => this.RaisePropertyChanged(Constants.ItemsName);
     }
 }

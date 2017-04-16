@@ -2,7 +2,6 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
-using System;
 using System.Threading;
 using IX.Observable.Adapters;
 
@@ -13,9 +12,8 @@ namespace IX.Observable
     /// </summary>
     /// <typeparam name="T">The type of the item.</typeparam>
     /// <seealso cref="IX.Observable.ObservableCollectionBase{T}" />
-    public abstract class ConcurrentObservableCollectionBase<T> : ObservableCollectionBase<T>, IDisposable
+    public abstract class ConcurrentObservableCollectionBase<T> : ObservableCollectionBase<T>
     {
-        private bool disposedValue;
         private ReaderWriterLockSlim synchronizationLocker;
 
         /// <summary>
@@ -39,7 +37,7 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// A synchronization lock item to be used when trying to synchronize read/write operations between threads.
+        /// Gets a synchronization lock item to be used when trying to synchronize read/write operations between threads.
         /// </summary>
         /// <remarks>
         /// <para>On implemening collections, returns an instance. All read/write operations on the underlying constructs should rely on
@@ -48,34 +46,19 @@ namespace IX.Observable
         protected sealed override ReaderWriterLockSlim SynchronizationLock => this.synchronizationLocker;
 
         /// <summary>
-        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
-        /// </summary>
-        public void Dispose()
-        {
-            // Do not change this code. Put cleanup code in Dispose(bool disposing).
-            this.Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        /// <summary>
         /// Releases unmanaged and - optionally - managed resources.
         /// </summary>
         /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
-        protected virtual void Dispose(bool disposing)
+        protected override void Dispose(bool disposing)
         {
-            if (!this.disposedValue)
+            if (disposing)
             {
-                if (disposing)
-                {
-                    this.synchronizationLocker.Dispose();
-                    this.InternalContainer.Clear();
-                }
-
-                this.synchronizationLocker = null;
-                this.InternalContainer = null;
-
-                this.disposedValue = true;
+                this.synchronizationLocker.Dispose();
             }
+
+            base.Dispose(disposing);
+
+            this.synchronizationLocker = null;
         }
     }
 }

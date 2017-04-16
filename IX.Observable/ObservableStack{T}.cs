@@ -77,7 +77,7 @@ namespace IX.Observable
         /// Peeks in the stack to view the topmost item, without removing it.
         /// </summary>
         /// <returns>The topmost element in the stack, if any.</returns>
-        public virtual T Peek() => this.CheckDisposed(() => this.ReadLock(() => ((StackCollectionAdapter<T>)this.InternalContainer).stack.Peek()));
+        public T Peek() => this.CheckDisposed(() => this.ReadLock(() => ((StackCollectionAdapter<T>)this.InternalContainer).stack.Peek()));
 
         /// <summary>
         /// Pops the topmost element from the stack, removing it.
@@ -128,11 +128,11 @@ namespace IX.Observable
         /// Copies all elements of the stack to a new array.
         /// </summary>
         /// <returns>An array containing all items in the stack.</returns>
-        public virtual T[] ToArray() => this.CheckDisposed(() => this.ReadLock(() => ((StackCollectionAdapter<T>)this.InternalContainer).stack.ToArray()));
+        public T[] ToArray() => this.CheckDisposed(() => this.ReadLock(() => ((StackCollectionAdapter<T>)this.InternalContainer).stack.ToArray()));
 
         /// <summary>
         /// Sets the capacity to the actual number of elements in the stack if that number is less than 90 percent of current capacity.
         /// </summary>
-        public virtual void TrimExcess() => this.CheckDisposed(() => this.WriteLock(() => ((StackCollectionAdapter<T>)this.InternalContainer).stack.TrimExcess()));
+        public void TrimExcess() => this.CheckDisposed(() => this.WriteLock(() => ((StackCollectionAdapter<T>)this.InternalContainer).stack.TrimExcess()));
     }
 }

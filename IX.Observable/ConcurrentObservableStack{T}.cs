@@ -15,7 +15,7 @@ namespace IX.Observable
     /// <typeparam name="T">The type of elements in the stack.</typeparam>
     [DebuggerDisplay("Count = {Count}")]
     [DebuggerTypeProxy(typeof(StackDebugView<>))]
-    public class ConcurrentObservableStack<T> : ObservableStack<T>, IStack<T>
+    public class ConcurrentObservableStack<T> : ObservableStack<T>
     {
         private ReaderWriterLockSlim locker;
 
@@ -84,5 +84,21 @@ namespace IX.Observable
         /// Gets a synchronization lock item to be used when trying to synchronize read/write operations between threads.
         /// </summary>
         protected override ReaderWriterLockSlim SynchronizationLock => this.locker;
+
+        /// <summary>
+        /// Disposes of this instance and performs necessary cleanup.
+        /// </summary>
+        /// <param name="managedDispose">Indicates whether or not the call came from <see cref="System.IDisposable"/> or from the destructor.</param>
+        protected override void Dispose(bool managedDispose)
+        {
+            if (managedDispose)
+            {
+                this.locker.Dispose();
+            }
+
+            base.Dispose(managedDispose);
+
+            this.locker = null;
+        }
     }
 }

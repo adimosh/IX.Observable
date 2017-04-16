@@ -2,7 +2,6 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -10,6 +9,7 @@ using System.Diagnostics;
 using System.Threading;
 using IX.Observable.Adapters;
 using IX.Observable.DebugAide;
+using IX.Observable.SynchronizationLockers;
 
 namespace IX.Observable
 {
@@ -55,14 +55,16 @@ namespace IX.Observable
         public void SetMasterList<TList>(TList list)
                     where TList : class, IList<T>, INotifyCollectionChanged
         {
-            ((MultiListMasterSlaveListAdapter<T>)this.InternalContainer).SetMaster(list);
+            this.CheckDisposed();
 
-            this.AsyncPost(() =>
+            using (this.WriteLock())
             {
-                this.RaiseCollectionChanged();
-                this.RaisePropertyChanged(nameof(this.Count));
-                this.RaisePropertyChanged(Constants.ItemsName);
-            });
+                ((MultiListMasterSlaveListAdapter<T>)this.InternalContainer).SetMaster(list);
+            }
+
+            this.RaiseCollectionChanged();
+            this.RaisePropertyChanged(nameof(this.Count));
+            this.RaisePropertyChanged(Constants.ItemsName);
         }
 
         /// <summary>
@@ -73,14 +75,16 @@ namespace IX.Observable
         public void SetSlaveList<TList>(TList list)
                     where TList : class, IEnumerable<T>, INotifyCollectionChanged
         {
-            ((MultiListMasterSlaveListAdapter<T>)this.InternalContainer).SetSlave(list);
+            this.CheckDisposed();
 
-            this.AsyncPost(() =>
+            using (this.WriteLock())
             {
-                this.RaiseCollectionChanged();
-                this.RaisePropertyChanged(nameof(this.Count));
-                this.RaisePropertyChanged(Constants.ItemsName);
-            });
+                ((MultiListMasterSlaveListAdapter<T>)this.InternalContainer).SetSlave(list);
+            }
+
+            this.RaiseCollectionChanged();
+            this.RaisePropertyChanged(nameof(this.Count));
+            this.RaisePropertyChanged(Constants.ItemsName);
         }
 
         /// <summary>
@@ -91,14 +95,16 @@ namespace IX.Observable
         public void RemoveSlaveList<TList>(TList list)
                     where TList : class, IEnumerable<T>, INotifyCollectionChanged
         {
-            ((MultiListMasterSlaveListAdapter<T>)this.InternalContainer).RemoveSlave(list);
+            this.CheckDisposed();
 
-            this.AsyncPost(() =>
+            using (this.WriteLock())
             {
-                this.RaiseCollectionChanged();
-                this.RaisePropertyChanged(nameof(this.Count));
-                this.RaisePropertyChanged(Constants.ItemsName);
-            });
+                ((MultiListMasterSlaveListAdapter<T>)this.InternalContainer).RemoveSlave(list);
+            }
+
+            this.RaiseCollectionChanged();
+            this.RaisePropertyChanged(nameof(this.Count));
+            this.RaisePropertyChanged(Constants.ItemsName);
         }
 
         /// <inheritdoc/>
@@ -108,12 +114,26 @@ namespace IX.Observable
             base.Add(item);
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Removes all items from the <see cref="ObservableMasterSlaveCollection{T}" />.
+        /// </summary>
+        /// <remarks>
+        /// <para>On concurrent collections, this method is write-synchronized.</para>
+        /// </remarks>
         public override void Clear()
         {
-            this.IncreaseIgnoreMustResetCounter(((MultiListMasterSlaveListAdapter<T>)this.InternalContainer).SlavesCount + 1);
+            this.CheckDisposed();
 
-            base.Clear();
+            using (this.WriteLock())
+            {
+                this.IncreaseIgnoreMustResetCounter(((MultiListMasterSlaveListAdapter<T>)this.InternalContainer).SlavesCount + 1);
+
+                this.InternalContainer.Clear();
+            }
+
+            this.RaiseCollectionChanged();
+            this.RaisePropertyChanged(nameof(this.Count));
+            this.ContentsMayHaveChanged();
         }
 
         /// <inheritdoc/>
@@ -136,25 +156,33 @@ namespace IX.Observable
             return true;
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Removes an item at the specified index.
+        /// </summary>
+        /// <param name="index">The index at which to remove an item from.</param>
         public override void RemoveAt(int index)
         {
-            if (index >= this.Count)
+            this.CheckDisposed();
+
+            T item;
+
+            using (ReadWriteSynchronizationLocker lockContext = this.ReadWriteLock())
             {
-                return;
+                if (index >= this.InternalContainer.Count)
+                {
+                    return;
+                }
+
+                lockContext.Upgrade();
+
+                item = this.InternalListContainer[index];
+                this.IncreaseIgnoreMustResetCounter();
+                this.InternalListContainer.RemoveAt(index);
             }
 
-            T item = this.InternalListContainer[index];
-            this.IncreaseIgnoreMustResetCounter();
-            this.InternalListContainer.RemoveAt(index);
-
-            this.AsyncPost(
-                (state) =>
-                {
-                    this.RaiseCollectionChangedRemove(state.NewValue, state.Index);
-                    this.RaisePropertyChanged(nameof(this.Count));
-                    this.ContentsMayHaveChanged();
-                }, new { NewValue = item, Index = index });
+            this.RaiseCollectionChangedRemove(item, index);
+            this.RaisePropertyChanged(nameof(this.Count));
+            this.ContentsMayHaveChanged();
         }
 
         /// <inheritdoc />

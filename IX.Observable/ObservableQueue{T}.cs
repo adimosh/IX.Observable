@@ -120,17 +120,17 @@ namespace IX.Observable
         /// Peeks at the topmost item in the queue without dequeueing it.
         /// </summary>
         /// <returns>The topmost item in the queue.</returns>
-        public virtual T Peek() => this.CheckDisposed(() => this.ReadLock(() => ((QueueCollectionAdapter<T>)this.InternalContainer).queue.Peek()));
+        public T Peek() => this.CheckDisposed(() => this.ReadLock(() => ((QueueCollectionAdapter<T>)this.InternalContainer).queue.Peek()));
 
         /// <summary>
         /// Copies the items of the queue into a new array.
         /// </summary>
         /// <returns>An array of items that are contained in the queue.</returns>
-        public virtual T[] ToArray() => this.CheckDisposed(() => this.ReadLock(() => ((QueueCollectionAdapter<T>)this.InternalContainer).queue.ToArray()));
+        public T[] ToArray() => this.CheckDisposed(() => this.ReadLock(() => ((QueueCollectionAdapter<T>)this.InternalContainer).queue.ToArray()));
 
         /// <summary>
         /// Sets the capacity to the actual number of elements in the <see cref="ObservableQueue{T}"/>, if that number is less than 90 percent of current capacity.
         /// </summary>
-        public virtual void TrimExcess() => this.CheckDisposed(() => this.WriteLock(() => ((QueueCollectionAdapter<T>)this.InternalContainer).queue.TrimExcess()));
+        public void TrimExcess() => this.CheckDisposed(() => this.WriteLock(() => ((QueueCollectionAdapter<T>)this.InternalContainer).queue.TrimExcess()));
     }
 }
