@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard1.0</TargetFramework>
-    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Version>0.1.0.1</Version>
     <FileVersion>0.1.0.1</FileVersion>
     <AssemblyVersion>0.1.0.0</AssemblyVersion>
@@ -23,6 +22,7 @@
     <DocumentationFile>bin\Debug\netstandard1.0\IX.Observable.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <WarningsAsErrors>true</WarningsAsErrors>
     <DefineConstants>RELEASE;NETSTANDARD1_0</DefineConstants>
     <DocumentationFile>bin\Release\netstandard1.0\IX.Observable.xml</DocumentationFile>

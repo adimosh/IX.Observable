@@ -23,7 +23,7 @@ namespace IX.Observable.UnitTests
             var numberOfItemsToCheck = UnitTestsUtils.Random.Next(numberOfItems);
             int[] itemsToCheck = new int[numberOfItemsToCheck];
 
-            for (int i = 0; i < numberOfItemsToCheck; i++)
+            for (var i = 0; i < numberOfItemsToCheck; i++)
             {
                 itemsToCheck[i] = UnitTestsUtils.Random.Next(numberOfItems);
             }

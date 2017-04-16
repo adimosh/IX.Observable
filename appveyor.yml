@@ -19,7 +19,12 @@ build_script:
 
     dotnet build IX.Observable\IX.Observable.csproj -c Release
 test_script:
-- cmd: dotnet test IX.Observable.UnitTests\IX.Observable.UnitTests.csproj
+- cmd: >-
+    cd IX.Observable.UnitTests
+
+    dotnet xunit
+
+    cd ..
 deploy_script:
 - cmd: >-
     dotnet pack IX.Observable\IX.Observable.csproj -c Release --no-build
