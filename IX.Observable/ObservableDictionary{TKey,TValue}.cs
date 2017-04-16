@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Threading;
 using IX.Observable.Adapters;
 using IX.Observable.DebugAide;
+using IX.Observable.SynchronizationLockers;
 
 namespace IX.Observable
 {
@@ -17,7 +18,7 @@ namespace IX.Observable
     /// <typeparam name="TValue">The data value type.</typeparam>
     [DebuggerDisplay("Count = {Count}")]
     [DebuggerTypeProxy(typeof(DictionaryDebugView<,>))]
-    public sealed class ObservableDictionary<TKey, TValue> : ObservableCollectionBase<KeyValuePair<TKey, TValue>>, IDictionary<TKey, TValue>, IReadOnlyDictionary<TKey, TValue>
+    public class ObservableDictionary<TKey, TValue> : ObservableCollectionBase<KeyValuePair<TKey, TValue>>, IDictionary<TKey, TValue>, IReadOnlyDictionary<TKey, TValue>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ObservableDictionary{TKey, TValue}" /> class.
@@ -138,7 +139,7 @@ namespace IX.Observable
         /// <summary>
         /// Gets the collection of keys in this dictionary.
         /// </summary>
-        public ICollection<TKey> Keys => ((DictionaryCollectionAdapter<TKey, TValue>)this.InternalContainer).dictionary.Keys;
+        public ICollection<TKey> Keys => this.CheckDisposed(() => this.ReadLock(() => ((DictionaryCollectionAdapter<TKey, TValue>)this.InternalContainer).dictionary.Keys));
 
         /// <summary>
         /// Gets the collection of keys in this dictionary.
@@ -148,7 +149,8 @@ namespace IX.Observable
         /// <summary>
         /// Gets the collection of values in this dictionary.
         /// </summary>
-        public ICollection<TValue> Values => ((DictionaryCollectionAdapter<TKey, TValue>)this.InternalContainer).dictionary.Values;
+        public ICollection<TValue> Values => this.CheckDisposed(() => this.ReadLock(() =>
+            ((DictionaryCollectionAdapter<TKey, TValue>)this.InternalContainer).dictionary.Values));
 
         /// <summary>
         /// Gets the collection of values in this dictionary.
@@ -162,18 +164,24 @@ namespace IX.Observable
         /// <returns>The value associated with the specified key.</returns>
         public TValue this[TKey key]
         {
-            get => ((DictionaryCollectionAdapter<TKey, TValue>)this.InternalContainer).dictionary[key];
+            get => this.CheckDisposed(() => this.ReadLock(() => ((DictionaryCollectionAdapter<TKey, TValue>)this.InternalContainer).dictionary[key]));
 
             set
             {
                 Dictionary<TKey, TValue> dictionary = ((DictionaryCollectionAdapter<TKey, TValue>)this.InternalContainer).dictionary;
-                if (dictionary.TryGetValue(key, out var val))
+
+                using (ReadWriteSynchronizationLocker lockingContext = this.ReadWriteLock())
                 {
-                    dictionary[key] = value;
-                }
-                else
-                {
-                    dictionary.Add(key, value);
+                    if (dictionary.TryGetValue(key, out var val))
+                    {
+                        lockingContext.Upgrade();
+                        dictionary[key] = value;
+                    }
+                    else
+                    {
+                        lockingContext.Upgrade();
+                        dictionary.Add(key, value);
+                    }
                 }
 
                 this.BroadcastChange();
@@ -192,7 +200,8 @@ namespace IX.Observable
         /// </summary>
         /// <param name="key">The key to look for.</param>
         /// <returns><c>true</c> whether a key has been found, <c>false</c> otherwise.</returns>
-        public bool ContainsKey(TKey key) => ((DictionaryCollectionAdapter<TKey, TValue>)this.InternalContainer).dictionary.ContainsKey(key);
+        public bool ContainsKey(TKey key) => this.CheckDisposed(() => this.ReadLock(() =>
+            ((DictionaryCollectionAdapter<TKey, TValue>)this.InternalContainer).dictionary.ContainsKey(key)));
 
         /// <summary>
         /// Attempts to remove all info related to a key from the dictionary.
@@ -201,14 +210,21 @@ namespace IX.Observable
         /// <returns><c>true</c> if the removal was successful, <c>false</c> otherwise.</returns>
         public bool Remove(TKey key)
         {
-            if (((DictionaryCollectionAdapter<TKey, TValue>)this.InternalContainer).dictionary.Remove(key))
-            {
-                this.BroadcastChange();
+            this.CheckDisposed();
 
-                return true;
+            bool result;
+
+            using (this.WriteLock())
+            {
+                result = ((DictionaryCollectionAdapter<TKey, TValue>)this.InternalContainer).dictionary.Remove(key);
             }
 
-            return false;
+            if (result)
+            {
+                this.BroadcastChange();
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -217,7 +233,15 @@ namespace IX.Observable
         /// <param name="key">The key.</param>
         /// <param name="value">The value.</param>
         /// <returns><c>true</c> if the value was successfully fetched, <c>false</c> otherwise.</returns>
-        public bool TryGetValue(TKey key, out TValue value) => ((DictionaryCollectionAdapter<TKey, TValue>)this.InternalContainer).dictionary.TryGetValue(key, out value);
+        public bool TryGetValue(TKey key, out TValue value)
+        {
+            this.CheckDisposed();
+
+            using (this.ReadLock())
+            {
+                return ((DictionaryCollectionAdapter<TKey, TValue>)this.InternalContainer).dictionary.TryGetValue(key, out value);
+            }
+        }
 
         /// <summary>
         /// Called when contents of this dictionary may have changed.
@@ -229,13 +253,13 @@ namespace IX.Observable
             this.RaisePropertyChanged(Constants.ItemsName);
         }
 
-        private void BroadcastChange() => this.AsyncPost(() =>
-            {
-                this.RaiseCollectionChanged();
-                this.RaisePropertyChanged(nameof(this.Keys));
-                this.RaisePropertyChanged(nameof(this.Values));
-                this.RaisePropertyChanged(nameof(this.Count));
-                this.RaisePropertyChanged(Constants.ItemsName);
-            });
+        private void BroadcastChange()
+        {
+            this.RaiseCollectionChanged();
+            this.RaisePropertyChanged(nameof(this.Keys));
+            this.RaisePropertyChanged(nameof(this.Values));
+            this.RaisePropertyChanged(nameof(this.Count));
+            this.RaisePropertyChanged(Constants.ItemsName);
+        }
     }
 }
