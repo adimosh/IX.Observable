@@ -18,9 +18,13 @@ nuget:
   project_feed: true
 build_script:
 - cmd: >-
-    dotnet tools\CSProjAutoVersionIncrementer.dll IX.Observable\IX.Observable.csproj %APPVEYOR_BUILD_VERSION%
+    cd IX.Observable
 
-    dotnet build IX.Observable\IX.Observable.csproj -c Release
+    dotnet csprojVersioning IX.Observable.csproj %APPVEYOR_BUILD_VERSION%
+
+    dotnet build IX.Observable.csproj -c Release
+
+    cd..
 test_script:
 - cmd: >-
     cd IX.Observable.UnitTests
