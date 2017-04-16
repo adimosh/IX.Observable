@@ -7,7 +7,7 @@ environment:
     secure: eF0Mu+Ky+FtngFJN7u4unv9l2ebEvlvfim9hPpWkRAc=
   nuget_user: adimosh@gmail.com
   nuget_password:
-    secure: uBvWMFhy9DPgv2TIksG2FQ==
+    secure: QzxGG+tm1H9IaA5tMZx2pA==
 install:
 - cmd: >-
     appveyor DownloadFile https://dist.nuget.org/win-x86-commandline/v4.1.0/nuget.exe
