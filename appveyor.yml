@@ -12,6 +12,8 @@ install:
 - cmd: >-
     appveyor DownloadFile https://dist.nuget.org/win-x86-commandline/v4.1.0/nuget.exe
 
+    nuget sources add -Name MyAccountFeed -Source https://ci.appveyor.com/nuget/adimosh-at-live-dot-com -UserName %nuget_user% -Password %nuget_password%
+
     nuget restore
 nuget:
   account_feed: true
