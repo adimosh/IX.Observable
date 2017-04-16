@@ -73,12 +73,9 @@ namespace IX.Observable
 
                 this.ClearCachedContents();
 
-                this.AsyncPost(() =>
-                {
-                    this.RaiseCollectionChanged();
-                    this.RaisePropertyChanged(nameof(this.Count));
-                    this.RaisePropertyChanged(Constants.ItemsName);
-                });
+                this.RaiseCollectionChanged();
+                this.RaisePropertyChanged(nameof(this.Count));
+                this.RaisePropertyChanged(Constants.ItemsName);
             }
         }
 
@@ -173,10 +170,6 @@ namespace IX.Observable
             }
 
             yield break;
-        }
-
-        private void FillCachedList()
-        {
         }
 
         private IList<TItem> CheckAndCache()

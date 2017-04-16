@@ -70,12 +70,9 @@ namespace IX.Observable
 
                 this.ClearCachedContents();
 
-                this.AsyncPost(() =>
-                {
-                    this.RaiseCollectionChanged();
-                    this.RaisePropertyChanged(nameof(this.Count));
-                    this.RaisePropertyChanged(Constants.ItemsName);
-                });
+                this.RaiseCollectionChanged();
+                this.RaisePropertyChanged(nameof(this.Count));
+                this.RaisePropertyChanged(Constants.ItemsName);
             }
         }
 
