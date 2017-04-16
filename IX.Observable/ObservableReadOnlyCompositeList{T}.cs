@@ -50,30 +50,6 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Gets the number of elements in the collection.
-        /// </summary>
-        /// <exception cref="System.TimeoutException">There was a timeout acquiring the required lock.</exception>
-        public override int Count
-        {
-            get
-            {
-                if (this.locker.TryEnterReadLock(Constants.ConcurrentLockAcquisitionTimeout))
-                {
-                    try
-                    {
-                        return this.InternalContainer.Count;
-                    }
-                    finally
-                    {
-                        this.locker.ExitReadLock();
-                    }
-                }
-
-                throw new TimeoutException();
-            }
-        }
-
-        /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
         /// </summary>
         public void Dispose()
@@ -84,115 +60,21 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Determines whether the <see cref="T:IX.Observable.ObservableCollectionBase`1" /> contains a specific value.
-        /// </summary>
-        /// <param name="item">The object to locate in the <see cref="T:IX.Observable.ObservableCollectionBase`1" />.</param>
-        /// <returns>
-        /// true if <paramref name="item" /> is found in the <see cref="T:IX.Observable.ObservableCollectionBase`1" />; otherwise, false.
-        /// </returns>
-        /// <exception cref="System.TimeoutException">There was a timeout acquiring the required lock.</exception>
-        public override bool Contains(T item)
-        {
-            if (this.locker.TryEnterReadLock(Constants.ConcurrentLockAcquisitionTimeout))
-            {
-                try
-                {
-                    return this.InternalContainer.Contains(item);
-                }
-                finally
-                {
-                    this.locker.ExitReadLock();
-                }
-            }
-
-            throw new TimeoutException();
-        }
-
-        /// <summary>
-        /// Copies the elements of the <see cref="T:IX.Observable.ObservableCollectionBase`1" /> to an <see cref="T:System.Array" />, starting at a particular <see cref="T:System.Array" /> index.
-        /// </summary>
-        /// <param name="array">The one-dimensional <see cref="T:System.Array" /> that is the destination of the elements copied from <see cref="T:IX.Observable.ObservableCollectionBase`1" />. The <see cref="T:System.Array" /> must have zero-based indexing.</param>
-        /// <param name="arrayIndex">The zero-based index in <paramref name="array" /> at which copying begins.</param>
-        /// <exception cref="System.TimeoutException">There was a timeout acquiring the required lock.</exception>
-        public override void CopyTo(T[] array, int arrayIndex)
-        {
-            if (this.locker.TryEnterReadLock(Constants.ConcurrentLockAcquisitionTimeout))
-            {
-                try
-                {
-                    this.InternalContainer.CopyTo(array, arrayIndex);
-                }
-                finally
-                {
-                    this.locker.ExitReadLock();
-                }
-            }
-
-            throw new TimeoutException();
-        }
-
-        /// <summary>
-        /// Returns an enumerator that iterates through the collection.
-        /// </summary>
-        /// <returns>
-        /// An enumerator that can be used to iterate through the collection.
-        /// </returns>
-        /// <exception cref="System.TimeoutException">There was a timeout acquiring the required lock.</exception>
-        public override IEnumerator<T> GetEnumerator()
-        {
-            if (this.locker.TryEnterReadLock(Constants.ConcurrentLockAcquisitionTimeout))
-            {
-                try
-                {
-                    using (IEnumerator<T> enumerator = this.InternalContainer.GetEnumerator())
-                    {
-                        while (enumerator.MoveNext())
-                        {
-                            yield return enumerator.Current;
-                        }
-                    }
-
-                    yield break;
-                }
-                finally
-                {
-                    this.locker.ExitReadLock();
-                }
-            }
-
-            throw new TimeoutException();
-        }
-
-        /// <summary>
         /// Sets a list.
         /// </summary>
         /// <typeparam name="TList">The type of the list.</typeparam>
         /// <param name="list">The list.</param>
         public void SetList<TList>(TList list)
-                    where TList : class, IEnumerable<T>, INotifyCollectionChanged
+            where TList : class, IEnumerable<T>, INotifyCollectionChanged
         {
-            if (this.locker.TryEnterWriteLock(Constants.ConcurrentLockAcquisitionTimeout))
+            using (this.WriteLock())
             {
-                try
-                {
-                    ((MultiListListAdapter<T>)this.InternalContainer).SetList(list);
-                }
-                finally
-                {
-                    this.locker.ExitWriteLock();
-                }
-
-                this.AsyncPost(() =>
-                {
-                    this.RaiseCollectionChanged();
-                    this.RaisePropertyChanged(nameof(this.Count));
-                    this.RaisePropertyChanged(Constants.ItemsName);
-                });
-
-                return;
+                ((MultiListListAdapter<T>)this.InternalContainer).SetList(list);
             }
 
-            throw new TimeoutException();
+            this.RaiseCollectionChanged();
+            this.RaisePropertyChanged(nameof(this.Count));
+            this.RaisePropertyChanged(Constants.ItemsName);
         }
 
         /// <summary>
@@ -201,30 +83,16 @@ namespace IX.Observable
         /// <typeparam name="TList">The type of the list.</typeparam>
         /// <param name="list">The list.</param>
         public void RemoveList<TList>(TList list)
-                    where TList : class, IEnumerable<T>, INotifyCollectionChanged
+            where TList : class, IEnumerable<T>, INotifyCollectionChanged
         {
-            if (this.locker.TryEnterWriteLock(Constants.ConcurrentLockAcquisitionTimeout))
+            using (this.WriteLock())
             {
-                try
-                {
-                    ((MultiListListAdapter<T>)this.InternalContainer).RemoveList(list);
-                }
-                finally
-                {
-                    this.locker.ExitWriteLock();
-                }
-
-                this.AsyncPost(() =>
-                {
-                    this.RaiseCollectionChanged();
-                    this.RaisePropertyChanged(nameof(this.Count));
-                    this.RaisePropertyChanged(Constants.ItemsName);
-                });
-
-                return;
+                ((MultiListListAdapter<T>)this.InternalContainer).RemoveList(list);
             }
 
-            throw new TimeoutException();
+            this.RaiseCollectionChanged();
+            this.RaisePropertyChanged(nameof(this.Count));
+            this.RaisePropertyChanged(Constants.ItemsName);
         }
 
         /// <summary>

@@ -17,12 +17,17 @@ namespace IX.Observable
     /// </summary>
     /// <seealso cref="System.ComponentModel.INotifyPropertyChanged" />
     /// <seealso cref="System.Collections.Specialized.INotifyCollectionChanged" />
-    public abstract class ObservableCollectionBase : INotifyPropertyChanged, INotifyCollectionChanged
+    public abstract class ObservableCollectionBase : INotifyPropertyChanged, INotifyCollectionChanged, IDisposable
     {
         /// <summary>
         /// The synchronization context that should be used when posting messages. This field can be null.
         /// </summary>
         private SynchronizationContext syncContext;
+
+        /// <summary>
+        /// Indicates whether this instance is disposed.
+        /// </summary>
+        private bool isDisposed;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ObservableCollectionBase"/> class.
@@ -31,6 +36,15 @@ namespace IX.Observable
         protected ObservableCollectionBase(SynchronizationContext context)
         {
             this.syncContext = context;
+        }
+
+        /// <summary>
+        /// Finalizes an instance of the <see cref="ObservableCollectionBase"/> class.
+        /// </summary>
+        ~ObservableCollectionBase()
+        {
+            this.Dispose(false);
+            this.isDisposed = true;
         }
 
         /// <summary>
@@ -49,7 +63,7 @@ namespace IX.Observable
         public event EventHandler<ExceptionOccurredEventArgs> ExceptionOccurredWhileNotifying;
 
         /// <summary>
-        /// A synchronization lock item to be used when trying to synchronize read/write operations between threads.
+        /// Gets a synchronization lock item to be used when trying to synchronize read/write operations between threads.
         /// </summary>
         /// <remarks>
         /// <para>On non-concurrent collections, this should be left <c>null</c> (<c>Nothing</c> in Visual Basic).</para>
@@ -57,6 +71,16 @@ namespace IX.Observable
         /// the same instance of <see cref="ReaderWriterLockSlim"/> that is returned here to synchronize.</para>
         /// </remarks>
         protected virtual ReaderWriterLockSlim SynchronizationLock => null;
+
+        /// <summary>
+        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// </summary>
+        public void Dispose()
+        {
+            GC.SuppressFinalize(this);
+            this.Dispose(false);
+            this.isDisposed = true;
+        }
 
         /// <summary>
         /// In a child class, triggers a property changed event.
@@ -291,6 +315,53 @@ namespace IX.Observable
         /// </summary>
         /// <returns>A disposable object representing the lock.</returns>
         protected ReadWriteSynchronizationLocker ReadWriteLock() => new ReadWriteSynchronizationLocker(this.SynchronizationLock);
+
+        /// <summary>
+        /// Checks whether or not this object is disposed and throws an <see cref="ObjectDisposedException"/>.
+        /// </summary>
+        protected void CheckDisposed()
+        {
+            if (this.isDisposed)
+            {
+                throw new ObjectDisposedException(this.GetType().FullName);
+            }
+        }
+
+        /// <summary>
+        /// Checks whether or not this object is disposed and throws an <see cref="ObjectDisposedException"/>, and, if not, invokes an action.
+        /// </summary>
+        /// <param name="action">The action to invoke.</param>
+        protected void CheckDisposed(Action action)
+        {
+            if (this.isDisposed)
+            {
+                throw new ObjectDisposedException(this.GetType().FullName);
+            }
+
+            action();
+        }
+
+        /// <summary>
+        /// Checks whether or not this object is disposed and throws an <see cref="ObjectDisposedException"/>, and, if not, invokes an action and returns its result.
+        /// </summary>
+        /// <param name="action">The action to invoke.</param>
+        /// <typeparam name="T">The return type of the action.</typeparam>
+        /// <returns>The result from the action.</returns>
+        protected T CheckDisposed<T>(Func<T> action)
+        {
+            if (this.isDisposed)
+            {
+                throw new ObjectDisposedException(this.GetType().FullName);
+            }
+
+            return action();
+        }
+
+        /// <summary>
+        /// Disposes of this instance and performs necessary cleanup.
+        /// </summary>
+        /// <param name="managedDispose">Indicates whether or not the call came from <see cref="IDisposable"/> or from the destructor.</param>
+        protected abstract void Dispose(bool managedDispose);
 
         private void InvokeCollectionChanged(NotifyCollectionChangedEventArgs args) => this.AsyncPost(
             (state) =>

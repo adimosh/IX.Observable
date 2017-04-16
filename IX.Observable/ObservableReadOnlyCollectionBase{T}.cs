@@ -18,7 +18,7 @@ namespace IX.Observable
     /// <seealso cref="System.ComponentModel.INotifyPropertyChanged" />
     /// <seealso cref="System.Collections.Specialized.INotifyCollectionChanged" />
     /// <seealso cref="System.Collections.Generic.IEnumerable{T}" />
-    public class ObservableReadOnlyCollectionBase<T> : ObservableCollectionBase, IReadOnlyCollection<T>, ICollection
+    public abstract class ObservableReadOnlyCollectionBase<T> : ObservableCollectionBase, IReadOnlyCollection<T>, ICollection
     {
         private CollectionAdapter<T> internalContainer;
         private object resetCountLocker;
@@ -41,12 +41,12 @@ namespace IX.Observable
         /// <remarks>
         /// <para>On concurrent collections, this property is read-synchronized.</para>
         /// </remarks>
-        public virtual int Count => this.ReadLock(() => ((IReadOnlyCollection<T>)this.InternalContainer).Count);
+        public virtual int Count => this.CheckDisposed(() => this.ReadLock(() => ((IReadOnlyCollection<T>)this.InternalContainer).Count));
 
         /// <summary>
         /// Gets a value indicating whether the <see cref="ObservableCollectionBase{T}" /> is read-only.
         /// </summary>
-        public bool IsReadOnly => this.ReadLock(() => this.InternalContainer.IsReadOnly);
+        public bool IsReadOnly => this.CheckDisposed(() => this.ReadLock(() => this.InternalContainer.IsReadOnly));
 
         /// <summary>
         /// Gets a value indicating whether this instance is synchronized.
@@ -54,7 +54,7 @@ namespace IX.Observable
         /// <value>
         ///   <c>true</c> if this instance is synchronized; otherwise, <c>false</c>.
         /// </value>
-        public bool IsSynchronized => this.SynchronizationLock != null;
+        public bool IsSynchronized => false;
 
         /// <summary>
         /// Gets the synchronize root.
@@ -62,16 +62,7 @@ namespace IX.Observable
         /// <value>
         /// The synchronize root.
         /// </value>
-        public object SyncRoot
-        {
-            get
-            {
-                using (this.ReadLock())
-                {
-                    return this.InternalContainer.SyncRoot;
-                }
-            }
-        }
+        public object SyncRoot => null;
 
         /// <summary>
         /// Gets or sets the internal object container.
@@ -120,7 +111,7 @@ namespace IX.Observable
         /// <remarks>
         /// <para>On concurrent collections, this method is read-synchronized.</para>
         /// </remarks>
-        public virtual bool Contains(T item) => this.ReadLock(() => this.InternalContainer.Contains(item));
+        public bool Contains(T item) => this.CheckDisposed(() => this.ReadLock(() => this.InternalContainer.Contains(item)));
 
         /// <summary>
         /// Copies the elements of the <see cref="ObservableCollectionBase{T}" /> to an <see cref="T:System.Array" />, starting at a particular <see cref="T:System.Array" /> index.
@@ -130,7 +121,7 @@ namespace IX.Observable
         /// <remarks>
         /// <para>On concurrent collections, this method is read-synchronized.</para>
         /// </remarks>
-        public virtual void CopyTo(T[] array, int arrayIndex) => this.ReadLock(() => this.InternalContainer.CopyTo(array, arrayIndex));
+        public void CopyTo(T[] array, int arrayIndex) => this.CheckDisposed(() => this.ReadLock(() => this.InternalContainer.CopyTo(array, arrayIndex)));
 
         /// <summary>
         /// Returns a locking enumerator that iterates through the collection.
@@ -146,8 +137,10 @@ namespace IX.Observable
         /// <para>Please make sure that you dispose the enumerator object at all times in order to avoid deadlocking and timeouts.</para>
         /// </remarks>
         /// <exception cref="System.TimeoutException">There was a timeout acquiring the necessary lock.</exception>
-        public IEnumerator<T> GetEnumerator()
+        public virtual IEnumerator<T> GetEnumerator()
         {
+            this.CheckDisposed();
+
             using (this.ReadLock())
             {
                 using (IEnumerator<T> enumerator = this.InternalContainer.GetEnumerator())
@@ -180,6 +173,8 @@ namespace IX.Observable
         /// </remarks>
         void ICollection.CopyTo(Array array, int index)
         {
+            this.CheckDisposed();
+
             T[] tempArray;
 
             using (this.ReadLock())
@@ -244,6 +239,26 @@ namespace IX.Observable
         /// </summary>
         protected virtual void ContentsMayHaveChanged()
         {
+        }
+
+        /// <summary>
+        /// Disposes of this instance and performs necessary cleanup.
+        /// </summary>
+        /// <param name="managedDispose">Indicates whether or not the call came from <see cref="IDisposable"/> or from the destructor.</param>
+        protected override void Dispose(bool managedDispose)
+        {
+            if (managedDispose)
+            {
+                try
+                {
+                    this.internalContainer.Clear();
+                }
+                catch
+                {
+                }
+            }
+
+            this.internalContainer = null;
         }
 
         private void InternalContainer_MustReset(object sender, EventArgs e) => this.AsyncPost(() =>

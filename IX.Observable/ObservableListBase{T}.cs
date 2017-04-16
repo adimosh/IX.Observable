@@ -7,6 +7,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 using IX.Observable.Adapters;
+using IX.Observable.SynchronizationLockers;
 
 namespace IX.Observable
 {
@@ -61,25 +62,23 @@ namespace IX.Observable
         /// <returns>The item at the specified index.</returns>
         public virtual T this[int index]
         {
-            get
-            {
-                using (this.ReadLock())
-                {
-                    return this.InternalListContainer[index];
-                }
-            }
+            get => this.CheckDisposed(() => this.ReadLock(() => this.InternalListContainer[index]));
 
             set
             {
-                if (index >= this.Count)
-                {
-                    throw new IndexOutOfRangeException();
-                }
+                this.CheckDisposed();
 
                 T oldValue;
 
-                using (this.WriteLock())
+                using (ReadWriteSynchronizationLocker lockContext = this.ReadWriteLock())
                 {
+                    if (index >= this.InternalContainer.Count)
+                    {
+                        throw new IndexOutOfRangeException();
+                    }
+
+                    lockContext.Upgrade();
+
                     oldValue = this.InternalListContainer[index];
                     this.InternalListContainer[index] = value;
                 }
@@ -119,7 +118,7 @@ namespace IX.Observable
         /// </summary>
         /// <param name="item">The item.</param>
         /// <returns>The index of the item, or <c>-1</c> if not found.</returns>
-        public virtual int IndexOf(T item) => this.InternalListContainer.IndexOf(item);
+        public virtual int IndexOf(T item) => this.CheckDisposed(() => this.ReadLock(() => this.InternalListContainer.IndexOf(item)));
 
         /// <summary>
         /// Inserts an item at the specified index.
@@ -128,15 +127,16 @@ namespace IX.Observable
         /// <param name="item">The item.</param>
         public virtual void Insert(int index, T item)
         {
-            this.InternalListContainer.Insert(index, item);
+            this.CheckDisposed();
 
-            this.AsyncPost(
-                (state) =>
-                {
-                    this.RaiseCollectionChangedAdd(state.NewValue, state.Index);
-                    this.RaisePropertyChanged(nameof(this.Count));
-                    this.ContentsMayHaveChanged();
-                }, new { NewValue = item, Index = index });
+            using (this.WriteLock())
+            {
+                this.InternalListContainer.Insert(index, item);
+            }
+
+            this.RaiseCollectionChangedAdd(item, index);
+            this.RaisePropertyChanged(nameof(this.Count));
+            this.ContentsMayHaveChanged();
         }
 
         /// <summary>
@@ -145,21 +145,26 @@ namespace IX.Observable
         /// <param name="index">The index at which to remove an item from.</param>
         public virtual void RemoveAt(int index)
         {
-            if (index >= this.Count)
+            this.CheckDisposed();
+
+            T item;
+
+            using (ReadWriteSynchronizationLocker lockContext = this.ReadWriteLock())
             {
-                return;
+                if (index >= this.InternalContainer.Count)
+                {
+                    return;
+                }
+
+                lockContext.Upgrade();
+
+                item = this.InternalListContainer[index];
+                this.InternalListContainer.RemoveAt(index);
             }
 
-            T item = this.InternalListContainer[index];
-            this.InternalListContainer.RemoveAt(index);
-
-            this.AsyncPost(
-                (state) =>
-                {
-                    this.RaiseCollectionChangedRemove(state.NewValue, state.Index);
-                    this.RaisePropertyChanged(nameof(this.Count));
-                    this.ContentsMayHaveChanged();
-                }, new { NewValue = item, Index = index });
+            this.RaiseCollectionChangedRemove(item, index);
+            this.RaisePropertyChanged(nameof(this.Count));
+            this.ContentsMayHaveChanged();
         }
 
         /// <summary>

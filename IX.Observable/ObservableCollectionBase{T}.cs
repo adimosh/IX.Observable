@@ -40,6 +40,8 @@ namespace IX.Observable
         /// </remarks>
         public virtual void Add(T item)
         {
+            this.CheckDisposed();
+
             int newIndex;
             using (this.WriteLock())
             {
@@ -67,6 +69,8 @@ namespace IX.Observable
         /// </remarks>
         public virtual void Clear()
         {
+            this.CheckDisposed();
+
             using (this.WriteLock())
             {
                 this.InternalContainer.Clear();
@@ -90,6 +94,8 @@ namespace IX.Observable
         /// </remarks>
         public virtual bool Remove(T item)
         {
+            this.CheckDisposed();
+
             int oldIndex;
             using (this.WriteLock())
             {
