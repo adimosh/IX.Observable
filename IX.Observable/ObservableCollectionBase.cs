@@ -15,8 +15,8 @@ namespace IX.Observable
     /// <summary>
     /// A base class for collections that are observable.
     /// </summary>
-    /// <seealso cref="System.ComponentModel.INotifyPropertyChanged" />
-    /// <seealso cref="System.Collections.Specialized.INotifyCollectionChanged" />
+    /// <seealso cref="INotifyPropertyChanged" />
+    /// <seealso cref="INotifyCollectionChanged" />
     public abstract class ObservableCollectionBase : INotifyPropertyChanged, INotifyCollectionChanged, IDisposable
     {
         /// <summary>

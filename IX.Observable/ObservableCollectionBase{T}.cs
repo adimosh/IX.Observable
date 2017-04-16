@@ -12,9 +12,9 @@ namespace IX.Observable
     /// A base class for collections that are observable.
     /// </summary>
     /// <typeparam name="T">The type of the item.</typeparam>
-    /// <seealso cref="System.ComponentModel.INotifyPropertyChanged" />
-    /// <seealso cref="System.Collections.Specialized.INotifyCollectionChanged" />
-    /// <seealso cref="System.Collections.Generic.IEnumerable{T}" />
+    /// <seealso cref="global::System.ComponentModel.INotifyPropertyChanged" />
+    /// <seealso cref="global::System.Collections.Specialized.INotifyCollectionChanged" />
+    /// <seealso cref="global::System.Collections.Generic.IEnumerable{T}" />
     public abstract class ObservableCollectionBase<T> : ObservableReadOnlyCollectionBase<T>, ICollection<T>
     {
         private object resetCountLocker;

@@ -17,7 +17,7 @@ namespace IX.Observable.SynchronizationLockers
         /// Initializes a new instance of the <see cref="ReadWriteSynchronizationLocker"/> class.
         /// </summary>
         /// <param name="locker">The locker.</param>
-        /// <exception cref="System.TimeoutException">The lock could not be acquired in time.</exception>
+        /// <exception cref="TimeoutException">The lock could not be acquired in time.</exception>
         public ReadWriteSynchronizationLocker(ReaderWriterLockSlim locker)
             : base(locker)
         {
@@ -30,7 +30,7 @@ namespace IX.Observable.SynchronizationLockers
         /// <summary>
         /// Upgrades the lock to a write lock.
         /// </summary>
-        /// <exception cref="System.TimeoutException">The lock could not be acquired in time.</exception>
+        /// <exception cref="TimeoutException">The lock could not be acquired in time.</exception>
         public void Upgrade()
         {
             if (!this.Locker?.TryEnterWriteLock(Constants.ConcurrentLockAcquisitionTimeout) ?? false)

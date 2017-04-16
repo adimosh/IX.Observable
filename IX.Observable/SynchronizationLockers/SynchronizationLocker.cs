@@ -10,7 +10,7 @@ namespace IX.Observable.SynchronizationLockers
     /// <summary>
     /// A synchronization locker base class.
     /// </summary>
-    /// <seealso cref="System.IDisposable" />
+    /// <seealso cref="IDisposable" />
     public abstract class SynchronizationLocker : IDisposable
     {
         /// <summary>

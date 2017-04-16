@@ -88,7 +88,7 @@ namespace IX.Observable
         /// <summary>
         /// Disposes of this instance and performs necessary cleanup.
         /// </summary>
-        /// <param name="managedDispose">Indicates whether or not the call came from <see cref="System.IDisposable"/> or from the destructor.</param>
+        /// <param name="managedDispose">Indicates whether or not the call came from <see cref="global::System.IDisposable"/> or from the destructor.</param>
         protected override void Dispose(bool managedDispose)
         {
             if (managedDispose)

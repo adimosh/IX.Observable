@@ -17,7 +17,7 @@ namespace IX.Observable.SynchronizationLockers
         /// Initializes a new instance of the <see cref="ReadOnlySynchronizationLocker"/> class.
         /// </summary>
         /// <param name="locker">The locker.</param>
-        /// <exception cref="System.TimeoutException">The lock could not be acquired in time.</exception>
+        /// <exception cref="TimeoutException">The lock could not be acquired in time.</exception>
         public ReadOnlySynchronizationLocker(ReaderWriterLockSlim locker)
             : base(locker)
         {

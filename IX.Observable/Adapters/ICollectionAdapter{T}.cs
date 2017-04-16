@@ -12,9 +12,9 @@ namespace IX.Observable.Adapters
     /// An adapter interface for non-standard collection types.
     /// </summary>
     /// <typeparam name="T">The type of item.</typeparam>
-    /// <seealso cref="System.Collections.Generic.IReadOnlyCollection{T}" />
-    /// <seealso cref="System.Collections.Generic.ICollection{T}" />
-    /// <seealso cref="System.Collections.ICollection" />
+    /// <seealso cref="global::System.Collections.Generic.IReadOnlyCollection{T}" />
+    /// <seealso cref="global::System.Collections.Generic.ICollection{T}" />
+    /// <seealso cref="ICollection" />
     public interface ICollectionAdapter<T> : IReadOnlyCollection<T>, ICollection<T>, ICollection
     {
         /// <summary>

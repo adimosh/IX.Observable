@@ -10,11 +10,11 @@ using IX.Observable.Adapters;
 namespace IX.Observable
 {
     /// <summary>
-    /// An observable, composite, thread-safe and readonly list made of multiple lists of the same rank.
+    /// An observable, composite, thread-safe and read-only list made of multiple lists of the same rank.
     /// </summary>
     /// <typeparam name="T">The type of the list item.</typeparam>
-    /// <seealso cref="System.IDisposable" />
-    /// <seealso cref="IX.Observable.ObservableReadOnlyCollectionBase{T}" />
+    /// <seealso cref="global::System.IDisposable" />
+    /// <seealso cref="Observable.ObservableReadOnlyCollectionBase{T}" />
     public class ObservableReadOnlyCompositeList<T> : ObservableReadOnlyCollectionBase<T>
     {
         private ReaderWriterLockSlim locker;
@@ -77,7 +77,7 @@ namespace IX.Observable
         /// <summary>
         /// Disposes of this instance and performs necessary cleanup.
         /// </summary>
-        /// <param name="managedDispose">Indicates whether or not the call came from <see cref="System.IDisposable"/> or from the destructor.</param>
+        /// <param name="managedDispose">Indicates whether or not the call came from <see cref="global::System.IDisposable"/> or from the destructor.</param>
         protected override void Dispose(bool managedDispose)
         {
             if (managedDispose)

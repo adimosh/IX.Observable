@@ -16,9 +16,9 @@ namespace IX.Observable
     /// </summary>
     /// <typeparam name="T">The item type.</typeparam>
     /// <seealso cref="IX.Observable.ObservableCollectionBase{T}" />
-    /// <seealso cref="System.Collections.IList" />
-    /// <seealso cref="System.Collections.Generic.IList{T}" />
-    /// <seealso cref="System.Collections.Generic.IReadOnlyList{T}" />
+    /// <seealso cref="IList" />
+    /// <seealso cref="global::System.Collections.Generic.IList{T}" />
+    /// <seealso cref="global::System.Collections.Generic.IReadOnlyList{T}" />
     public abstract class ObservableListBase<T> : ObservableCollectionBase<T>, IList<T>, IReadOnlyList<T>, IList
     {
         /// <summary>

@@ -15,9 +15,9 @@ namespace IX.Observable
     /// A base class for read-only collections that are observable.
     /// </summary>
     /// <typeparam name="T">The type of the item.</typeparam>
-    /// <seealso cref="System.ComponentModel.INotifyPropertyChanged" />
-    /// <seealso cref="System.Collections.Specialized.INotifyCollectionChanged" />
-    /// <seealso cref="System.Collections.Generic.IEnumerable{T}" />
+    /// <seealso cref="global::System.ComponentModel.INotifyPropertyChanged" />
+    /// <seealso cref="INotifyCollectionChanged" />
+    /// <seealso cref="global::System.Collections.Generic.IEnumerable{T}" />
     public abstract class ObservableReadOnlyCollectionBase<T> : ObservableCollectionBase, IReadOnlyCollection<T>, ICollection
     {
         private CollectionAdapter<T> internalContainer;
@@ -136,7 +136,7 @@ namespace IX.Observable
         /// <para>If the enumerator is never disposed of, it will never release the read lock, thus making the other threads time out.</para>
         /// <para>Please make sure that you dispose the enumerator object at all times in order to avoid deadlocking and timeouts.</para>
         /// </remarks>
-        /// <exception cref="System.TimeoutException">There was a timeout acquiring the necessary lock.</exception>
+        /// <exception cref="global::System.TimeoutException">There was a timeout acquiring the necessary lock.</exception>
         public virtual IEnumerator<T> GetEnumerator()
         {
             this.CheckDisposed();
