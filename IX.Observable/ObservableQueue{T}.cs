@@ -79,15 +79,18 @@ namespace IX.Observable
         /// <returns>The dequeued item.</returns>
         public T Dequeue()
         {
-            T item = ((QueueCollectionAdapter<T>)this.InternalContainer).queue.Dequeue();
+            this.CheckDisposed();
 
-            this.AsyncPost(
-                (state) =>
+            T item;
+
+            using (this.WriteLock())
             {
-                this.RaisePropertyChanged(nameof(this.Count));
-                this.RaisePropertyChanged(Constants.ItemsName);
-                this.RaiseCollectionChangedRemove(state, 0);
-            }, item);
+                item = ((QueueCollectionAdapter<T>)this.InternalContainer).queue.Dequeue();
+            }
+
+            this.RaisePropertyChanged(nameof(this.Count));
+            this.RaisePropertyChanged(Constants.ItemsName);
+            this.RaiseCollectionChangedRemove(item, 0);
 
             return item;
         }
@@ -98,32 +101,36 @@ namespace IX.Observable
         /// <param name="item">The item to enqueue.</param>
         public void Enqueue(T item)
         {
-            ((QueueCollectionAdapter<T>)this.InternalContainer).queue.Enqueue(item);
+            this.CheckDisposed();
 
-            this.AsyncPost(
-                (state) =>
+            int newIndex;
+
+            using (this.WriteLock())
             {
-                this.RaisePropertyChanged(nameof(this.Count));
-                this.RaisePropertyChanged(Constants.ItemsName);
-                this.RaiseCollectionChangedAdd(state.item, state.index);
-            }, new { index = this.Count - 1, item });
+                ((QueueCollectionAdapter<T>)this.InternalContainer).queue.Enqueue(item);
+                newIndex = this.InternalContainer.Count - 1;
+            }
+
+            this.RaisePropertyChanged(nameof(this.Count));
+            this.RaisePropertyChanged(Constants.ItemsName);
+            this.RaiseCollectionChangedAdd(item, newIndex);
         }
 
         /// <summary>
         /// Peeks at the topmost item in the queue without dequeueing it.
         /// </summary>
         /// <returns>The topmost item in the queue.</returns>
-        public virtual T Peek() => ((QueueCollectionAdapter<T>)this.InternalContainer).queue.Peek();
+        public virtual T Peek() => this.CheckDisposed(() => this.ReadLock(() => ((QueueCollectionAdapter<T>)this.InternalContainer).queue.Peek()));
 
         /// <summary>
         /// Copies the items of the queue into a new array.
         /// </summary>
         /// <returns>An array of items that are contained in the queue.</returns>
-        public virtual T[] ToArray() => ((QueueCollectionAdapter<T>)this.InternalContainer).queue.ToArray();
+        public virtual T[] ToArray() => this.CheckDisposed(() => this.ReadLock(() => ((QueueCollectionAdapter<T>)this.InternalContainer).queue.ToArray()));
 
         /// <summary>
         /// Sets the capacity to the actual number of elements in the <see cref="ObservableQueue{T}"/>, if that number is less than 90 percent of current capacity.
         /// </summary>
-        public virtual void TrimExcess() => ((QueueCollectionAdapter<T>)this.InternalContainer).queue.TrimExcess();
+        public virtual void TrimExcess() => this.CheckDisposed(() => this.WriteLock(() => ((QueueCollectionAdapter<T>)this.InternalContainer).queue.TrimExcess()));
     }
 }

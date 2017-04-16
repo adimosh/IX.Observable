@@ -311,6 +311,18 @@ namespace IX.Observable
         protected WriteOnlySynchronizationLocker WriteLock() => new WriteOnlySynchronizationLocker(this.SynchronizationLock);
 
         /// <summary>
+        /// Invokes using a writer lock.
+        /// </summary>
+        /// <param name="invoker">An invoker that is called.</param>
+        protected void WriteLock(Action invoker)
+        {
+            using (new WriteOnlySynchronizationLocker(this.SynchronizationLock))
+            {
+                invoker();
+            }
+        }
+
+        /// <summary>
         /// Produces an upgradeable reader lock in concurrent collections.
         /// </summary>
         /// <returns>A disposable object representing the lock.</returns>
