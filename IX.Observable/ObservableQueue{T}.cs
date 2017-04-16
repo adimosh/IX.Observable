@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Threading;
 using IX.Observable.Adapters;
 using IX.Observable.DebugAide;
+using IX.System.Collections.Generic;
 
 namespace IX.Observable
 {
