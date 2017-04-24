@@ -2,11 +2,13 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using IX.Observable.Adapters;
 using IX.Observable.DebugAide;
+using IX.Observable.UndoLevels;
 using IX.System.Collections.Generic;
 
 namespace IX.Observable
@@ -15,7 +17,7 @@ namespace IX.Observable
     /// A stack that broadcasts its changes.
     /// </summary>
     /// <typeparam name="T">The type of elements in the stack.</typeparam>
-    [DebuggerDisplay("Count = {Count}")]
+    [DebuggerDisplay("Stack count = {Count}")]
     [DebuggerTypeProxy(typeof(StackDebugView<>))]
     public class ObservableStack<T> : ObservableCollectionBase<T>, IStack<T>
     {
@@ -23,7 +25,7 @@ namespace IX.Observable
         /// Initializes a new instance of the <see cref="ObservableStack{T}"/> class.
         /// </summary>
         public ObservableStack()
-            : base(new StackCollectionAdapter<T>(new Stack<T>()), null)
+            : base(new StackCollectionAdapter<T>(new System.Collections.Generic.Stack<T>()), null)
         {
         }
 
@@ -32,7 +34,7 @@ namespace IX.Observable
         /// </summary>
         /// <param name="capacity">The initial capacity of the stack.</param>
         public ObservableStack(int capacity)
-            : base(new StackCollectionAdapter<T>(new Stack<T>(capacity)), null)
+            : base(new StackCollectionAdapter<T>(new System.Collections.Generic.Stack<T>(capacity)), null)
         {
         }
 
@@ -41,7 +43,7 @@ namespace IX.Observable
         /// </summary>
         /// <param name="collection">A collection of items to copy into the stack.</param>
         public ObservableStack(IEnumerable<T> collection)
-            : base(new StackCollectionAdapter<T>(new Stack<T>(collection)), null)
+            : base(new StackCollectionAdapter<T>(new System.Collections.Generic.Stack<T>(collection)), null)
         {
         }
 
@@ -50,7 +52,7 @@ namespace IX.Observable
         /// </summary>
         /// <param name="context">The synchronization context top use when posting observable messages.</param>
         public ObservableStack(SynchronizationContext context)
-            : base(new StackCollectionAdapter<T>(new Stack<T>()), context)
+            : base(new StackCollectionAdapter<T>(new System.Collections.Generic.Stack<T>()), context)
         {
         }
 
@@ -60,7 +62,7 @@ namespace IX.Observable
         /// <param name="context">The synchronization context top use when posting observable messages.</param>
         /// <param name="capacity">The initial capacity of the stack.</param>
         public ObservableStack(SynchronizationContext context, int capacity)
-            : base(new StackCollectionAdapter<T>(new Stack<T>(capacity)), context)
+            : base(new StackCollectionAdapter<T>(new System.Collections.Generic.Stack<T>(capacity)), context)
         {
         }
 
@@ -70,7 +72,7 @@ namespace IX.Observable
         /// <param name="context">The synchronization context top use when posting observable messages.</param>
         /// <param name="collection">A collection of items to copy into the stack.</param>
         public ObservableStack(SynchronizationContext context, IEnumerable<T> collection)
-            : base(new StackCollectionAdapter<T>(new Stack<T>(collection)), context)
+            : base(new StackCollectionAdapter<T>(new System.Collections.Generic.Stack<T>(collection)), context)
         {
         }
 
@@ -78,7 +80,7 @@ namespace IX.Observable
         /// Peeks in the stack to view the topmost item, without removing it.
         /// </summary>
         /// <returns>The topmost element in the stack, if any.</returns>
-        public T Peek() => this.CheckDisposed(() => this.ReadLock(() => ((StackCollectionAdapter<T>)this.InternalContainer).stack.Peek()));
+        public T Peek() => this.CheckDisposed(() => this.ReadLock(() => ((StackCollectionAdapter<T>)this.InternalContainer).Peek()));
 
         /// <summary>
         /// Pops the topmost element from the stack, removing it.
@@ -93,7 +95,7 @@ namespace IX.Observable
 
             using (this.WriteLock())
             {
-                item = ((StackCollectionAdapter<T>)this.InternalContainer).stack.Pop();
+                item = ((StackCollectionAdapter<T>)this.InternalContainer).Pop();
                 index = this.InternalContainer.Count;
             }
 
@@ -116,7 +118,7 @@ namespace IX.Observable
 
             using (this.WriteLock())
             {
-                ((StackCollectionAdapter<T>)this.InternalContainer).stack.Push(item);
+                ((StackCollectionAdapter<T>)this.InternalContainer).Push(item);
                 index = this.InternalContainer.Count - 1;
             }
 
@@ -129,11 +131,188 @@ namespace IX.Observable
         /// Copies all elements of the stack to a new array.
         /// </summary>
         /// <returns>An array containing all items in the stack.</returns>
-        public T[] ToArray() => this.CheckDisposed(() => this.ReadLock(() => ((StackCollectionAdapter<T>)this.InternalContainer).stack.ToArray()));
+        public T[] ToArray() => this.CheckDisposed(() => this.ReadLock(() => ((StackCollectionAdapter<T>)this.InternalContainer).ToArray()));
 
         /// <summary>
         /// Sets the capacity to the actual number of elements in the stack if that number is less than 90 percent of current capacity.
         /// </summary>
-        public void TrimExcess() => this.CheckDisposed(() => this.WriteLock(() => ((StackCollectionAdapter<T>)this.InternalContainer).stack.TrimExcess()));
+        public void TrimExcess() => this.CheckDisposed(() => this.WriteLock(() => ((StackCollectionAdapter<T>)this.InternalContainer).TrimExcess()));
+
+        /// <summary>
+        /// Has the last undone operation redone.
+        /// </summary>
+        /// <param name="undoRedoLevel">A level of undo, with contents.</param>
+        /// <param name="toInvokeOutsideLock">An action to invoke outside of the lock.</param>
+        protected override void RedoInternally(UndoRedoLevel undoRedoLevel, out Action toInvokeOutsideLock)
+        {
+            switch (undoRedoLevel)
+            {
+                case AddUndoLevel<T> aul:
+                    {
+                        var container = (StackCollectionAdapter<T>)this.InternalContainer;
+
+                        container.Push(aul.AddedItem);
+
+                        var index = aul.Index;
+                        T item = aul.AddedItem;
+                        toInvokeOutsideLock = () =>
+                        {
+                            this.RaisePropertyChanged(nameof(this.Count));
+                            this.RaisePropertyChanged(Constants.ItemsName);
+                            this.RaiseCollectionChangedAdd(item, index);
+                        };
+
+                        break;
+                    }
+
+                case EnqueueUndoLevel<T> eul:
+                    {
+                        var container = (StackCollectionAdapter<T>)this.InternalContainer;
+
+                        container.Push(eul.EnqueuedItem);
+
+                        var index = this.InternalContainer.Count - 1;
+                        T item = eul.EnqueuedItem;
+                        toInvokeOutsideLock = () =>
+                        {
+                            this.RaisePropertyChanged(nameof(this.Count));
+                            this.RaisePropertyChanged(Constants.ItemsName);
+                            this.RaiseCollectionChangedAdd(item, index);
+                        };
+
+                        break;
+                    }
+
+                case DequeueUndoLevel<T> dul:
+                    {
+                        var container = (StackCollectionAdapter<T>)this.InternalContainer;
+
+                        T item = container.Pop();
+
+                        var index = this.InternalContainer.Count;
+                        toInvokeOutsideLock = () =>
+                        {
+                            this.RaisePropertyChanged(nameof(this.Count));
+                            this.RaisePropertyChanged(Constants.ItemsName);
+                            this.RaiseCollectionChangedRemove(item, index);
+                        };
+
+                        break;
+                    }
+
+                case RemoveUndoLevel<T> rul:
+                    {
+                        toInvokeOutsideLock = null;
+                        break;
+                    }
+
+                case ClearUndoLevel<T> cul:
+                    {
+                        this.InternalContainer.Clear();
+
+                        toInvokeOutsideLock = () =>
+                        {
+                            this.RaisePropertyChanged(nameof(this.Count));
+                            this.RaisePropertyChanged(Constants.ItemsName);
+                            this.RaiseCollectionChanged();
+                        };
+
+                        break;
+                    }
+
+                default:
+                    throw new InvalidOperationException();
+            }
+        }
+
+        /// <summary>
+        /// Has the last operation undone.
+        /// </summary>
+        /// <param name="undoRedoLevel">A level of undo, with contents.</param>
+        /// <param name="toInvokeOutsideLock">An action to invoke outside of the lock.</param>
+        protected override void UndoInternally(UndoRedoLevel undoRedoLevel, out Action toInvokeOutsideLock)
+        {
+            switch (undoRedoLevel)
+            {
+                case AddUndoLevel<T> aul:
+                    {
+                        var container = (StackCollectionAdapter<T>)this.InternalContainer;
+
+                        T item = container.Pop();
+
+                        var index = this.InternalContainer.Count;
+                        toInvokeOutsideLock = () =>
+                        {
+                            this.RaisePropertyChanged(nameof(this.Count));
+                            this.RaisePropertyChanged(Constants.ItemsName);
+                            this.RaiseCollectionChangedRemove(item, index);
+                        };
+
+                        break;
+                    }
+
+                case EnqueueUndoLevel<T> eul:
+                    {
+                        var container = (StackCollectionAdapter<T>)this.InternalContainer;
+
+                        T item = container.Pop();
+
+                        var index = this.InternalContainer.Count;
+                        toInvokeOutsideLock = () =>
+                        {
+                            this.RaisePropertyChanged(nameof(this.Count));
+                            this.RaisePropertyChanged(Constants.ItemsName);
+                            this.RaiseCollectionChangedRemove(item, index);
+                        };
+
+                        break;
+                    }
+
+                case DequeueUndoLevel<T> dul:
+                    {
+                        var container = (StackCollectionAdapter<T>)this.InternalContainer;
+
+                        container.Push(dul.DequeuedItem);
+
+                        var index = this.InternalContainer.Count - 1;
+                        T item = dul.DequeuedItem;
+                        toInvokeOutsideLock = () =>
+                        {
+                            this.RaisePropertyChanged(nameof(this.Count));
+                            this.RaisePropertyChanged(Constants.ItemsName);
+                            this.RaiseCollectionChangedAdd(item, index);
+                        };
+
+                        break;
+                    }
+
+                case RemoveUndoLevel<T> rul:
+                    {
+                        toInvokeOutsideLock = null;
+                        break;
+                    }
+
+                case ClearUndoLevel<T> cul:
+                    {
+                        var container = (StackCollectionAdapter<T>)this.InternalContainer;
+                        for (var i = 0; i < cul.OriginalItems.Length - 1; i++)
+                        {
+                            container.Push(cul.OriginalItems[i]);
+                        }
+
+                        toInvokeOutsideLock = () =>
+                        {
+                            this.RaisePropertyChanged(nameof(this.Count));
+                            this.RaisePropertyChanged(Constants.ItemsName);
+                            this.RaiseCollectionChanged();
+                        };
+
+                        break;
+                    }
+
+                default:
+                    throw new InvalidOperationException();
+            }
+        }
     }
 }

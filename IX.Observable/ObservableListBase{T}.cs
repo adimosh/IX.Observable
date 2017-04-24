@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Threading;
 using IX.Observable.Adapters;
 using IX.Observable.SynchronizationLockers;
+using IX.Observable.UndoLevels;
 
 namespace IX.Observable
 {
@@ -132,6 +133,7 @@ namespace IX.Observable
             using (this.WriteLock())
             {
                 this.InternalListContainer.Insert(index, item);
+                this.PushUndoLevel(new AddUndoLevel<T> { AddedItem = item, Index = index });
             }
 
             this.RaiseCollectionChangedAdd(item, index);

@@ -5,7 +5,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Threading;
 using IX.Observable.Adapters;
 
@@ -16,7 +15,6 @@ namespace IX.Observable
     /// </summary>
     /// <typeparam name="T">The type of the item.</typeparam>
     /// <seealso cref="global::System.ComponentModel.INotifyPropertyChanged" />
-    /// <seealso cref="INotifyCollectionChanged" />
     /// <seealso cref="global::System.Collections.Generic.IEnumerable{T}" />
     public abstract class ObservableReadOnlyCollectionBase<T> : ObservableCollectionBase, IReadOnlyCollection<T>, ICollection
     {
@@ -208,31 +206,6 @@ namespace IX.Observable
                 this.IgnoreResetCount += increaseBy;
             }
         }
-
-        /// <summary>
-        /// Called when an item is added to a collection.
-        /// </summary>
-        /// <param name="addedItem">The added item.</param>
-        /// <param name="index">The index.</param>
-        protected virtual void RaiseCollectionChangedAdd(T addedItem, int index)
-            => this.RaiseCollectionChanged(NotifyCollectionChangedAction.Add, newItem: addedItem, newIndex: index);
-
-        /// <summary>
-        /// Called when an item in a collection is changed.
-        /// </summary>
-        /// <param name="oldItem">The old item.</param>
-        /// <param name="newItem">The new item.</param>
-        /// <param name="index">The index.</param>
-        protected virtual void RaiseCollectionChangedChanged(T oldItem, T newItem, int index)
-            => this.RaiseCollectionChanged(NotifyCollectionChangedAction.Replace, oldItem, newItem, index, index);
-
-        /// <summary>
-        /// Called when an item is removed from a collection.
-        /// </summary>
-        /// <param name="removedItem">The removed item.</param>
-        /// <param name="index">The index.</param>
-        protected virtual void RaiseCollectionChangedRemove(T removedItem, int index)
-            => this.RaiseCollectionChanged(NotifyCollectionChangedAction.Remove, oldItem: removedItem, oldIndex: index);
 
         /// <summary>
         /// Called when the contents may have changed so that proper notifications can happen.

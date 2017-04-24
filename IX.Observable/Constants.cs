@@ -8,5 +8,6 @@ namespace IX.Observable
     {
         internal const int ConcurrentLockAcquisitionTimeout = 100;
         internal const string ItemsName = "Item[]";
+        internal const int StandardUndoRedoLevels = 10;
     }
 }

@@ -2,6 +2,7 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
@@ -261,5 +262,8 @@ namespace IX.Observable
             this.RaisePropertyChanged(nameof(this.Count));
             this.RaisePropertyChanged(Constants.ItemsName);
         }
+
+        protected override void UndoInternally(UndoRedoLevel undoRedoLevel, out Action toInvokeOutsideLock) => throw new NotImplementedException();
+        protected override void RedoInternally(UndoRedoLevel undoRedoLevel, out Action toInvokeOutsideLock) => throw new NotImplementedException();
     }
 }

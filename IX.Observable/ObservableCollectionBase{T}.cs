@@ -2,9 +2,14 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
+using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Threading;
 using IX.Observable.Adapters;
+using IX.Observable.SynchronizationLockers;
+using IX.Observable.UndoLevels;
+using IX.Undoable;
 
 namespace IX.Observable
 {
@@ -13,11 +18,17 @@ namespace IX.Observable
     /// </summary>
     /// <typeparam name="T">The type of the item.</typeparam>
     /// <seealso cref="global::System.ComponentModel.INotifyPropertyChanged" />
-    /// <seealso cref="global::System.Collections.Specialized.INotifyCollectionChanged" />
+    /// <seealso cref="INotifyCollectionChanged" />
     /// <seealso cref="global::System.Collections.Generic.IEnumerable{T}" />
-    public abstract class ObservableCollectionBase<T> : ObservableReadOnlyCollectionBase<T>, ICollection<T>
+    public abstract class ObservableCollectionBase<T> : ObservableReadOnlyCollectionBase<T>, ICollection<T>, IUndoableItem
     {
         private object resetCountLocker;
+
+        private IX.System.Collections.Generic.PushDownStack<UndoRedoLevel> undoStack;
+        private IX.System.Collections.Generic.PushDownStack<UndoRedoLevel> redoStack;
+
+        private bool isCapturedIntoUndoContext;
+        private IUndoableItem parentUndoableContext;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ObservableCollectionBase{T}"/> class.
@@ -29,7 +40,54 @@ namespace IX.Observable
         {
             this.InternalContainer = internalContainer;
             this.resetCountLocker = new object();
+
+            this.undoStack = new IX.System.Collections.Generic.PushDownStack<UndoRedoLevel>(Constants.StandardUndoRedoLevels);
+            this.redoStack = new IX.System.Collections.Generic.PushDownStack<UndoRedoLevel>(Constants.StandardUndoRedoLevels);
         }
+
+        /// <summary>
+        /// Gets or sets the number of levels to keep undo or redo information.
+        /// </summary>
+        /// <value>The history levels.</value>
+        /// <remarks><para>If this value is set, for example, to 7, then the implementing object should allow the <see cref="M:IX.Undoable.IUndoableItem.Undo" /> method
+        /// to be called 7 times to change the state of the object. Upon calling it an 8th time, there should be no change in the
+        /// state of the object.</para>
+        /// <para>Any call beyond the limit imposed here should not fail, but it should also not change the state of the object.</para></remarks>
+        public int HistoryLevels
+        {
+            get => this.undoStack.Limit;
+            set
+            {
+                if (this.undoStack.Limit != value)
+                {
+                    this.undoStack.Limit = value;
+                    this.redoStack.Limit = value;
+
+                    this.RaisePropertyChanged(nameof(this.HistoryLevels));
+
+                    this.RaisePropertyChanged(nameof(this.CanUndo));
+                    this.RaisePropertyChanged(nameof(this.CanRedo));
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether or not the implementer can perform an undo.
+        /// </summary>
+        /// <value><c>true</c> if the call to the <see cref="M:IX.Undoable.IUndoableItem.Undo" /> method would result in a state change, <c>false</c> otherwise.</value>
+        public bool CanUndo => this.CheckDisposed(() => this.ReadLock(() => this.undoStack.Count > 0 || this.ParentUndoContext != null));
+
+        /// <summary>
+        /// Gets a value indicating whether or not the implementer can perform a redo.
+        /// </summary>
+        /// <value><c>true</c> if the call to the <see cref="M:IX.Undoable.IUndoableItem.Redo" /> method would result in a state change, <c>false</c> otherwise.</value>
+        public bool CanRedo => this.CheckDisposed(() => this.ReadLock(() => this.redoStack.Count > 0 || this.ParentUndoContext != null));
+
+        /// <summary>
+        /// Gets the parent undo context, if any.
+        /// </summary>
+        /// <value>The parent undo context.</value>
+        protected IUndoableItem ParentUndoContext { get => this.parentUndoableContext; }
 
         /// <summary>
         /// Adds an item to the <see cref="ObservableCollectionBase{T}" />.
@@ -46,6 +104,7 @@ namespace IX.Observable
             using (this.WriteLock())
             {
                 newIndex = this.InternalContainer.Add(item);
+                this.PushUndoLevel(new AddUndoLevel<T> { AddedItem = item, Index = newIndex });
             }
 
             if (newIndex == -1)
@@ -73,7 +132,12 @@ namespace IX.Observable
 
             using (this.WriteLock())
             {
+                T[] tempArray = new T[this.InternalContainer.Count];
+                this.InternalContainer.CopyTo(tempArray, 0);
+
                 this.InternalContainer.Clear();
+
+                this.PushUndoLevel(new ClearUndoLevel<T> { OriginalItems = tempArray });
             }
 
             this.RaiseCollectionChanged();
@@ -100,6 +164,7 @@ namespace IX.Observable
             using (this.WriteLock())
             {
                 oldIndex = this.InternalContainer.Remove(item);
+                this.PushUndoLevel(new RemoveUndoLevel<T> { RemovedItem = item, Index = oldIndex });
             }
 
             if (oldIndex >= 0)
@@ -123,5 +188,150 @@ namespace IX.Observable
                 return false;
             }
         }
+
+        /// <summary>
+        /// Allows the implementer to be captured by a containing undo-/redo-capable object so that undo and redo operations
+        /// can be coordinated across a larger scope.
+        /// </summary>
+        /// <param name="parent">The parent undo and redo context.</param>
+        public void CaptureIntoUndoContext(IUndoableItem parent) => this.CheckDisposed(() => this.WriteLock(() =>
+        {
+            this.isCapturedIntoUndoContext = true;
+            this.parentUndoableContext = parent ?? throw new ArgumentNullException(nameof(parent));
+        }));
+
+        /// <summary>
+        /// Releases the implementer from being captured into an undo and redo context.
+        /// </summary>
+        public void ReleaseFromUndoContext() => this.CheckDisposed(() => this.WriteLock(() =>
+        {
+            this.isCapturedIntoUndoContext = false;
+        }));
+
+        /// <summary>
+        /// Has the last operation performed on the implementing instance undone.
+        /// </summary>
+        /// <remarks><para>If the object is captured, the method will call the capturing parent's Undo method, which can bubble down to
+        /// the last instance of an undo-/redo-capable object.</para>
+        /// <para>If that is the case, the capturing object is solely responsible for ensuring that the inner state of the whole
+        /// system is correct. Implementing classes should not expect this method to also handle state.</para>
+        /// <para>If the object is released, it is expected that this method once again starts ensuring state when called.</para></remarks>
+        public void Undo() => this.CheckDisposed(() =>
+        {
+            if (this.ParentUndoContext != null)
+            {
+                this.ParentUndoContext.Undo();
+                return;
+            }
+
+            Action toInvoke;
+            using (ReadWriteSynchronizationLocker locker = this.ReadWriteLock())
+            {
+                if (this.undoStack.Count == 0)
+                {
+                    return;
+                }
+
+                locker.Upgrade();
+
+                UndoRedoLevel level = this.undoStack.Pop();
+                this.UndoInternally(level, out toInvoke);
+                this.redoStack.Push(level);
+            }
+
+            toInvoke?.Invoke();
+
+            this.RaisePropertyChanged(nameof(this.CanUndo));
+            this.RaisePropertyChanged(nameof(this.CanRedo));
+        });
+
+        /// <summary>
+        /// Has the last undone operation performed on the implemented instance, presuming that it has not changed, redone.
+        /// </summary>
+        /// <remarks><para>If the object is captured, the method will call the capturing parent's Redo method, which can bubble down to
+        /// the last instance of an undo-/redo-capable object.</para>
+        /// <para>If that is the case, the capturing object is solely responsible for ensuring that the inner state of the whole
+        /// system is correct. Implementing classes should not expect this method to also handle state.</para>
+        /// <para>If the object is released, it is expected that this method once again starts ensuring state when called.</para></remarks>
+        public void Redo() => this.CheckDisposed(() =>
+        {
+            if (this.ParentUndoContext != null)
+            {
+                this.ParentUndoContext.Redo();
+                return;
+            }
+
+            Action toInvoke;
+            using (ReadWriteSynchronizationLocker locker = this.ReadWriteLock())
+            {
+                if (this.redoStack.Count == 0)
+                {
+                    return;
+                }
+
+                locker.Upgrade();
+
+                UndoRedoLevel level = this.redoStack.Pop();
+                this.RedoInternally(level, out toInvoke);
+                this.undoStack.Push(level);
+            }
+
+            toInvoke?.Invoke();
+
+            this.RaisePropertyChanged(nameof(this.CanUndo));
+            this.RaisePropertyChanged(nameof(this.CanRedo));
+        });
+
+        /// <summary>
+        /// Has the last operation undone.
+        /// </summary>
+        /// <param name="undoRedoLevel">A level of undo, with contents.</param>
+        /// <param name="toInvokeOutsideLock">An action to invoke outside of the lock.</param>
+        protected abstract void UndoInternally(UndoRedoLevel undoRedoLevel, out Action toInvokeOutsideLock);
+
+        /// <summary>
+        /// Has the last undone operation redone.
+        /// </summary>
+        /// <param name="undoRedoLevel">A level of undo, with contents.</param>
+        /// <param name="toInvokeOutsideLock">An action to invoke outside of the lock.</param>
+        protected abstract void RedoInternally(UndoRedoLevel undoRedoLevel, out Action toInvokeOutsideLock);
+
+        /// <summary>
+        /// Push an undo level into the stack.
+        /// </summary>
+        /// <param name="undoRedoLevel">The undo level to push.</param>
+        protected void PushUndoLevel(UndoRedoLevel undoRedoLevel)
+        {
+            this.undoStack.Push(undoRedoLevel);
+            this.redoStack.Clear();
+
+            this.RaisePropertyChanged(nameof(this.CanUndo));
+            this.RaisePropertyChanged(nameof(this.CanRedo));
+        }
+
+        /// <summary>
+        /// Called when an item is added to a collection.
+        /// </summary>
+        /// <param name="addedItem">The added item.</param>
+        /// <param name="index">The index.</param>
+        protected virtual void RaiseCollectionChangedAdd(T addedItem, int index)
+            => this.RaiseCollectionChanged(NotifyCollectionChangedAction.Add, newItem: addedItem, newIndex: index);
+
+        /// <summary>
+        /// Called when an item in a collection is changed.
+        /// </summary>
+        /// <param name="oldItem">The old item.</param>
+        /// <param name="newItem">The new item.</param>
+        /// <param name="index">The index.</param>
+        protected virtual void RaiseCollectionChangedChanged(T oldItem, T newItem, int index)
+            => this.RaiseCollectionChanged(NotifyCollectionChangedAction.Replace, oldItem, newItem, index, index);
+
+        /// <summary>
+        /// Called when an item is removed from a collection.
+        /// </summary>
+        /// <param name="removedItem">The removed item.</param>
+        /// <param name="index">The index.</param>
+        protected virtual void RaiseCollectionChangedRemove(T removedItem, int index)
+            => this.RaiseCollectionChanged(NotifyCollectionChangedAction.Remove, oldItem: removedItem, oldIndex: index);
     }
 }

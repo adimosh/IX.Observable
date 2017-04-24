@@ -15,6 +15,14 @@ actual software applications, but overlooked in available libraries. For instanc
 [`CompositeCollection`](https://msdn.microsoft.com/en-us/library/system.windows.data.compositecollection.aspx) combines multiple collections in one bindable collection,
 but is only available in the WPF libraries.
 
+### Fair warning
+
+Observable collections are not built for speed and performance.
+
+While performance is a consideration when we build these classes, however, please be advised that they serve primarily UI-related scenarios.
+
+If you need to use observable collections in a high-performance scenario, please either attempt re-desigining your workload or use a different library instead.
+
 ## Code health
 - Build status: [![Build status](https://ci.appveyor.com/api/projects/status/ir1tqpxdo9gkqj70?svg=true)](https://ci.appveyor.com/project/adimosh/ix-observable)
 - Master branch status: [![Build status](https://ci.appveyor.com/api/projects/status/ir1tqpxdo9gkqj70/branch/master?svg=true)](https://ci.appveyor.com/project/adimosh/ix-observable/branch/master)
