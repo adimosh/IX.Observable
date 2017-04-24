@@ -82,6 +82,7 @@ namespace IX.Observable
 
                     oldValue = this.InternalListContainer[index];
                     this.InternalListContainer[index] = value;
+                    this.PushUndoLevel(new ChangeAtUndoLevel<T> { Index = index, OldValue = oldValue, NewValue = value });
                 }
 
                 this.RaiseCollectionChangedChanged(oldValue, value, index);
@@ -162,6 +163,7 @@ namespace IX.Observable
 
                 item = this.InternalListContainer[index];
                 this.InternalListContainer.RemoveAt(index);
+                this.PushUndoLevel(new RemoveUndoLevel<T> { Index = index, RemovedItem = item });
             }
 
             this.RaiseCollectionChangedRemove(item, index);
@@ -249,6 +251,177 @@ namespace IX.Observable
             }
 
             throw new InvalidCastException();
+        }
+
+        /// <summary>
+        /// Has the last operation undone.
+        /// </summary>
+        /// <param name="undoRedoLevel">A level of undo, with contents.</param>
+        /// <param name="toInvokeOutsideLock">An action to invoke outside of the lock.</param>
+        protected override void UndoInternally(UndoRedoLevel undoRedoLevel, out Action toInvokeOutsideLock)
+        {
+            switch (undoRedoLevel)
+            {
+                case AddUndoLevel<T> aul:
+                    {
+                        var index = aul.Index;
+
+                        this.InternalListContainer.RemoveAt(index);
+
+                        T item = aul.AddedItem;
+                        toInvokeOutsideLock = () =>
+                        {
+                            this.RaiseCollectionChangedRemove(item, index);
+                            this.RaisePropertyChanged(nameof(this.Count));
+                            this.ContentsMayHaveChanged();
+                        };
+
+                        break;
+                    }
+
+                case RemoveUndoLevel<T> rul:
+                    {
+                        T item = rul.RemovedItem;
+                        var index = rul.Index;
+
+                        this.InternalListContainer.Insert(index, item);
+
+                        toInvokeOutsideLock = () =>
+                        {
+                            this.RaiseCollectionChangedAdd(item, index);
+                            this.RaisePropertyChanged(nameof(this.Count));
+                            this.ContentsMayHaveChanged();
+                        };
+
+                        break;
+                    }
+
+                case ClearUndoLevel<T> cul:
+                    {
+                        foreach (T t in cul.OriginalItems)
+                        {
+                            this.InternalListContainer.Add(t);
+                        }
+
+                        toInvokeOutsideLock = () =>
+                        {
+                            this.RaiseCollectionChanged();
+                            this.RaisePropertyChanged(nameof(this.Count));
+                            this.ContentsMayHaveChanged();
+                        };
+
+                        break;
+                    }
+
+                case ChangeAtUndoLevel<T> caul:
+                    {
+                        T oldItem = caul.NewValue;
+                        T newItem = caul.OldValue;
+                        var index = caul.Index;
+
+                        this.InternalListContainer[index] = newItem;
+
+                        toInvokeOutsideLock = () =>
+                        {
+                            this.RaiseCollectionChangedChanged(oldItem, newItem, index);
+                            this.RaisePropertyChanged(nameof(this.Count));
+                            this.ContentsMayHaveChanged();
+                        };
+
+                        break;
+                    }
+
+                default:
+                    {
+                        toInvokeOutsideLock = null;
+
+                        break;
+                    }
+            }
+        }
+
+        /// <summary>
+        /// Has the last undone operation redone.
+        /// </summary>
+        /// <param name="undoRedoLevel">A level of undo, with contents.</param>
+        /// <param name="toInvokeOutsideLock">An action to invoke outside of the lock.</param>
+        protected override void RedoInternally(UndoRedoLevel undoRedoLevel, out Action toInvokeOutsideLock)
+        {
+            switch (undoRedoLevel)
+            {
+                case AddUndoLevel<T> aul:
+                    {
+                        var index = aul.Index;
+                        T item = aul.AddedItem;
+
+                        this.InternalListContainer.Insert(index, item);
+
+                        toInvokeOutsideLock = () =>
+                        {
+                            this.RaiseCollectionChangedAdd(item, index);
+                            this.RaisePropertyChanged(nameof(this.Count));
+                            this.ContentsMayHaveChanged();
+                        };
+
+                        break;
+                    }
+
+                case RemoveUndoLevel<T> rul:
+                    {
+                        T item = rul.RemovedItem;
+                        var index = rul.Index;
+
+                        this.InternalListContainer.RemoveAt(index);
+
+                        toInvokeOutsideLock = () =>
+                        {
+                            this.RaiseCollectionChangedRemove(item, index);
+                            this.RaisePropertyChanged(nameof(this.Count));
+                            this.ContentsMayHaveChanged();
+                        };
+
+                        break;
+                    }
+
+                case ClearUndoLevel<T> cul:
+                    {
+                        this.InternalContainer.Clear();
+
+                        toInvokeOutsideLock = () =>
+                        {
+                            this.RaiseCollectionChanged();
+                            this.RaisePropertyChanged(nameof(this.Count));
+                            this.ContentsMayHaveChanged();
+                        };
+
+                        break;
+                    }
+
+                case ChangeAtUndoLevel<T> caul:
+                    {
+                        T oldItem = caul.OldValue;
+                        T newItem = caul.NewValue;
+                        var index = caul.Index;
+
+                        this.InternalListContainer[index] = newItem;
+
+                        toInvokeOutsideLock = () =>
+                        {
+                            this.RaiseCollectionChangedChanged(oldItem, newItem, index);
+                            this.RaisePropertyChanged(nameof(this.Count));
+                            this.ContentsMayHaveChanged();
+                        };
+
+                        break;
+                    }
+
+                default:
+                    {
+                        toInvokeOutsideLock = null;
+
+                        break;
+                    }
+            }
         }
     }
 }

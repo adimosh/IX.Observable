@@ -17,6 +17,12 @@ namespace IX.Observable
     /// An observable collection created from a master collection (to which updates go) and many slave, read-only collections.
     /// </summary>
     /// <typeparam name="T">The type of the item.</typeparam>
+    /// <seealso cref="IX.Observable.ObservableListBase{T}" />
+    /// <seealso cref="global::System.Collections.Generic.IList{T}" />
+    /// <seealso cref="global::System.Collections.Generic.IReadOnlyCollection{T}" />
+    /// <seealso cref="global::System.Collections.Generic.ICollection{T}" />
+    /// <seealso cref="global::System.Collections.ICollection" />
+    /// <seealso cref="global::System.Collections.IList" />
     /// <seealso cref="IX.Observable.ObservableCollectionBase{TItem}" />
     [DebuggerDisplay("Count = {Count}")]
     [DebuggerTypeProxy(typeof(CollectionDebugView<>))]
@@ -107,7 +113,11 @@ namespace IX.Observable
             this.RaisePropertyChanged(Constants.ItemsName);
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Adds an item to the <see cref="T:IX.Observable.ObservableCollectionBase`1" />.
+        /// </summary>
+        /// <param name="item">The object to add to the <see cref="T:IX.Observable.ObservableCollectionBase`1" />.</param>
+        /// <remarks>On concurrent collections, this method is write-synchronized.</remarks>
         public override void Add(T item)
         {
             this.IncreaseIgnoreMustResetCounter();
@@ -136,14 +146,24 @@ namespace IX.Observable
             this.ContentsMayHaveChanged();
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Inserts an item at the specified index.
+        /// </summary>
+        /// <param name="index">The index at which to insert.</param>
+        /// <param name="item">The item.</param>
         public override void Insert(int index, T item)
         {
             this.IncreaseIgnoreMustResetCounter();
             base.Insert(index, item);
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Removes the first occurrence of a specific object from the <see cref="T:IX.Observable.ObservableCollectionBase`1" />.
+        /// </summary>
+        /// <param name="item">The object to remove from the <see cref="T:IX.Observable.ObservableCollectionBase`1" />.</param>
+        /// <returns><c>true</c> if <paramref name="item" /> was successfully removed from the <see cref="T:IX.Observable.ObservableCollectionBase`1" />; otherwise, <c>false</c>.
+        /// This method also returns false if <paramref name="item" /> is not found in the original <see cref="T:IX.Observable.ObservableCollectionBase`1" />.</returns>
+        /// <remarks>On concurrent collections, this method is write-synchronized.</remarks>
         public override bool Remove(T item)
         {
             this.IncreaseIgnoreMustResetCounter();
