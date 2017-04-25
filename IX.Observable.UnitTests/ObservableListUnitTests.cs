@@ -277,5 +277,41 @@ namespace IX.Observable.UnitTests
             list.Redo();
             Assert.True(list.Count == 0);
         }
+
+        [Fact(DisplayName = "ObservableList, Undo with undo operations past the limit")]
+        public void ObservableListMultipleUndoOperations()
+        {
+            // ARRANGE
+            var list = new ObservableList<int>
+            {
+                1,
+                7,
+                19,
+                23,
+                4
+            };
+
+            list.HistoryLevels = 3;
+
+            list.Add(15);
+            list.Add(89);
+            list.Add(3);
+            list.Add(2);
+            list.Add(57);
+
+            // ACT
+            list.Undo();
+            list.Undo();
+            list.Undo();
+            list.Undo();
+            list.Undo();
+            list.Undo();
+
+            // ASSERT
+            Assert.True(list.Contains(89));
+            Assert.False(list.Contains(57));
+            Assert.False(list.Contains(2));
+            Assert.False(list.Contains(3));
+        }
     }
 }
