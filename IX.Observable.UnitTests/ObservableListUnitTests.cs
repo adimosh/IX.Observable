@@ -313,5 +313,43 @@ namespace IX.Observable.UnitTests
             Assert.False(list.Contains(2));
             Assert.False(list.Contains(3));
         }
+
+        [Fact(DisplayName = "ObservableList, Redo cut-off")]
+        public void ObservableListMultipleRedoCutoff()
+        {
+            // ARRANGE
+            var list = new ObservableList<int>
+            {
+                1,
+                7,
+                19,
+                23,
+                4
+            };
+
+            list.Add(15);
+            list.Add(89);
+            list.Add(3);
+            list.Add(2);
+            list.Add(57);
+
+            // ACT
+            list.Undo();
+            list.Undo();
+            list.Undo();
+            list.Redo();
+
+            list.Add(74);
+
+            list.Redo();
+            list.Redo();
+            list.Redo();
+
+            // ASSERT
+            Assert.True(list.Contains(3));
+            Assert.False(list.Contains(57));
+            Assert.False(list.Contains(2));
+            Assert.True(list.Contains(74));
+        }
     }
 }

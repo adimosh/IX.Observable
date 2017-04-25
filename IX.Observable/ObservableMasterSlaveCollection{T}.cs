@@ -10,6 +10,7 @@ using System.Threading;
 using IX.Observable.Adapters;
 using IX.Observable.DebugAide;
 using IX.Observable.SynchronizationLockers;
+using IX.Observable.UndoLevels;
 
 namespace IX.Observable
 {
@@ -136,9 +137,16 @@ namespace IX.Observable
 
             using (this.WriteLock())
             {
-                this.IncreaseIgnoreMustResetCounter(((MultiListMasterSlaveListAdapter<T>)this.InternalContainer).SlavesCount + 1);
+                var container = (MultiListMasterSlaveListAdapter<T>)this.InternalContainer;
+
+                this.IncreaseIgnoreMustResetCounter(container.SlavesCount + 1);
+
+                T[] originalArray = new T[container.MasterCount];
+                container.MasterCopyTo(originalArray, 0);
 
                 this.InternalContainer.Clear();
+
+                this.PushUndoLevel(new ClearUndoLevel<T> { OriginalItems = originalArray });
             }
 
             this.RaiseCollectionChanged();
@@ -198,6 +206,8 @@ namespace IX.Observable
                 item = this.InternalListContainer[index];
                 this.IncreaseIgnoreMustResetCounter();
                 this.InternalListContainer.RemoveAt(index);
+
+                this.PushUndoLevel(new RemoveUndoLevel<T> { Index = index, RemovedItem = item });
             }
 
             this.RaiseCollectionChangedRemove(item, index);
@@ -205,7 +215,9 @@ namespace IX.Observable
             this.ContentsMayHaveChanged();
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Called when the contents may have changed so that proper notifications can happen.
+        /// </summary>
         protected override void ContentsMayHaveChanged() => this.RaisePropertyChanged(Constants.ItemsName);
     }
 }

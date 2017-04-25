@@ -24,10 +24,7 @@ namespace IX.Observable.Adapters
         {
             get
             {
-                if (this.master == null)
-                {
-                    throw new InvalidOperationException();
-                }
+                this.InitializeMissingMaster();
 
                 return this.master.Count + this.slaves.Sum(p => p.Count());
             }
@@ -39,10 +36,7 @@ namespace IX.Observable.Adapters
         {
             get
             {
-                if (this.master == null)
-                {
-                    throw new InvalidOperationException();
-                }
+                this.InitializeMissingMaster();
 
                 return this.master.IsReadOnly;
             }
@@ -56,10 +50,7 @@ namespace IX.Observable.Adapters
         {
             get
             {
-                if (this.master == null)
-                {
-                    throw new InvalidOperationException();
-                }
+                this.InitializeMissingMaster();
 
                 return this.master.Count;
             }
@@ -69,6 +60,8 @@ namespace IX.Observable.Adapters
         {
             get
             {
+                this.InitializeMissingMaster();
+
                 if (index < this.master.Count)
                 {
                     return this.master[index];
@@ -90,15 +83,17 @@ namespace IX.Observable.Adapters
                 return default(T);
             }
 
-            set => this.master[index] = value;
+            set
+            {
+                this.InitializeMissingMaster();
+
+                this.master[index] = value;
+            }
         }
 
         public override int Add(T item)
         {
-            if (this.master == null)
-            {
-                throw new InvalidOperationException();
-            }
+            this.InitializeMissingMaster();
 
             this.master.Add(item);
 
@@ -107,30 +102,28 @@ namespace IX.Observable.Adapters
 
         public override void Clear()
         {
-            if (this.master == null)
-            {
-                throw new InvalidOperationException();
-            }
+            this.InitializeMissingMaster();
 
             this.master.Clear();
         }
 
         public override bool Contains(T item)
         {
-            if (this.master == null)
-            {
-                throw new InvalidOperationException();
-            }
+            this.InitializeMissingMaster();
 
             return this.master.Contains(item) || this.slaves.Any(p => p.Contains(item));
         }
 
+        public void MasterCopyTo(T[] array, int arrayIndex)
+        {
+            this.InitializeMissingMaster();
+
+            this.master.CopyTo(array, arrayIndex);
+        }
+
         public override void CopyTo(T[] array, int arrayIndex)
         {
-            if (this.master == null)
-            {
-                throw new InvalidOperationException();
-            }
+            this.InitializeMissingMaster();
 
             var totalCount = this.Count + arrayIndex;
             IEnumerator<T> enumerator = this.GetEnumerator();
@@ -148,10 +141,7 @@ namespace IX.Observable.Adapters
 
         public override IEnumerator<T> GetEnumerator()
         {
-            if (this.master == null)
-            {
-                throw new InvalidOperationException();
-            }
+            this.InitializeMissingMaster();
 
             foreach (T var in this.master)
             {
@@ -171,10 +161,7 @@ namespace IX.Observable.Adapters
 
         public override int Remove(T item)
         {
-            if (this.master == null)
-            {
-                throw new InvalidOperationException();
-            }
+            this.InitializeMissingMaster();
 
             var index = this.master.IndexOf(item);
 
@@ -183,10 +170,17 @@ namespace IX.Observable.Adapters
             return index;
         }
 
-        public override void Insert(int index, T item) => this.master.Insert(index, item);
+        public override void Insert(int index, T item)
+        {
+            this.InitializeMissingMaster();
+
+            this.master.Insert(index, item);
+        }
 
         public override int IndexOf(T item)
         {
+            this.InitializeMissingMaster();
+
             var offset = 0;
 
             int foundIndex;
@@ -218,7 +212,12 @@ namespace IX.Observable.Adapters
         /// Removes an item at a specific index.
         /// </summary>
         /// <param name="index">The index at which to remove from.</param>
-        public override void RemoveAt(int index) => this.master.RemoveAt(index);
+        public override void RemoveAt(int index)
+        {
+            this.InitializeMissingMaster();
+
+            this.master.RemoveAt(index);
+        }
 
         internal void SetMaster<TList>(TList masterList)
             where TList : class, IList<T>, INotifyCollectionChanged
@@ -249,5 +248,13 @@ namespace IX.Observable.Adapters
         }
 
         private void List_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) => this.TriggerReset();
+
+        private void InitializeMissingMaster()
+        {
+            if (this.master == null)
+            {
+                this.master = new ObservableList<T>();
+            }
+        }
     }
 }
