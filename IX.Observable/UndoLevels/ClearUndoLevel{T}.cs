@@ -1,20 +1,20 @@
-﻿// <copyright file="EnqueueUndoLevel.cs" company="Adrian Mos">
+﻿// <copyright file="ClearUndoLevel{T}.cs" company="Adrian Mos">
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
 namespace IX.Observable.UndoLevels
 {
     /// <summary>
-    /// An undo step for when an item was enqueued.
+    /// An undo step for when a collection was cleared.
     /// </summary>
     /// <typeparam name="T">The type of item.</typeparam>
     /// <seealso cref="IX.Observable.UndoRedoLevel" />
-    public class EnqueueUndoLevel<T> : UndoRedoLevel
+    public class ClearUndoLevel<T> : UndoRedoLevel
     {
         /// <summary>
-        /// Gets or sets the enqueued item.
+        /// Gets or sets the original items.
         /// </summary>
-        /// <value>The enqueued item.</value>
-        public T EnqueuedItem { get; set; }
+        /// <value>The original items.</value>
+        public T[] OriginalItems { get; set; }
     }
 }

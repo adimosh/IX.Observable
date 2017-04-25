@@ -35,9 +35,21 @@ namespace IX.Observable.Adapters
 
         public override object SyncRoot => ((ICollection)this.dictionary).SyncRoot;
 
+        public TValue this[TKey key]
+        {
+            get => this.dictionary[key];
+            set => this.dictionary[key] = value;
+        }
+
         public override int Add(KeyValuePair<TKey, TValue> item)
         {
             ((ICollection<KeyValuePair<TKey, TValue>>)this.dictionary).Add(item);
+            return -1;
+        }
+
+        public int Add(TKey key, TValue value)
+        {
+            this.dictionary.Add(key, value);
             return -1;
         }
 
@@ -66,5 +78,9 @@ namespace IX.Observable.Adapters
             ((ICollection<KeyValuePair<TKey, TValue>>)this.dictionary).Remove(item);
             return -1;
         }
+
+        public bool Remove(TKey item) => this.dictionary.Remove(item);
+
+        public bool TryGetValue(TKey key, out TValue value) => this.dictionary.TryGetValue(key, out value);
     }
 }

@@ -8,7 +8,7 @@ using System.Diagnostics;
 using System.Threading;
 using IX.Observable.Adapters;
 using IX.Observable.DebugAide;
-using IX.Observable.SynchronizationLockers;
+using IX.Observable.UndoLevels;
 
 namespace IX.Observable
 {
@@ -171,17 +171,17 @@ namespace IX.Observable
             {
                 Dictionary<TKey, TValue> dictionary = ((DictionaryCollectionAdapter<TKey, TValue>)this.InternalContainer).dictionary;
 
-                using (ReadWriteSynchronizationLocker lockingContext = this.ReadWriteLock())
+                using (this.WriteLock())
                 {
                     if (dictionary.TryGetValue(key, out var val))
                     {
-                        lockingContext.Upgrade();
                         dictionary[key] = value;
+                        this.PushUndoLevel(new DictionaryChangeUndoLevel<TKey, TValue> { Key = key, OldValue = val, NewValue = value });
                     }
                     else
                     {
-                        lockingContext.Upgrade();
                         dictionary.Add(key, value);
+                        this.PushUndoLevel(new DictionaryAddUndoLevel<TKey, TValue> { Key = key, Value = value });
                     }
                 }
 
@@ -214,10 +214,21 @@ namespace IX.Observable
             this.CheckDisposed();
 
             bool result;
+            var container = (DictionaryCollectionAdapter<TKey, TValue>)this.InternalContainer;
 
             using (this.WriteLock())
             {
-                result = ((DictionaryCollectionAdapter<TKey, TValue>)this.InternalContainer).dictionary.Remove(key);
+                if (!container.TryGetValue(key, out TValue value))
+                {
+                    return false;
+                }
+
+                result = container.Remove(key);
+
+                if (result)
+                {
+                    this.PushUndoLevel(new DictionaryRemoveUndoLevel<TKey, TValue> { Key = key, Value = value });
+                }
             }
 
             if (result)
@@ -254,6 +265,168 @@ namespace IX.Observable
             this.RaisePropertyChanged(Constants.ItemsName);
         }
 
+        /// <summary>
+        /// Has the last operation undone.
+        /// </summary>
+        /// <param name="undoRedoLevel">A level of undo, with contents.</param>
+        /// <param name="toInvokeOutsideLock">An action to invoke outside of the lock.</param>
+        /// <exception cref="InvalidOperationException">The undo level could not be recognized.</exception>
+        protected override void UndoInternally(UndoRedoLevel undoRedoLevel, out Action toInvokeOutsideLock)
+        {
+            switch (undoRedoLevel)
+            {
+                case AddUndoLevel<KeyValuePair<TKey, TValue>> aul:
+                    {
+                        var container = (DictionaryCollectionAdapter<TKey, TValue>)this.InternalContainer;
+
+                        container.Remove(aul.AddedItem.Key);
+
+                        toInvokeOutsideLock = () => this.BroadcastChange();
+
+                        break;
+                    }
+
+                case RemoveUndoLevel<KeyValuePair<TKey, TValue>> rul:
+                    {
+                        var container = (DictionaryCollectionAdapter<TKey, TValue>)this.InternalContainer;
+
+                        container.Add(rul.RemovedItem.Key, rul.RemovedItem.Value);
+
+                        toInvokeOutsideLock = () => this.BroadcastChange();
+
+                        break;
+                    }
+
+                case ClearUndoLevel<KeyValuePair<TKey, TValue>> cul:
+                    {
+                        var container = (DictionaryCollectionAdapter<TKey, TValue>)this.InternalContainer;
+
+                        foreach (KeyValuePair<TKey, TValue> item in cul.OriginalItems)
+                        {
+                            container.Add(item.Key, item.Value);
+                        }
+
+                        toInvokeOutsideLock = () => this.BroadcastChange();
+
+                        break;
+                    }
+
+                case DictionaryAddUndoLevel<TKey, TValue> daul:
+                    {
+                        var container = (DictionaryCollectionAdapter<TKey, TValue>)this.InternalContainer;
+
+                        container.Remove(daul.Key);
+
+                        toInvokeOutsideLock = () => this.BroadcastChange();
+
+                        break;
+                    }
+
+                case DictionaryRemoveUndoLevel<TKey, TValue> raul:
+                    {
+                        var container = (DictionaryCollectionAdapter<TKey, TValue>)this.InternalContainer;
+
+                        container.Add(raul.Key, raul.Value);
+
+                        toInvokeOutsideLock = () => this.BroadcastChange();
+
+                        break;
+                    }
+
+                case DictionaryChangeUndoLevel<TKey, TValue> caul:
+                    {
+                        var container = (DictionaryCollectionAdapter<TKey, TValue>)this.InternalContainer;
+
+                        container[caul.Key] = caul.OldValue;
+
+                        toInvokeOutsideLock = () => this.BroadcastChange();
+
+                        break;
+                    }
+
+                default:
+                    throw new InvalidOperationException();
+            }
+        }
+
+        /// <summary>
+        /// Has the last undone operation redone.
+        /// </summary>
+        /// <param name="undoRedoLevel">A level of undo, with contents.</param>
+        /// <param name="toInvokeOutsideLock">An action to invoke outside of the lock.</param>
+        protected override void RedoInternally(UndoRedoLevel undoRedoLevel, out Action toInvokeOutsideLock)
+        {
+            switch (undoRedoLevel)
+            {
+                case AddUndoLevel<KeyValuePair<TKey, TValue>> aul:
+                    {
+                        var container = (DictionaryCollectionAdapter<TKey, TValue>)this.InternalContainer;
+
+                        container.Add(aul.AddedItem.Key, aul.AddedItem.Value);
+
+                        toInvokeOutsideLock = () => this.BroadcastChange();
+
+                        break;
+                    }
+
+                case RemoveUndoLevel<KeyValuePair<TKey, TValue>> rul:
+                    {
+                        var container = (DictionaryCollectionAdapter<TKey, TValue>)this.InternalContainer;
+
+                        container.Remove(rul.RemovedItem.Key);
+
+                        toInvokeOutsideLock = () => this.BroadcastChange();
+
+                        break;
+                    }
+
+                case ClearUndoLevel<KeyValuePair<TKey, TValue>> cul:
+                    {
+                        this.InternalContainer.Clear();
+
+                        toInvokeOutsideLock = () => this.BroadcastChange();
+
+                        break;
+                    }
+
+                case DictionaryAddUndoLevel<TKey, TValue> daul:
+                    {
+                        var container = (DictionaryCollectionAdapter<TKey, TValue>)this.InternalContainer;
+
+                        container.Add(daul.Key, daul.Value);
+
+                        toInvokeOutsideLock = () => this.BroadcastChange();
+
+                        break;
+                    }
+
+                case DictionaryRemoveUndoLevel<TKey, TValue> raul:
+                    {
+                        var container = (DictionaryCollectionAdapter<TKey, TValue>)this.InternalContainer;
+
+                        container.Remove(raul.Key);
+
+                        toInvokeOutsideLock = () => this.BroadcastChange();
+
+                        break;
+                    }
+
+                case DictionaryChangeUndoLevel<TKey, TValue> caul:
+                    {
+                        var container = (DictionaryCollectionAdapter<TKey, TValue>)this.InternalContainer;
+
+                        container[caul.Key] = caul.NewValue;
+
+                        toInvokeOutsideLock = () => this.BroadcastChange();
+
+                        break;
+                    }
+
+                default:
+                    throw new InvalidOperationException();
+            }
+        }
+
         private void BroadcastChange()
         {
             this.RaiseCollectionChanged();
@@ -262,8 +435,5 @@ namespace IX.Observable
             this.RaisePropertyChanged(nameof(this.Count));
             this.RaisePropertyChanged(Constants.ItemsName);
         }
-
-        protected override void UndoInternally(UndoRedoLevel undoRedoLevel, out Action toInvokeOutsideLock) => throw new NotImplementedException();
-        protected override void RedoInternally(UndoRedoLevel undoRedoLevel, out Action toInvokeOutsideLock) => throw new NotImplementedException();
     }
 }
