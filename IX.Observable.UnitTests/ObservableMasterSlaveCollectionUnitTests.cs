@@ -171,7 +171,7 @@ namespace IX.Observable.UnitTests
             Assert.True(list[3] == 19);
         }
 
-        [Fact(DisplayName = "ObservableMasterSlaveCollection, Undo with Insert")]
+        [Fact(DisplayName = "ObservableMasterSlaveCollection, Undo with RemoveAt")]
         public void ObservableMasterSlaveCollectionUndoAtRemoveAt()
         {
             // ARRANGE
@@ -585,7 +585,7 @@ namespace IX.Observable.UnitTests
             Assert.True(list.Contains(-5));
         }
 
-        [Fact(DisplayName = "ObservableMasterSlaveCollection with a slave, Undo with Insert")]
+        [Fact(DisplayName = "ObservableMasterSlaveCollection with a slave, Undo with RemoveAt")]
         public void ObservableMasterSlaveCollectionUndoAtRemoveAtWithSlave()
         {
             // ARRANGE

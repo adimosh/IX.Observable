@@ -171,7 +171,7 @@ namespace IX.Observable.UnitTests
             Assert.True(list[3] == 19);
         }
 
-        [Fact(DisplayName = "ObservableList, Undo with Insert")]
+        [Fact(DisplayName = "ObservableList, Undo with RemoveAt")]
         public void ObservableListUndoAtRemoveAt()
         {
             // ARRANGE
