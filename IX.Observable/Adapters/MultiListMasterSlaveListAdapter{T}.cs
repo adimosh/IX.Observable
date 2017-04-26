@@ -3,7 +3,6 @@
 // </copyright>
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
@@ -41,10 +40,6 @@ namespace IX.Observable.Adapters
                 return this.master.IsReadOnly;
             }
         }
-
-        public override bool IsSynchronized => false;
-
-        public override object SyncRoot => (this.master as ICollection)?.SyncRoot;
 
         internal int MasterCount
         {

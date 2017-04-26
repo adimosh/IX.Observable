@@ -2,7 +2,6 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
-using System.Collections;
 using System.Collections.Generic;
 
 namespace IX.Observable.Adapters
@@ -47,18 +46,6 @@ namespace IX.Observable.Adapters
         /// </summary>
         /// <value><c>true</c> if this instance is read only; otherwise, <c>false</c>.</value>
         public override bool IsReadOnly => false;
-
-        /// <summary>
-        /// Gets a value indicating whether this instance is synchronized.
-        /// </summary>
-        /// <value><c>true</c> if this instance is synchronized; otherwise, <c>false</c>.</value>
-        public override bool IsSynchronized => ((ICollection)this.queue).IsSynchronized;
-
-        /// <summary>
-        /// Gets the synchronize root.
-        /// </summary>
-        /// <value>The synchronize root.</value>
-        public override object SyncRoot => ((ICollection)this.queue).SyncRoot;
 
         /// <summary>
         /// Adds the specified item.

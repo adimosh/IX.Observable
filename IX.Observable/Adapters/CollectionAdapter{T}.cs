@@ -42,7 +42,9 @@ namespace IX.Observable.Adapters
         /// <value>
         /// <c>true</c> if this instance is synchronized; otherwise, <c>false</c>.
         /// </value>
-        public abstract bool IsSynchronized { get; }
+        /// <remarks>This is obsolete, and should not be used anymore. Returns <c>false</c> always.</remarks>
+        [Obsolete]
+        public bool IsSynchronized => false;
 
         /// <summary>
         /// Gets the synchronize root.
@@ -50,7 +52,9 @@ namespace IX.Observable.Adapters
         /// <value>
         /// The synchronize root.
         /// </value>
-        public abstract object SyncRoot { get; }
+        /// <remarks>This is obsolete, and should not be used anymore. Returns <c>null</c> always.</remarks>
+        [Obsolete]
+        public object SyncRoot => null;
 
         /// <summary>
         /// Adds the specified item.

@@ -72,6 +72,11 @@ namespace IX.Observable
         }
 
         /// <summary>
+        /// Gets a value indicating whether this instance is caught into an undo context.
+        /// </summary>
+        public bool IsCapturedIntoUndoContext => this.isCapturedIntoUndoContext;
+
+        /// <summary>
         /// Gets a value indicating whether or not the implementer can perform an undo.
         /// </summary>
         /// <value><c>true</c> if the call to the <see cref="M:IX.Undoable.IUndoableItem.Undo" /> method would result in a state change, <c>false</c> otherwise.</value>

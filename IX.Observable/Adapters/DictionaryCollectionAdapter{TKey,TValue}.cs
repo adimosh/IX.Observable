@@ -2,7 +2,6 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
-using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -30,10 +29,6 @@ namespace IX.Observable.Adapters
         public override int Count => this.dictionary.Count;
 
         public override bool IsReadOnly => ((ICollection<KeyValuePair<TKey, TValue>>)this.dictionary).IsReadOnly;
-
-        public override bool IsSynchronized => ((ICollection)this.dictionary).IsSynchronized;
-
-        public override object SyncRoot => ((ICollection)this.dictionary).SyncRoot;
 
         public TValue this[TKey key]
         {

@@ -20,6 +20,7 @@ namespace IX.Observable
     {
         private CollectionAdapter<T> internalContainer;
         private object resetCountLocker;
+        private object syncRoot;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ObservableReadOnlyCollectionBase{T}"/> class.
@@ -31,6 +32,8 @@ namespace IX.Observable
         {
             this.InternalContainer = internalContainer;
             this.resetCountLocker = new object();
+
+            this.syncRoot = new object();
         }
 
         /// <summary>
@@ -52,15 +55,23 @@ namespace IX.Observable
         /// <value>
         ///   <c>true</c> if this instance is synchronized; otherwise, <c>false</c>.
         /// </value>
+        [Obsolete]
         public bool IsSynchronized => false;
 
         /// <summary>
-        /// Gets the synchronize root.
+        /// Gets the synchronization root.
         /// </summary>
         /// <value>
-        /// The synchronize root.
+        /// The synchronization root.
         /// </value>
-        public object SyncRoot => null;
+        /// <remarks>
+        /// <para>This property is inexplicably still used to &quot;synchronize&quot; access to the collections, even though MSDN members themselves
+        /// admit that it was a mistake that would not be repeated with generic collections.</para>
+        /// <para>It is ill-advised to use it yourself, as it does not synchronize anything.</para>
+        /// <para>This property will always return an object, since UI frameworks (such as the XCeed Avalon) depend on it.</para>
+        /// </remarks>
+        [Obsolete]
+        public object SyncRoot => this.syncRoot;
 
         /// <summary>
         /// Gets or sets the internal object container.
@@ -112,9 +123,9 @@ namespace IX.Observable
         public bool Contains(T item) => this.CheckDisposed(() => this.ReadLock(() => this.InternalContainer.Contains(item)));
 
         /// <summary>
-        /// Copies the elements of the <see cref="ObservableCollectionBase{T}" /> to an <see cref="T:System.Array" />, starting at a particular <see cref="T:System.Array" /> index.
+        /// Copies the elements of the <see cref="ObservableCollectionBase{T}" /> to an <see cref="Array" />, starting at a particular <see cref="Array" /> index.
         /// </summary>
-        /// <param name="array">The one-dimensional <see cref="T:System.Array" /> that is the destination of the elements copied from <see cref="ObservableCollectionBase{T}" />. The <see cref="T:System.Array" /> must have zero-based indexing.</param>
+        /// <param name="array">The one-dimensional <see cref="Array" /> that is the destination of the elements copied from <see cref="ObservableCollectionBase{T}" />. The <see cref="Array" /> must have zero-based indexing.</param>
         /// <param name="arrayIndex">The zero-based index in <paramref name="array" /> at which copying begins.</param>
         /// <remarks>
         /// <para>On concurrent collections, this method is read-synchronized.</para>
@@ -134,7 +145,7 @@ namespace IX.Observable
         /// <para>If the enumerator is never disposed of, it will never release the read lock, thus making the other threads time out.</para>
         /// <para>Please make sure that you dispose the enumerator object at all times in order to avoid deadlocking and timeouts.</para>
         /// </remarks>
-        /// <exception cref="global::System.TimeoutException">There was a timeout acquiring the necessary lock.</exception>
+        /// <exception cref="TimeoutException">There was a timeout acquiring the necessary lock.</exception>
         public virtual IEnumerator<T> GetEnumerator()
         {
             this.CheckDisposed();
@@ -157,7 +168,7 @@ namespace IX.Observable
         /// Returns an enumerator that iterates through a collection.
         /// </summary>
         /// <returns>
-        /// An <see cref="T:System.Collections.IEnumerator" /> object that can be used to iterate through the collection.
+        /// An <see cref="IEnumerator" /> object that can be used to iterate through the collection.
         /// </returns>
         IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
 

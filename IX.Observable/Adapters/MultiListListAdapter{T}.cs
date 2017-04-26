@@ -3,7 +3,6 @@
 // </copyright>
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
@@ -24,10 +23,6 @@ namespace IX.Observable.Adapters
         public int SlavesCount => this.lists.Count;
 
         public override bool IsReadOnly => true;
-
-        public override bool IsSynchronized => false;
-
-        public override object SyncRoot => this.lists.Select(p => (p as ICollection)?.SyncRoot).FirstOrDefault(p => p != null);
 
         public override T this[int index]
         {

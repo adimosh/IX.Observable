@@ -2,8 +2,6 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
-using System;
-using System.Collections;
 using System.Collections.Generic;
 
 namespace IX.Observable.Adapters
@@ -25,10 +23,6 @@ namespace IX.Observable.Adapters
         public override int Count => this.list.Count;
 
         public override bool IsReadOnly => false;
-
-        public override bool IsSynchronized => ((ICollection)this.list).IsSynchronized;
-
-        public override object SyncRoot => throw new NotImplementedException();
 
         public override T this[int index]
         {
