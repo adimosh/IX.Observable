@@ -1,4 +1,4 @@
-﻿// <copyright file="ObservableCollectionBase.cs" company="Adrian Mos">
+﻿// <copyright file="ObservableBase.cs" company="Adrian Mos">
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
@@ -17,7 +17,7 @@ namespace IX.Observable
     /// </summary>
     /// <seealso cref="INotifyPropertyChanged" />
     /// <seealso cref="INotifyCollectionChanged" />
-    public abstract class ObservableCollectionBase : INotifyPropertyChanged, INotifyCollectionChanged, IDisposable
+    public abstract class ObservableBase : INotifyPropertyChanged, INotifyCollectionChanged, IDisposable
     {
         /// <summary>
         /// The synchronization context that should be used when posting messages. This field can be null.
@@ -30,18 +30,18 @@ namespace IX.Observable
         private bool isDisposed;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ObservableCollectionBase"/> class.
+        /// Initializes a new instance of the <see cref="ObservableBase"/> class.
         /// </summary>
         /// <param name="context">The synchronization context to use, if any.</param>
-        protected ObservableCollectionBase(SynchronizationContext context)
+        protected ObservableBase(SynchronizationContext context)
         {
             this.syncContext = context;
         }
 
         /// <summary>
-        /// Finalizes an instance of the <see cref="ObservableCollectionBase"/> class.
+        /// Finalizes an instance of the <see cref="ObservableBase"/> class.
         /// </summary>
-        ~ObservableCollectionBase()
+        ~ObservableBase()
         {
             this.Dispose(false);
             this.isDisposed = true;

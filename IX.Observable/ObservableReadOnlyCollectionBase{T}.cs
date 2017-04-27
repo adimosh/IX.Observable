@@ -16,7 +16,7 @@ namespace IX.Observable
     /// <typeparam name="T">The type of the item.</typeparam>
     /// <seealso cref="global::System.ComponentModel.INotifyPropertyChanged" />
     /// <seealso cref="global::System.Collections.Generic.IEnumerable{T}" />
-    public abstract class ObservableReadOnlyCollectionBase<T> : ObservableCollectionBase, IReadOnlyCollection<T>, ICollection
+    public abstract class ObservableReadOnlyCollectionBase<T> : ObservableBase, IReadOnlyCollection<T>, ICollection
     {
         private CollectionAdapter<T> internalContainer;
         private object resetCountLocker;
