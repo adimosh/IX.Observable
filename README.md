@@ -83,6 +83,10 @@ Documentation is currently in progress.
 
 ## Contributing
 
+Contributing can be done by anyone, at any time and in any form, as long as the contributor
+has read the [contributing guidelines](https://adimosh.github.io/contributingguidelines)
+beforehand and tries their best to abide by them.
+
 ### Developer instructions
 
 The project builds in Visual Studio 2017 and uses some of the language enhancements VS2017 brought. The project structure also follows the .NET Core CSPROJ standard.
@@ -97,41 +101,6 @@ The project is and will be exclusive to the .NET Standard. For now, there is no 
 highest level of compatibility. Should any special build be required in the future, please point it out, as well as giving a reason/scenario in which things did not
 work out with the current targets. Such questions and comments are always welcome, since I cannot commit to developing on all available platforms and operating systems
 at the same time.
-
-### Direct code contributions
-
-This repository accepts direct code contributions in the form of issue-less pull requests.
-
-These contributions should be done through forking the repository and creating pull requests towards the main repository.
-
-### Preferred contribution procedure
-
-Preferred contribution procedure is to take an [up-for-grabs issue from GitHub](https://github.com/adimosh/IX.Observable/issues), create a fork of the code, and
-create a pull request with the changes.
-
-### Acceptance Guidelines
-
-Contribution will be accepted if:
-
-- They make sense (or, if their sense is not immediately noticeable, are explained through comments)
-- They don't break the build or unit tests
-- They are not changing the style and formatting of the code (especially pull requests that focus exclusively on such changes)
-- They pass the standards set by the StyleCop analyzer
-- They introduce an actual useable feature, or new unit tests
-- They don't introduced other dependencies, unless they are discussed first
-- They don't mess around with build/project/tool settings
-
-A few notes about unit test contributions:
-
-- Unit tests use the xunit.net framework - please do not use anything but that
-- Unit test contributions must not rely on magic numbers, unless it is a specific scenario for a magic number that you are testing; instead, please use randomness as much as possible
-
-A few notes about bugfixes:
-
-- Please do not submit bugfix pull requests unless you also explain the bug first
-- A bug fix should also have a unit test dedicated to it
-
-Also, contributions will be accepted if they highlight and fix typos in any part of this repository.
 
 ## Acknowledgements
 
