@@ -20,7 +20,7 @@ namespace IX.Observable
     public abstract class ObservableBase : INotifyPropertyChanged, INotifyCollectionChanged, IDisposable
     {
         /// <summary>
-        /// The synchronization context that should be used when posting messages. This field can be null.
+        /// The synchronization context that should be used when posting messages. This field can be <c>null</c> (<c>Nothing</c> in Visual Basic).
         /// </summary>
         private SynchronizationContext syncContext;
 

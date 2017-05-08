@@ -258,8 +258,14 @@ namespace IX.Observable
         /// </summary>
         /// <param name="undoRedoLevel">A level of undo, with contents.</param>
         /// <param name="toInvokeOutsideLock">An action to invoke outside of the lock.</param>
-        protected override void UndoInternally(UndoRedoLevel undoRedoLevel, out Action toInvokeOutsideLock)
+        /// <returns><c>true</c> if the undo was successful, <c>false</c> otherwise.</returns>
+        protected override bool UndoInternally(UndoRedoLevel undoRedoLevel, out Action toInvokeOutsideLock)
         {
+            if (base.UndoInternally(undoRedoLevel, out toInvokeOutsideLock))
+            {
+                return true;
+            }
+
             switch (undoRedoLevel)
             {
                 case AddUndoLevel<T> aul:
@@ -335,9 +341,11 @@ namespace IX.Observable
                     {
                         toInvokeOutsideLock = null;
 
-                        break;
+                        return false;
                     }
             }
+
+            return true;
         }
 
         /// <summary>
@@ -345,8 +353,14 @@ namespace IX.Observable
         /// </summary>
         /// <param name="undoRedoLevel">A level of undo, with contents.</param>
         /// <param name="toInvokeOutsideLock">An action to invoke outside of the lock.</param>
-        protected override void RedoInternally(UndoRedoLevel undoRedoLevel, out Action toInvokeOutsideLock)
+        /// <returns><c>true</c> if the redo was successful, <c>false</c> otherwise.</returns>
+        protected override bool RedoInternally(UndoRedoLevel undoRedoLevel, out Action toInvokeOutsideLock)
         {
+            if (base.RedoInternally(undoRedoLevel, out toInvokeOutsideLock))
+            {
+                return true;
+            }
+
             switch (undoRedoLevel)
             {
                 case AddUndoLevel<T> aul:
@@ -419,9 +433,11 @@ namespace IX.Observable
                     {
                         toInvokeOutsideLock = null;
 
-                        break;
+                        return false;
                     }
             }
+
+            return true;
         }
     }
 }

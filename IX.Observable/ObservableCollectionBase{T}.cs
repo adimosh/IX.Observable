@@ -9,6 +9,7 @@ using System.Threading;
 using IX.Observable.Adapters;
 using IX.Observable.SynchronizationLockers;
 using IX.Observable.UndoLevels;
+using IX.System.Collections.Generic;
 using IX.Undoable;
 
 namespace IX.Observable
@@ -24,8 +25,8 @@ namespace IX.Observable
     {
         private object resetCountLocker;
 
-        private IX.System.Collections.Generic.PushDownStack<UndoRedoLevel> undoStack;
-        private IX.System.Collections.Generic.PushDownStack<UndoRedoLevel> redoStack;
+        private PushDownStack<UndoRedoLevel> undoStack;
+        private PushDownStack<UndoRedoLevel> redoStack;
 
         private bool isCapturedIntoUndoContext;
         private IUndoableItem parentUndoableContext;
@@ -230,6 +231,7 @@ namespace IX.Observable
             }
 
             Action toInvoke;
+            bool internalResult;
             using (ReadWriteSynchronizationLocker locker = this.ReadWriteLock())
             {
                 if (this.undoStack.Count == 0)
@@ -240,11 +242,17 @@ namespace IX.Observable
                 locker.Upgrade();
 
                 UndoRedoLevel level = this.undoStack.Pop();
-                this.UndoInternally(level, out toInvoke);
-                this.redoStack.Push(level);
+                internalResult = this.UndoInternally(level, out toInvoke);
+                if (internalResult)
+                {
+                    this.redoStack.Push(level);
+                }
             }
 
-            toInvoke?.Invoke();
+            if (internalResult)
+            {
+                toInvoke?.Invoke();
+            }
 
             this.RaisePropertyChanged(nameof(this.CanUndo));
             this.RaisePropertyChanged(nameof(this.CanRedo));
@@ -267,6 +275,7 @@ namespace IX.Observable
             }
 
             Action toInvoke;
+            bool internalResult;
             using (ReadWriteSynchronizationLocker locker = this.ReadWriteLock())
             {
                 if (this.redoStack.Count == 0)
@@ -277,29 +286,173 @@ namespace IX.Observable
                 locker.Upgrade();
 
                 UndoRedoLevel level = this.redoStack.Pop();
-                this.RedoInternally(level, out toInvoke);
-                this.undoStack.Push(level);
+                internalResult = this.RedoInternally(level, out toInvoke);
+                if (internalResult)
+                {
+                    this.undoStack.Push(level);
+                }
             }
 
-            toInvoke?.Invoke();
+            if (internalResult)
+            {
+                toInvoke?.Invoke();
+            }
 
             this.RaisePropertyChanged(nameof(this.CanUndo));
             this.RaisePropertyChanged(nameof(this.CanRedo));
         });
 
         /// <summary>
+        /// Has the state changes received undone from the object.
+        /// </summary>
+        /// <param name="stateChanges">The state changes to redo.</param>
+        /// <exception cref="ItemNotCapturedIntoUndoContextException">There is no capturing context.</exception>
+        public void UndoStateChanges(StateChange[] stateChanges)
+        {
+            if (!this.isCapturedIntoUndoContext)
+            {
+                throw new ItemNotCapturedIntoUndoContextException();
+            }
+
+            foreach (StateChange sc in stateChanges)
+            {
+                switch (sc)
+                {
+                    case SubItemStateChange sisc:
+                        {
+                            if (sisc.SubObject is IUndoableItem iu)
+                            {
+                                iu.UndoStateChanges(sisc.StateChanges);
+                            }
+
+                            break;
+                        }
+
+                    case UndoLevelStateChange ulsc:
+                        {
+                            foreach (UndoRedoLevel level in ulsc.Levels)
+                            {
+                                Action act;
+                                bool internalResult;
+
+                                using (ReadWriteSynchronizationLocker locker = this.ReadWriteLock())
+                                {
+                                    internalResult = this.UndoInternally(level, out act);
+                                }
+
+                                if (internalResult)
+                                {
+                                    act?.Invoke();
+                                }
+                            }
+
+                            break;
+                        }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Has the state changes received redone into the object.
+        /// </summary>
+        /// <param name="stateChanges">The state changes to redo.</param>
+        /// <exception cref="ItemNotCapturedIntoUndoContextException">There is no capturing context.</exception>
+        public void RedoStateChanges(StateChange[] stateChanges)
+        {
+            if (!this.isCapturedIntoUndoContext)
+            {
+                throw new ItemNotCapturedIntoUndoContextException();
+            }
+
+            foreach (StateChange sc in stateChanges)
+            {
+                switch (sc)
+                {
+                    case SubItemStateChange sisc:
+                        {
+                            if (sisc.SubObject is IUndoableItem iu)
+                            {
+                                iu.RedoStateChanges(sisc.StateChanges);
+                            }
+
+                            break;
+                        }
+
+                    case UndoLevelStateChange ulsc:
+                        {
+                            foreach (UndoRedoLevel level in ulsc.Levels)
+                            {
+                                Action act;
+                                bool internalResult;
+
+                                using (ReadWriteSynchronizationLocker locker = this.ReadWriteLock())
+                                {
+                                    internalResult = this.RedoInternally(level, out act);
+                                }
+
+                                if (internalResult)
+                                {
+                                    act?.Invoke();
+                                }
+                            }
+
+                            break;
+                        }
+                }
+            }
+        }
+
+        /// <summary>
         /// Has the last operation undone.
         /// </summary>
         /// <param name="undoRedoLevel">A level of undo, with contents.</param>
         /// <param name="toInvokeOutsideLock">An action to invoke outside of the lock.</param>
-        protected abstract void UndoInternally(UndoRedoLevel undoRedoLevel, out Action toInvokeOutsideLock);
+        /// <returns><c>true</c> if the undo was successful, <c>false</c> otherwise.</returns>
+        protected virtual bool UndoInternally(UndoRedoLevel undoRedoLevel, out Action toInvokeOutsideLock)
+        {
+            if (undoRedoLevel is ItemChangeUndoLevel)
+            {
+                var lvl = undoRedoLevel as ItemChangeUndoLevel;
+
+                lvl.Instance.UndoStateChanges(lvl.StateChanges);
+
+                toInvokeOutsideLock = null;
+
+                return true;
+            }
+            else
+            {
+                toInvokeOutsideLock = null;
+
+                return false;
+            }
+        }
 
         /// <summary>
         /// Has the last undone operation redone.
         /// </summary>
         /// <param name="undoRedoLevel">A level of undo, with contents.</param>
         /// <param name="toInvokeOutsideLock">An action to invoke outside of the lock.</param>
-        protected abstract void RedoInternally(UndoRedoLevel undoRedoLevel, out Action toInvokeOutsideLock);
+        /// <returns><c>true</c> if the redo was successful, <c>false</c> otherwise.</returns>
+        protected virtual bool RedoInternally(UndoRedoLevel undoRedoLevel, out Action toInvokeOutsideLock)
+        {
+            if (undoRedoLevel is ItemChangeUndoLevel)
+            {
+                var lvl = undoRedoLevel as ItemChangeUndoLevel;
+
+                lvl.Instance.UndoStateChanges(lvl.StateChanges);
+
+                toInvokeOutsideLock = null;
+
+                return true;
+            }
+            else
+            {
+                toInvokeOutsideLock = null;
+
+                return false;
+            }
+        }
 
         /// <summary>
         /// Push an undo level into the stack.

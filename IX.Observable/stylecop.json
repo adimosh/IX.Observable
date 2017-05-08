@@ -3,18 +3,22 @@
   "settings": {
     "documentationRules": {
       "companyName": "Adrian Mos",
-      "copyrightText": "Copyright (c) {companyName} with all rights reserved. Part of the IX Framework.",
+      "copyrightText": "Copyright (c) {companyName} with all rights reserved.",
       "documentPrivateElements": false,
       "documentExposedElements": true,
       "documentInterfaces": true,
       "documentInternalElements": false,
-      "documentPrivateFields": false
+      "documentPrivateFields": false,
+    "xmlHeader": true
     },
     "orderingRules": {
       "systemUsingDirectivesFirst": true,
       "usingDirectivesPlacement": "outsideNamespace",
       "elementOrder": [ "kind", "constant", "readonly", "static", "accessibility" ]
     },
+  "maintainabilityRules": {
+    "topLevelTypes": [ "class", "struct", "interface" ]
+  },
     "namingRules": {
       "allowCommonHungarianPrefixes": false
     },
