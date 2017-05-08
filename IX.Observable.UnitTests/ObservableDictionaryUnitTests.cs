@@ -1,13 +1,19 @@
 ﻿// <copyright file="ObservableDictionaryUnitTests.cs" company="Adrian Mos">
-// Copyright (c) Adrian Mos with all rights reserved. Unit tests framework.
+// Copyright (c) Adrian Mos with all rights reserved.
 // </copyright>
 
 using Xunit;
 
 namespace IX.Observable.UnitTests
 {
+    /// <summary>
+    /// ObservableDictionary unit tests.
+    /// </summary>
     public class ObservableDictionaryUnitTests
     {
+        /// <summary>
+        /// Observables the dictionary count.
+        /// </summary>
         [Fact(DisplayName = "ObservableDictionary ctor, Indexer and Count")]
         public void ObservableDictionaryCount()
         {
@@ -45,6 +51,9 @@ namespace IX.Observable.UnitTests
             }
         }
 
+        /// <summary>
+        /// Observables the dictionary undo at add.
+        /// </summary>
         [Fact(DisplayName = "ObservableDictionary, Undo with Add")]
         public void ObservableDictionaryUndoAtAdd()
         {
@@ -55,7 +64,7 @@ namespace IX.Observable.UnitTests
                 [7] = 7,
                 [19] = 19,
                 [23] = 23,
-                [4] = 4
+                [4] = 4,
             };
 
             // ACT
@@ -69,6 +78,9 @@ namespace IX.Observable.UnitTests
             Assert.False(list.ContainsKey(6));
         }
 
+        /// <summary>
+        /// Observables the dictionary redo at add.
+        /// </summary>
         [Fact(DisplayName = "ObservableDictionary, Redo with undone Add")]
         public void ObservableDictionaryRedoAtAdd()
         {
@@ -79,7 +91,7 @@ namespace IX.Observable.UnitTests
                 [7] = 7,
                 [19] = 19,
                 [23] = 23,
-                [4] = 4
+                [4] = 4,
             };
 
             list.Add(6, 6);
@@ -94,6 +106,9 @@ namespace IX.Observable.UnitTests
             Assert.True(list.ContainsKey(6));
         }
 
+        /// <summary>
+        /// Observables the dictionary undo at clear.
+        /// </summary>
         [Fact(DisplayName = "ObservableDictionary, Undo with Clear")]
         public void ObservableDictionaryUndoAtClear()
         {
@@ -104,7 +119,7 @@ namespace IX.Observable.UnitTests
                 [7] = 7,
                 [19] = 19,
                 [23] = 23,
-                [4] = 4
+                [4] = 4,
             };
 
             list.Clear();
@@ -126,6 +141,9 @@ namespace IX.Observable.UnitTests
             Assert.True(list.ContainsKey(4));
         }
 
+        /// <summary>
+        /// Observables the dictionary redo at clear.
+        /// </summary>
         [Fact(DisplayName = "ObservableDictionary, Redo with undone Clear")]
         public void ObservableDictionaryRedoAtClear()
         {
@@ -136,7 +154,7 @@ namespace IX.Observable.UnitTests
                 [7] = 7,
                 [19] = 19,
                 [23] = 23,
-                [4] = 4
+                [4] = 4,
             };
 
             list.Clear();
@@ -160,6 +178,9 @@ namespace IX.Observable.UnitTests
             Assert.False(list.ContainsKey(4));
         }
 
+        /// <summary>
+        /// Observables the dictionary undo at remove.
+        /// </summary>
         [Fact(DisplayName = "ObservableDictionary, Undo with Remove")]
         public void ObservableDictionaryUndoAtRemove()
         {
@@ -170,7 +191,7 @@ namespace IX.Observable.UnitTests
                 [7] = 7,
                 [19] = 19,
                 [23] = 23,
-                [4] = 4
+                [4] = 4,
             };
 
             // ACT
@@ -184,6 +205,9 @@ namespace IX.Observable.UnitTests
             Assert.True(list.ContainsKey(7));
         }
 
+        /// <summary>
+        /// Observables the dictionary redo at remove.
+        /// </summary>
         [Fact(DisplayName = "ObservableDictionary, Redo with undone Remove")]
         public void ObservableDictionaryRedoAtRemove()
         {
@@ -194,7 +218,7 @@ namespace IX.Observable.UnitTests
                 [7] = 7,
                 [19] = 19,
                 [23] = 23,
-                [4] = 4
+                [4] = 4,
             };
 
             list.Remove(7);
@@ -209,6 +233,9 @@ namespace IX.Observable.UnitTests
             Assert.False(list.ContainsKey(7));
         }
 
+        /// <summary>
+        /// Observables the dictionary undo multiple operations.
+        /// </summary>
         [Fact(DisplayName = "ObservableDictionary, Undo with multiple operations")]
         public void ObservableDictionaryUndoMultipleOperations()
         {
@@ -219,7 +246,7 @@ namespace IX.Observable.UnitTests
                 [7] = 7,
                 [19] = 19,
                 [23] = 23,
-                [4] = 4
+                [4] = 4,
             };
 
             list.Add(18, 18);
@@ -229,7 +256,6 @@ namespace IX.Observable.UnitTests
             list.Add(7, 7);
 
             // Act & Assert groups
-
             Assert.True(list.Count == 1);
             Assert.True(list[7] == 7);
 
@@ -265,6 +291,9 @@ namespace IX.Observable.UnitTests
             Assert.True(list.Count == 0);
         }
 
+        /// <summary>
+        /// Observables the dictionary multiple undo operations.
+        /// </summary>
         [Fact(DisplayName = "ObservableDictionary, Undo with undo operations past the limit")]
         public void ObservableDictionaryMultipleUndoOperations()
         {
@@ -275,7 +304,7 @@ namespace IX.Observable.UnitTests
                 [7] = 7,
                 [19] = 19,
                 [23] = 23,
-                [4] = 4
+                [4] = 4,
             };
 
             list.HistoryLevels = 3;
@@ -301,6 +330,9 @@ namespace IX.Observable.UnitTests
             Assert.False(list.ContainsKey(3));
         }
 
+        /// <summary>
+        /// Observables the dictionary multiple redo cutoff.
+        /// </summary>
         [Fact(DisplayName = "ObservableDictionary, Redo cut-off")]
         public void ObservableDictionaryMultipleRedoCutoff()
         {
@@ -311,7 +343,7 @@ namespace IX.Observable.UnitTests
                 [7] = 7,
                 [19] = 19,
                 [23] = 23,
-                [4] = 4
+                [4] = 4,
             };
 
             list.Add(15, 15);

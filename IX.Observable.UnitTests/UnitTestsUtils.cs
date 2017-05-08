@@ -1,5 +1,5 @@
 ﻿// <copyright file="UnitTestsUtils.cs" company="Adrian Mos">
-// Copyright (c) Adrian Mos with all rights reserved. Unit tests framework.
+// Copyright (c) Adrian Mos with all rights reserved.
 // </copyright>
 
 using System;

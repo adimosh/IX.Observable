@@ -1,9 +1,19 @@
-﻿using Xunit;
+﻿// <copyright file="ObservableListUnitTests.cs" company="Adrian Mos">
+// Copyright (c) Adrian Mos with all rights reserved.
+// </copyright>
+
+using Xunit;
 
 namespace IX.Observable.UnitTests
 {
+    /// <summary>
+    /// ObservableList unit tests.
+    /// </summary>
     public class ObservableListUnitTests
     {
+        /// <summary>
+        /// Observables the list undo at add.
+        /// </summary>
         [Fact(DisplayName = "ObservableList, Undo with Add")]
         public void ObservableListUndoAtAdd()
         {
@@ -14,7 +24,7 @@ namespace IX.Observable.UnitTests
                 7,
                 19,
                 23,
-                4
+                4,
             };
 
             // ACT
@@ -28,6 +38,9 @@ namespace IX.Observable.UnitTests
             Assert.False(list.Contains(6));
         }
 
+        /// <summary>
+        /// Observables the list redo at add.
+        /// </summary>
         [Fact(DisplayName = "ObservableList, Redo with undone Add")]
         public void ObservableListRedoAtAdd()
         {
@@ -38,7 +51,7 @@ namespace IX.Observable.UnitTests
                 7,
                 19,
                 23,
-                4
+                4,
             };
 
             list.Add(6);
@@ -53,6 +66,9 @@ namespace IX.Observable.UnitTests
             Assert.True(list.Contains(6));
         }
 
+        /// <summary>
+        /// Observables the list undo at clear.
+        /// </summary>
         [Fact(DisplayName = "ObservableList, Undo with Clear")]
         public void ObservableListUndoAtClear()
         {
@@ -63,7 +79,7 @@ namespace IX.Observable.UnitTests
                 7,
                 19,
                 23,
-                4
+                4,
             };
 
             list.Clear();
@@ -85,6 +101,9 @@ namespace IX.Observable.UnitTests
             Assert.True(list.Contains(4));
         }
 
+        /// <summary>
+        /// Observables the list redo at clear.
+        /// </summary>
         [Fact(DisplayName = "ObservableList, Redo with undone Clear")]
         public void ObservableListRedoAtClear()
         {
@@ -95,7 +114,7 @@ namespace IX.Observable.UnitTests
                 7,
                 19,
                 23,
-                4
+                4,
             };
 
             list.Clear();
@@ -119,6 +138,9 @@ namespace IX.Observable.UnitTests
             Assert.False(list.Contains(4));
         }
 
+        /// <summary>
+        /// Observables the list undo at insert.
+        /// </summary>
         [Fact(DisplayName = "ObservableList, Undo with Insert")]
         public void ObservableListUndoAtInsert()
         {
@@ -129,7 +151,7 @@ namespace IX.Observable.UnitTests
                 7,
                 19,
                 23,
-                4
+                4,
             };
 
             // ACT
@@ -145,6 +167,9 @@ namespace IX.Observable.UnitTests
             Assert.True(list[2] == 19);
         }
 
+        /// <summary>
+        /// Observables the list redo at insert.
+        /// </summary>
         [Fact(DisplayName = "ObservableList, Redo with undone Insert")]
         public void ObservableListRedoAtInsert()
         {
@@ -155,7 +180,7 @@ namespace IX.Observable.UnitTests
                 7,
                 19,
                 23,
-                4
+                4,
             };
 
             list.Insert(2, 6);
@@ -171,6 +196,9 @@ namespace IX.Observable.UnitTests
             Assert.True(list[3] == 19);
         }
 
+        /// <summary>
+        /// Observables the list undo at remove at.
+        /// </summary>
         [Fact(DisplayName = "ObservableList, Undo with RemoveAt")]
         public void ObservableListUndoAtRemoveAt()
         {
@@ -181,7 +209,7 @@ namespace IX.Observable.UnitTests
                 7,
                 19,
                 23,
-                4
+                4,
             };
 
             // ACT
@@ -197,6 +225,9 @@ namespace IX.Observable.UnitTests
             Assert.True(list[3] == 23);
         }
 
+        /// <summary>
+        /// Observables the list redo at remove at.
+        /// </summary>
         [Fact(DisplayName = "ObservableList, Redo with undone RemoveAt")]
         public void ObservableListRedoAtRemoveAt()
         {
@@ -207,7 +238,7 @@ namespace IX.Observable.UnitTests
                 7,
                 19,
                 23,
-                4
+                4,
             };
 
             list.RemoveAt(2);
@@ -222,6 +253,9 @@ namespace IX.Observable.UnitTests
             Assert.True(list[2] == 23);
         }
 
+        /// <summary>
+        /// Observables the list undo multiple operations.
+        /// </summary>
         [Fact(DisplayName = "ObservableList, Undo with multiple operations")]
         public void ObservableListUndoMultipleOperations()
         {
@@ -232,7 +266,7 @@ namespace IX.Observable.UnitTests
                 7,
                 19,
                 23,
-                4
+                4,
             };
 
             list.Add(18);
@@ -242,7 +276,6 @@ namespace IX.Observable.UnitTests
             list.Add(7);
 
             // Act & Assert groups
-
             Assert.True(list.Count == 1);
             Assert.True(list[0] == 7);
 
@@ -278,6 +311,9 @@ namespace IX.Observable.UnitTests
             Assert.True(list.Count == 0);
         }
 
+        /// <summary>
+        /// Observables the list multiple undo operations.
+        /// </summary>
         [Fact(DisplayName = "ObservableList, Undo with undo operations past the limit")]
         public void ObservableListMultipleUndoOperations()
         {
@@ -288,7 +324,7 @@ namespace IX.Observable.UnitTests
                 7,
                 19,
                 23,
-                4
+                4,
             };
 
             list.HistoryLevels = 3;
@@ -314,6 +350,9 @@ namespace IX.Observable.UnitTests
             Assert.False(list.Contains(3));
         }
 
+        /// <summary>
+        /// Observables the list multiple redo cutoff.
+        /// </summary>
         [Fact(DisplayName = "ObservableList, Redo cut-off")]
         public void ObservableListMultipleRedoCutoff()
         {
@@ -324,7 +363,7 @@ namespace IX.Observable.UnitTests
                 7,
                 19,
                 23,
-                4
+                4,
             };
 
             list.Add(15);
