@@ -1,5 +1,5 @@
 ﻿// <copyright file="DictionaryChangeUndoLevel{TKey,TValue}.cs" company="Adrian Mos">
-// Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
+// Copyright (c) Adrian Mos with all rights reserved.
 // </copyright>
 
 namespace IX.Observable.UndoLevels

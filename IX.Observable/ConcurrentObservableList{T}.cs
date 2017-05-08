@@ -1,5 +1,5 @@
 ﻿// <copyright file="ConcurrentObservableList{T}.cs" company="Adrian Mos">
-// Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
+// Copyright (c) Adrian Mos with all rights reserved.
 // </copyright>
 
 using System.Collections.Generic;
