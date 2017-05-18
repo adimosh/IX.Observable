@@ -42,18 +42,21 @@ namespace IX.Observable
             this.InternalContainer = internalContainer;
             this.resetCountLocker = new object();
 
-            this.undoStack = new IX.System.Collections.Generic.PushDownStack<UndoRedoLevel>(Constants.StandardUndoRedoLevels);
-            this.redoStack = new IX.System.Collections.Generic.PushDownStack<UndoRedoLevel>(Constants.StandardUndoRedoLevels);
+            this.undoStack = new PushDownStack<UndoRedoLevel>(Constants.StandardUndoRedoLevels);
+            this.redoStack = new PushDownStack<UndoRedoLevel>(Constants.StandardUndoRedoLevels);
         }
 
         /// <summary>
         /// Gets or sets the number of levels to keep undo or redo information.
         /// </summary>
         /// <value>The history levels.</value>
-        /// <remarks><para>If this value is set, for example, to 7, then the implementing object should allow the <see cref="M:IX.Undoable.IUndoableItem.Undo" /> method
+        /// <remarks>
+        /// <para>If this value is set, for example, to 7, then the implementing object should allow the <see cref="M:IX.Undoable.IUndoableItem.Undo" /> method
         /// to be called 7 times to change the state of the object. Upon calling it an 8th time, there should be no change in the
         /// state of the object.</para>
-        /// <para>Any call beyond the limit imposed here should not fail, but it should also not change the state of the object.</para></remarks>
+        /// <para>Any call beyond the limit imposed here should not fail, but it should also not change the state of the object.</para>
+        /// <para>This member is not serialized, as it interferes with the undo/redo context, which cannot itself be serialized.</para>
+        /// </remarks>
         public int HistoryLevels
         {
             get => this.undoStack.Limit;
@@ -93,6 +96,11 @@ namespace IX.Observable
         /// Gets the parent undo context, if any.
         /// </summary>
         /// <value>The parent undo context.</value>
+        /// <remarks>
+        /// <para>This member is not serialized, as it represents the undo/redo context, which cannot itself be serialized.</para>
+        /// <para>The concept of the undo/redo context is incompatible with serialization. Any collection that is serialized will be free of any original context
+        /// when deserialized.</para>
+        /// </remarks>
         protected IUndoableItem ParentUndoContext { get => this.parentUndoableContext; }
 
         /// <summary>

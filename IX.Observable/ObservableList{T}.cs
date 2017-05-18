@@ -3,6 +3,7 @@
 // </copyright>
 
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using System.Threading;
 using IX.Observable.Adapters;
 
@@ -13,6 +14,7 @@ namespace IX.Observable
     /// </summary>
     /// <typeparam name="T">The type of item in the list.</typeparam>
     /// <seealso cref="IX.Observable.ObservableListBase{T}" />
+    [CollectionDataContract(Name = "Observable{0}List")]
     public class ObservableList<T> : ObservableListBase<T>
     {
         /// <summary>
