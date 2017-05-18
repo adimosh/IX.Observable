@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Runtime.Serialization;
 using System.Threading;
 using IX.Observable.Adapters;
 using IX.Observable.DebugAide;
@@ -17,8 +18,9 @@ namespace IX.Observable
     /// A stack that broadcasts its changes.
     /// </summary>
     /// <typeparam name="T">The type of elements in the stack.</typeparam>
-    [DebuggerDisplay("Stack count = {Count}")]
+    [DebuggerDisplay("ObservableStack, Count = {Count}")]
     [DebuggerTypeProxy(typeof(StackDebugView<>))]
+    [CollectionDataContract(Namespace = Constants.DataContractNamespace, Name = "Observable{0}Stack", ItemName = "Item")]
     public class ObservableStack<T> : ObservableCollectionBase<T>, IStack<T>
     {
         /// <summary>

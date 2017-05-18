@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Threading;
 using IX.Observable.Adapters;
 using IX.Observable.DebugAide;
@@ -18,8 +19,9 @@ namespace IX.Observable
     /// A queue that broadcasts its changes.
     /// </summary>
     /// <typeparam name="T">The type of items in the queue.</typeparam>
-    [DebuggerDisplay("Count = {Count}")]
+    [DebuggerDisplay("ObservableQueue, Count = {Count}")]
     [DebuggerTypeProxy(typeof(QueueDebugView<>))]
+    [CollectionDataContract(Namespace = Constants.DataContractNamespace, Name = "Observable{0}Queue", ItemName = "Item")]
     public class ObservableQueue<T> : ObservableCollectionBase<T>, IQueue<T>
     {
         /// <summary>

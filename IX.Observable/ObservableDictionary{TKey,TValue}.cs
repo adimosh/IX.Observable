@@ -18,9 +18,9 @@ namespace IX.Observable
     /// </summary>
     /// <typeparam name="TKey">The data key type.</typeparam>
     /// <typeparam name="TValue">The data value type.</typeparam>
-    [DebuggerDisplay("Count = {Count}")]
+    [DebuggerDisplay("ObservableDictionary, Count = {Count}")]
     [DebuggerTypeProxy(typeof(DictionaryDebugView<,>))]
-    [CollectionDataContract(Name = "Observable{1}DictionaryBy{0}", ItemName = "Entry", KeyName = "Key", ValueName = "Value")]
+    [CollectionDataContract(Namespace = Constants.DataContractNamespace, Name = "Observable{1}DictionaryBy{0}", ItemName = "Entry", KeyName = "Key", ValueName = "Value")]
     public class ObservableDictionary<TKey, TValue> : ObservableCollectionBase<KeyValuePair<TKey, TValue>>, IDictionary<TKey, TValue>, IReadOnlyDictionary<TKey, TValue>
     {
         /// <summary>

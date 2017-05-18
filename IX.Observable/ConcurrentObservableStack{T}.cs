@@ -4,6 +4,7 @@
 
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Runtime.Serialization;
 using System.Threading;
 using IX.Observable.DebugAide;
 
@@ -13,8 +14,9 @@ namespace IX.Observable
     /// A thread-safe stack that broadcasts its changes.
     /// </summary>
     /// <typeparam name="T">The type of elements in the stack.</typeparam>
-    [DebuggerDisplay("Count = {Count}")]
+    [DebuggerDisplay("ConcurrentObserableStack, Count = {Count}")]
     [DebuggerTypeProxy(typeof(StackDebugView<>))]
+    [CollectionDataContract(Namespace = Constants.DataContractNamespace, Name = "Observable{0}Stack", ItemName = "Item")]
     public class ConcurrentObservableStack<T> : ObservableStack<T>
     {
         private ReaderWriterLockSlim locker;

@@ -18,7 +18,7 @@ namespace IX.Observable
     /// <seealso cref="IX.Observable.ObservableListBase{T}" />
     [DebuggerDisplay("ObservableList, Count = {Count}")]
     [DebuggerTypeProxy(typeof(CollectionDebugView<>))]
-    [CollectionDataContract(Name = "Observable{0}List", ItemName = "Item")]
+    [CollectionDataContract(Namespace = Constants.DataContractNamespace, Name = "Observable{0}List", ItemName = "Item")]
     public class ObservableList<T> : ObservableListBase<T>
     {
         /// <summary>
