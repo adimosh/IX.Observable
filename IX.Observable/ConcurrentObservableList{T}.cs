@@ -17,7 +17,7 @@ namespace IX.Observable
     /// <seealso cref="IX.Observable.ObservableList{T}" />
     [DebuggerDisplay("ObservableList, Count = {Count}")]
     [DebuggerTypeProxy(typeof(CollectionDebugView<>))]
-    [CollectionDataContract(Name = "Observable{0}List")]
+    [CollectionDataContract(Name = "Observable{0}List", ItemName = "Item")]
     public class ConcurrentObservableList<T> : ObservableList<T>
     {
         private ReaderWriterLockSlim locker;

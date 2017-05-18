@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Runtime.Serialization;
 using System.Threading;
 using IX.Observable.Adapters;
 using IX.Observable.DebugAide;
@@ -19,6 +20,7 @@ namespace IX.Observable
     /// <typeparam name="TValue">The data value type.</typeparam>
     [DebuggerDisplay("Count = {Count}")]
     [DebuggerTypeProxy(typeof(DictionaryDebugView<,>))]
+    [CollectionDataContract(Name = "Observable{1}DictionaryBy{0}", ItemName = "Entry", KeyName = "Key", ValueName = "Value")]
     public class ObservableDictionary<TKey, TValue> : ObservableCollectionBase<KeyValuePair<TKey, TValue>>, IDictionary<TKey, TValue>, IReadOnlyDictionary<TKey, TValue>
     {
         /// <summary>

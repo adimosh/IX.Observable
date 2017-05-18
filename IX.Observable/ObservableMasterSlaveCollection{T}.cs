@@ -24,8 +24,8 @@ namespace IX.Observable
     /// <seealso cref="global::System.Collections.Generic.ICollection{T}" />
     /// <seealso cref="ICollection" />
     /// <seealso cref="IList" />
-    /// <seealso cref="IX.Observable.ObservableCollectionBase{TItem}" />
-    [DebuggerDisplay("Count = {Count}")]
+    /// <seealso cref="Observable.ObservableCollectionBase{TItem}" />
+    [DebuggerDisplay("ObservableMasterSlaveCollection, Count = {Count}")]
     [DebuggerTypeProxy(typeof(CollectionDebugView<>))]
     public class ObservableMasterSlaveCollection<T> : ObservableListBase<T>, IList<T>, IReadOnlyCollection<T>, ICollection<T>, ICollection, IList
     {
