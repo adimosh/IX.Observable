@@ -14,7 +14,10 @@ namespace IX.Observable
     /// A thread-safe stack that broadcasts its changes.
     /// </summary>
     /// <typeparam name="T">The type of elements in the stack.</typeparam>
-    [DebuggerDisplay("ConcurrentObserableStack, Count = {Count}")]
+    /// <remarks>
+    /// <para>This class is not serializable. In order to serialize / deserialize content, please use the copying methods and serialize the result.</para>
+    /// </remarks>
+    [DebuggerDisplay("ConcurrentObservableStack, Count = {Count}")]
     [DebuggerTypeProxy(typeof(StackDebugView<>))]
     [CollectionDataContract(Namespace = Constants.DataContractNamespace, Name = "Observable{0}Stack", ItemName = "Item")]
     public class ConcurrentObservableStack<T> : ObservableStack<T>

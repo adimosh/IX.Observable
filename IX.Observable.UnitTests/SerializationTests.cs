@@ -3,6 +3,7 @@
 // </copyright>
 
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Text;
@@ -303,144 +304,6 @@ namespace IX.Observable.UnitTests
         /// <summary>
         /// Observables the list serialization test.
         /// </summary>
-        [Fact(DisplayName = "ObservableStack serialization")]
-        public void ObservableStackSerializationTest()
-        {
-            // ARRANGE
-            // =======
-
-            // A random generator (we'll test random values to avoid hard-codings)
-            var r = new Random();
-
-            // The data contract serializer we'll use to serialize and deserialize
-            var dcs = new DataContractSerializer(typeof(ObservableStack<DummyDataContract>));
-
-            // The dummy data
-            var ddc1 = new DummyDataContract { RandomValue = r.Next() };
-            var ddc2 = new DummyDataContract { RandomValue = r.Next() };
-            var ddc3 = new DummyDataContract { RandomValue = r.Next() };
-            var ddc4 = new DummyDataContract { RandomValue = r.Next() };
-
-            // The original observable list
-            var l1 = new ObservableStack<DummyDataContract>
-            {
-                ddc1,
-                ddc2,
-                ddc3,
-                ddc4,
-            };
-
-            // The deserialized list
-            ObservableStack<DummyDataContract> l2;
-
-            // The serialization content
-            string content;
-
-            // ACT
-            // ===
-            using (var ms = new MemoryStream())
-            {
-                dcs.WriteObject(ms, l1);
-
-                ms.Seek(0, SeekOrigin.Begin);
-
-                using (var textReader = new StreamReader(ms, Encoding.UTF8, false, 32768, true))
-                {
-                    content = textReader.ReadToEnd();
-                }
-
-                ms.Seek(0, SeekOrigin.Begin);
-
-                l2 = dcs.ReadObject(ms) as ObservableStack<DummyDataContract>;
-            }
-
-            // ASSERT
-            // ======
-
-            // Serialization content is OK
-            Assert.False(string.IsNullOrWhiteSpace(content));
-            Assert.Equal(
-                $@"<ObservableDDCStack xmlns=""{Constants.DataContractNamespace}"" xmlns:i=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:a=""http://schemas.datacontract.org/2004/07/IX.Observable.UnitTests""><Item><a:RandomValue>{ddc1.RandomValue}</a:RandomValue></Item><Item><a:RandomValue>{ddc2.RandomValue}</a:RandomValue></Item><Item><a:RandomValue>{ddc3.RandomValue}</a:RandomValue></Item><Item><a:RandomValue>{ddc4.RandomValue}</a:RandomValue></Item></ObservableDDCStack>",
-                content);
-
-            // Deserialized object is OK
-            Assert.NotNull(l2);
-            Assert.Equal(l1.Count, l2.Count);
-            Assert.True(l1.SequenceEquals(l2));
-        }
-
-        /// <summary>
-        /// Observables the list serialization test.
-        /// </summary>
-        [Fact(DisplayName = "ConcurrentObservableStack serialization")]
-        public void ConcurrentObservableStackSerializationTest()
-        {
-            // ARRANGE
-            // =======
-
-            // A random generator (we'll test random values to avoid hard-codings)
-            var r = new Random();
-
-            // The data contract serializer we'll use to serialize and deserialize
-            var dcs = new DataContractSerializer(typeof(ConcurrentObservableStack<DummyDataContract>));
-
-            // The dummy data
-            var ddc1 = new DummyDataContract { RandomValue = r.Next() };
-            var ddc2 = new DummyDataContract { RandomValue = r.Next() };
-            var ddc3 = new DummyDataContract { RandomValue = r.Next() };
-            var ddc4 = new DummyDataContract { RandomValue = r.Next() };
-
-            // The original observable list
-            var l1 = new ConcurrentObservableStack<DummyDataContract>
-            {
-                ddc1,
-                ddc2,
-                ddc3,
-                ddc4,
-            };
-
-            // The deserialized list
-            ConcurrentObservableStack<DummyDataContract> l2;
-
-            // The serialization content
-            string content;
-
-            // ACT
-            // ===
-            using (var ms = new MemoryStream())
-            {
-                dcs.WriteObject(ms, l1);
-
-                ms.Seek(0, SeekOrigin.Begin);
-
-                using (var textReader = new StreamReader(ms, Encoding.UTF8, false, 32768, true))
-                {
-                    content = textReader.ReadToEnd();
-                }
-
-                ms.Seek(0, SeekOrigin.Begin);
-
-                l2 = dcs.ReadObject(ms) as ConcurrentObservableStack<DummyDataContract>;
-            }
-
-            // ASSERT
-            // ======
-
-            // Serialization content is OK
-            Assert.False(string.IsNullOrWhiteSpace(content));
-            Assert.Equal(
-                $@"<ObservableDDCStack xmlns=""{Constants.DataContractNamespace}"" xmlns:i=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:a=""http://schemas.datacontract.org/2004/07/IX.Observable.UnitTests""><Item><a:RandomValue>{ddc1.RandomValue}</a:RandomValue></Item><Item><a:RandomValue>{ddc2.RandomValue}</a:RandomValue></Item><Item><a:RandomValue>{ddc3.RandomValue}</a:RandomValue></Item><Item><a:RandomValue>{ddc4.RandomValue}</a:RandomValue></Item></ObservableDDCStack>",
-                content);
-
-            // Deserialized object is OK
-            Assert.NotNull(l2);
-            Assert.Equal(l1.Count, l2.Count);
-            Assert.True(l1.SequenceEquals(l2));
-        }
-
-        /// <summary>
-        /// Observables the list serialization test.
-        /// </summary>
         [Fact(DisplayName = "ObservableQueue serialization")]
         public void ObservableQueueSerializationTest()
         {
@@ -580,6 +443,7 @@ namespace IX.Observable.UnitTests
         /// Class DummyDataContract.
         /// </summary>
         /// <seealso cref="System.IEquatable{DummyDataContract}" />
+        [DebuggerDisplay("DDC {RandomValue}")]
         [DataContract(Name = "DDC")]
         private class DummyDataContract : IEquatable<DummyDataContract>
         {
