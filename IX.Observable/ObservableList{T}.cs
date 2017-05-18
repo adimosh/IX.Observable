@@ -3,9 +3,11 @@
 // </copyright>
 
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Runtime.Serialization;
 using System.Threading;
 using IX.Observable.Adapters;
+using IX.Observable.DebugAide;
 
 namespace IX.Observable
 {
@@ -14,6 +16,8 @@ namespace IX.Observable
     /// </summary>
     /// <typeparam name="T">The type of item in the list.</typeparam>
     /// <seealso cref="IX.Observable.ObservableListBase{T}" />
+    [DebuggerDisplay("ObservableList, Count = {Count}")]
+    [DebuggerTypeProxy(typeof(CollectionDebugView<>))]
     [CollectionDataContract(Name = "Observable{0}List")]
     public class ObservableList<T> : ObservableListBase<T>
     {

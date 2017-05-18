@@ -22,8 +22,8 @@ namespace IX.Observable
     /// <seealso cref="global::System.Collections.Generic.IList{T}" />
     /// <seealso cref="global::System.Collections.Generic.IReadOnlyCollection{T}" />
     /// <seealso cref="global::System.Collections.Generic.ICollection{T}" />
-    /// <seealso cref="global::System.Collections.ICollection" />
-    /// <seealso cref="global::System.Collections.IList" />
+    /// <seealso cref="ICollection" />
+    /// <seealso cref="IList" />
     /// <seealso cref="IX.Observable.ObservableCollectionBase{TItem}" />
     [DebuggerDisplay("Count = {Count}")]
     [DebuggerTypeProxy(typeof(CollectionDebugView<>))]

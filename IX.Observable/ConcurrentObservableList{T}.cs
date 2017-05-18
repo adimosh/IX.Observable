@@ -3,7 +3,10 @@
 // </copyright>
 
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Runtime.Serialization;
 using System.Threading;
+using IX.Observable.DebugAide;
 
 namespace IX.Observable
 {
@@ -12,6 +15,9 @@ namespace IX.Observable
     /// </summary>
     /// <typeparam name="T">The type of the items in the list.</typeparam>
     /// <seealso cref="IX.Observable.ObservableList{T}" />
+    [DebuggerDisplay("ObservableList, Count = {Count}")]
+    [DebuggerTypeProxy(typeof(CollectionDebugView<>))]
+    [CollectionDataContract(Name = "Observable{0}List")]
     public class ConcurrentObservableList<T> : ObservableList<T>
     {
         private ReaderWriterLockSlim locker;
