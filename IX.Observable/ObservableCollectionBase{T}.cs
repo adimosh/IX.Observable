@@ -35,6 +35,20 @@ namespace IX.Observable
         /// Initializes a new instance of the <see cref="ObservableCollectionBase{T}"/> class.
         /// </summary>
         /// <param name="internalContainer">The internal container of items.</param>
+        protected ObservableCollectionBase(CollectionAdapter<T> internalContainer)
+            : base(internalContainer)
+        {
+            this.InternalContainer = internalContainer;
+            this.resetCountLocker = new object();
+
+            this.undoStack = new PushDownStack<UndoRedoLevel>(Constants.StandardUndoRedoLevels);
+            this.redoStack = new PushDownStack<UndoRedoLevel>(Constants.StandardUndoRedoLevels);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ObservableCollectionBase{T}"/> class.
+        /// </summary>
+        /// <param name="internalContainer">The internal container of items.</param>
         /// <param name="context">The synchronization context to use, if any.</param>
         protected ObservableCollectionBase(CollectionAdapter<T> internalContainer, SynchronizationContext context)
             : base(internalContainer, context)

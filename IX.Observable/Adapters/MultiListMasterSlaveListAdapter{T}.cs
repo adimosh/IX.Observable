@@ -217,7 +217,22 @@ namespace IX.Observable.Adapters
         internal void SetMaster<TList>(TList masterList)
             where TList : class, IList<T>, INotifyCollectionChanged
         {
-            this.master = masterList ?? throw new ArgumentNullException(nameof(masterList));
+            TList newMaster = masterList ?? throw new ArgumentNullException(nameof(masterList));
+            IList<T> oldMaster = this.master;
+
+            if (oldMaster != null)
+            {
+                try
+                {
+                    ((INotifyCollectionChanged)oldMaster).CollectionChanged -= this.List_CollectionChanged;
+                }
+                catch
+                {
+                    // We need to do nothing here. Inability to remove the event delegate reference is of no consequence.
+                }
+            }
+
+            this.master = newMaster;
             masterList.CollectionChanged += this.List_CollectionChanged;
         }
 
@@ -237,6 +252,7 @@ namespace IX.Observable.Adapters
             }
             catch
             {
+                // We need to do nothing here. Inability to remove the event delegate reference is of no consequence.
             }
 
             this.slaves.Remove(slaveList ?? throw new ArgumentNullException(nameof(slaveList)));

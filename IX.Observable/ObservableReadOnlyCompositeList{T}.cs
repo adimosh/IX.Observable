@@ -23,7 +23,7 @@ namespace IX.Observable
         /// Initializes a new instance of the <see cref="ObservableReadOnlyCompositeList{T}"/> class.
         /// </summary>
         public ObservableReadOnlyCompositeList()
-            : base(new MultiListListAdapter<T>(), null)
+            : base(new MultiListListAdapter<T>())
         {
             this.locker = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
         }

@@ -26,6 +26,19 @@ namespace IX.Observable
         /// Initializes a new instance of the <see cref="ObservableReadOnlyCollectionBase{T}"/> class.
         /// </summary>
         /// <param name="internalContainer">The internal container of items.</param>
+        protected ObservableReadOnlyCollectionBase(CollectionAdapter<T> internalContainer)
+            : base()
+        {
+            this.InternalContainer = internalContainer;
+            this.resetCountLocker = new object();
+
+            this.syncRoot = new object();
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ObservableReadOnlyCollectionBase{T}"/> class.
+        /// </summary>
+        /// <param name="internalContainer">The internal container of items.</param>
         /// <param name="context">The synchronization context to use, if any.</param>
         protected ObservableReadOnlyCollectionBase(CollectionAdapter<T> internalContainer, SynchronizationContext context)
             : base(context)

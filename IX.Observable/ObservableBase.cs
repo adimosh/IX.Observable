@@ -20,11 +20,6 @@ namespace IX.Observable
     public abstract class ObservableBase : INotifyPropertyChanged, INotifyCollectionChanged, IDisposable
     {
         /// <summary>
-        /// The synchronization context that should be used when posting messages. This field can be <c>null</c> (<c>Nothing</c> in Visual Basic).
-        /// </summary>
-        private SynchronizationContext syncContext;
-
-        /// <summary>
         /// Indicates whether this instance is disposed.
         /// </summary>
         private bool isDisposed;
@@ -32,10 +27,18 @@ namespace IX.Observable
         /// <summary>
         /// Initializes a new instance of the <see cref="ObservableBase"/> class.
         /// </summary>
+        protected ObservableBase()
+        {
+            this.SynchronizationContext = SynchronizationContext.Current;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ObservableBase"/> class.
+        /// </summary>
         /// <param name="context">The synchronization context to use, if any.</param>
         protected ObservableBase(SynchronizationContext context)
         {
-            this.syncContext = context;
+            this.SynchronizationContext = context;
         }
 
         /// <summary>
@@ -61,6 +64,15 @@ namespace IX.Observable
         /// Triggered when an exception has occurred during a <see cref="CollectionChanged"/> or <see cref="PropertyChanged"/> event invocation.
         /// </summary>
         public event EventHandler<ExceptionOccurredEventArgs> ExceptionOccurredWhileNotifying;
+
+        /// <summary>
+        /// Gets or sets the synchronization context that should be used when posting messages. This field can be <c>null</c> (<c>Nothing</c> in Visual Basic).
+        /// </summary>
+        /// <value>The synchronization context.</value>
+        /// <remarks>
+        /// <para>Please be careful when setting this property, as setting a wrong synchronization context can have unpredictable effects in UI threads.</para>
+        /// </remarks>
+        public SynchronizationContext SynchronizationContext { get; set; }
 
         /// <summary>
         /// Gets a synchronization lock item to be used when trying to synchronize read/write operations between threads.
@@ -91,6 +103,7 @@ namespace IX.Observable
         /// In a child class, triggers a property changed event.
         /// </summary>
         /// <param name="propertyName">The name of the property.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="propertyName"/> is <c>null</c> (<c>Nothing</c> in Visual Basic).</exception>
         protected void RaisePropertyChanged(string propertyName)
         {
             if (string.IsNullOrWhiteSpace(propertyName))
@@ -242,13 +255,13 @@ namespace IX.Observable
         /// <param name="stateTransport">The object used to do state transportation.</param>
         protected void AsyncPost<T>(Action<T> postAction, T stateTransport)
         {
-            if (this.syncContext == null)
+            if (this.SynchronizationContext == null)
             {
                 Task.Run(() => postAction(stateTransport)).ConfigureAwait(false);
             }
             else
             {
-                this.syncContext.Post(
+                this.SynchronizationContext.Post(
                     (state) =>
                 {
                     var st = (T)state;
@@ -263,13 +276,13 @@ namespace IX.Observable
         /// <param name="postAction">The action to post.</param>
         protected void AsyncPost(Action postAction)
         {
-            if (this.syncContext == null)
+            if (this.SynchronizationContext == null)
             {
                 Task.Run(postAction);
             }
             else
             {
-                this.syncContext.Post(
+                this.SynchronizationContext.Post(
                     (state) =>
                 {
                     postAction();
@@ -334,8 +347,9 @@ namespace IX.Observable
         protected ReadWriteSynchronizationLocker ReadWriteLock() => new ReadWriteSynchronizationLocker(this.SynchronizationLock);
 
         /// <summary>
-        /// Checks whether or not this object is disposed and throws an <see cref="ObjectDisposedException"/>.
+        /// Checks whether or not this object is disposed and throws an <see cref="ObjectDisposedException" />.
         /// </summary>
+        /// <exception cref="ObjectDisposedException">This instance is disposed.</exception>
         protected void CheckDisposed()
         {
             if (this.isDisposed)
@@ -345,9 +359,10 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Checks whether or not this object is disposed and throws an <see cref="ObjectDisposedException"/>, and, if not, invokes an action.
+        /// Checks whether or not this object is disposed and throws an <see cref="ObjectDisposedException" />, and, if not, invokes an action.
         /// </summary>
         /// <param name="action">The action to invoke.</param>
+        /// <exception cref="ObjectDisposedException">This instance is disposed.</exception>
         protected void CheckDisposed(Action action)
         {
             if (this.isDisposed)
@@ -359,11 +374,12 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Checks whether or not this object is disposed and throws an <see cref="ObjectDisposedException"/>, and, if not, invokes an action and returns its result.
+        /// Checks whether or not this object is disposed and throws an <see cref="ObjectDisposedException" />, and, if not, invokes an action and returns its result.
         /// </summary>
-        /// <param name="action">The action to invoke.</param>
         /// <typeparam name="T">The return type of the action.</typeparam>
+        /// <param name="action">The action to invoke.</param>
         /// <returns>The result from the action.</returns>
+        /// <exception cref="ObjectDisposedException">This instance is disposed.</exception>
         protected T CheckDisposed<T>(Func<T> action)
         {
             if (this.isDisposed)

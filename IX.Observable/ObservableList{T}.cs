@@ -25,7 +25,7 @@ namespace IX.Observable
         /// Initializes a new instance of the <see cref="ObservableList{T}"/> class.
         /// </summary>
         public ObservableList()
-            : this((SynchronizationContext)null)
+            : base(new ListListAdapter<T>())
         {
         }
 
@@ -34,7 +34,7 @@ namespace IX.Observable
         /// </summary>
         /// <param name="source">The source.</param>
         public ObservableList(IEnumerable<T> source)
-            : this(source, null)
+            : base(new ListListAdapter<T>(source))
         {
         }
 

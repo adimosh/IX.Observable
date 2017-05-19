@@ -33,7 +33,7 @@ namespace IX.Observable
         /// Initializes a new instance of the <see cref="ObservableMasterSlaveCollection{T}"/> class.
         /// </summary>
         public ObservableMasterSlaveCollection()
-            : base(new MultiListMasterSlaveListAdapter<T>(), null)
+            : base(new MultiListMasterSlaveListAdapter<T>())
         {
         }
 

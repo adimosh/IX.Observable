@@ -27,7 +27,7 @@ namespace IX.Observable
         /// Initializes a new instance of the <see cref="ObservableDictionary{TKey, TValue}" /> class.
         /// </summary>
         public ObservableDictionary()
-            : base(new DictionaryCollectionAdapter<TKey, TValue>(), null)
+            : base(new DictionaryCollectionAdapter<TKey, TValue>())
         {
         }
 
@@ -36,7 +36,7 @@ namespace IX.Observable
         /// </summary>
         /// <param name="capacity">The initial capacity of the dictionary.</param>
         public ObservableDictionary(int capacity)
-            : base(new DictionaryCollectionAdapter<TKey, TValue>(new Dictionary<TKey, TValue>(capacity)), null)
+            : base(new DictionaryCollectionAdapter<TKey, TValue>(new Dictionary<TKey, TValue>(capacity)))
         {
         }
 
@@ -45,7 +45,7 @@ namespace IX.Observable
         /// </summary>
         /// <param name="equalityComparer">A comparer object to use for equality comparison.</param>
         public ObservableDictionary(IEqualityComparer<TKey> equalityComparer)
-            : base(new DictionaryCollectionAdapter<TKey, TValue>(new Dictionary<TKey, TValue>(equalityComparer)), null)
+            : base(new DictionaryCollectionAdapter<TKey, TValue>(new Dictionary<TKey, TValue>(equalityComparer)))
         {
         }
 
@@ -55,7 +55,7 @@ namespace IX.Observable
         /// <param name="capacity">The initial capacity of the dictionary.</param>
         /// <param name="equalityComparer">A comparer object to use for equality comparison.</param>
         public ObservableDictionary(int capacity, IEqualityComparer<TKey> equalityComparer)
-            : base(new DictionaryCollectionAdapter<TKey, TValue>(new Dictionary<TKey, TValue>(capacity, equalityComparer)), null)
+            : base(new DictionaryCollectionAdapter<TKey, TValue>(new Dictionary<TKey, TValue>(capacity, equalityComparer)))
         {
         }
 
@@ -64,7 +64,7 @@ namespace IX.Observable
         /// </summary>
         /// <param name="dictionary">A dictionary of items to copy from.</param>
         public ObservableDictionary(IDictionary<TKey, TValue> dictionary)
-            : base(new DictionaryCollectionAdapter<TKey, TValue>(new Dictionary<TKey, TValue>(dictionary)), null)
+            : base(new DictionaryCollectionAdapter<TKey, TValue>(new Dictionary<TKey, TValue>(dictionary)))
         {
         }
 
@@ -74,7 +74,7 @@ namespace IX.Observable
         /// <param name="dictionary">A dictionary of items to copy from.</param>
         /// <param name="comparer">A comparer object to use for equality comparison.</param>
         public ObservableDictionary(IDictionary<TKey, TValue> dictionary, IEqualityComparer<TKey> comparer)
-            : base(new DictionaryCollectionAdapter<TKey, TValue>(new Dictionary<TKey, TValue>(dictionary, comparer)), null)
+            : base(new DictionaryCollectionAdapter<TKey, TValue>(new Dictionary<TKey, TValue>(dictionary, comparer)))
         {
         }
 

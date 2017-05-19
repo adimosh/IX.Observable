@@ -28,7 +28,7 @@ namespace IX.Observable
         /// Initializes a new instance of the <see cref="ObservableQueue{T}"/> class.
         /// </summary>
         public ObservableQueue()
-            : base(new QueueCollectionAdapter<T>(new System.Collections.Generic.Queue<T>()), null)
+            : base(new QueueCollectionAdapter<T>(new System.Collections.Generic.Queue<T>()))
         {
         }
 
@@ -37,7 +37,7 @@ namespace IX.Observable
         /// </summary>
         /// <param name="collection">A collection of items to copy from.</param>
         public ObservableQueue(IEnumerable<T> collection)
-            : base(new QueueCollectionAdapter<T>(new System.Collections.Generic.Queue<T>(collection)), null)
+            : base(new QueueCollectionAdapter<T>(new System.Collections.Generic.Queue<T>(collection)))
         {
         }
 
@@ -46,7 +46,7 @@ namespace IX.Observable
         /// </summary>
         /// <param name="capacity">The initial capacity of the queue.</param>
         public ObservableQueue(int capacity)
-            : base(new QueueCollectionAdapter<T>(new System.Collections.Generic.Queue<T>(capacity)), null)
+            : base(new QueueCollectionAdapter<T>(new System.Collections.Generic.Queue<T>(capacity)))
         {
         }
 

@@ -26,6 +26,15 @@ namespace IX.Observable
         /// Initializes a new instance of the <see cref="ObservableListBase{T}"/> class.
         /// </summary>
         /// <param name="internalContainer">The internal container.</param>
+        public ObservableListBase(ListAdapter<T> internalContainer)
+            : base(internalContainer)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ObservableListBase{T}"/> class.
+        /// </summary>
+        /// <param name="internalContainer">The internal container.</param>
         /// <param name="context">The context.</param>
         public ObservableListBase(ListAdapter<T> internalContainer, SynchronizationContext context)
             : base(internalContainer, context)

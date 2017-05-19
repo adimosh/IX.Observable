@@ -28,7 +28,7 @@ namespace IX.Observable
         /// Initializes a new instance of the <see cref="ObservableStack{T}"/> class.
         /// </summary>
         public ObservableStack()
-            : base(new StackCollectionAdapter<T>(new System.Collections.Generic.Stack<T>()), null)
+            : base(new StackCollectionAdapter<T>(new System.Collections.Generic.Stack<T>()))
         {
         }
 
@@ -37,7 +37,7 @@ namespace IX.Observable
         /// </summary>
         /// <param name="capacity">The initial capacity of the stack.</param>
         public ObservableStack(int capacity)
-            : base(new StackCollectionAdapter<T>(new System.Collections.Generic.Stack<T>(capacity)), null)
+            : base(new StackCollectionAdapter<T>(new System.Collections.Generic.Stack<T>(capacity)))
         {
         }
 
@@ -46,7 +46,7 @@ namespace IX.Observable
         /// </summary>
         /// <param name="collection">A collection of items to copy into the stack.</param>
         public ObservableStack(IEnumerable<T> collection)
-            : base(new StackCollectionAdapter<T>(new System.Collections.Generic.Stack<T>(collection)), null)
+            : base(new StackCollectionAdapter<T>(new System.Collections.Generic.Stack<T>(collection)))
         {
         }
 
