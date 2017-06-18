@@ -3,9 +3,10 @@
 // </copyright>
 
 using System;
-using System.Collections;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using IX.Observable.SynchronizationLockers;
@@ -28,8 +29,10 @@ namespace IX.Observable
         /// Initializes a new instance of the <see cref="ObservableBase"/> class.
         /// </summary>
         protected ObservableBase()
+            : this(
+                  EnvironmentSettings.AlwaysSuppressDefaultSynchronizationContext ? null :
+                  (EnvironmentSettings.SpecificSynchronizationContext ?? SynchronizationContext.Current))
         {
-            this.SynchronizationContext = SynchronizationContext.Current;
         }
 
         /// <summary>
@@ -137,6 +140,7 @@ namespace IX.Observable
         /// <summary>
         /// In a child class, triggers a collection changed event for a list of changes.
         /// </summary>
+        /// <typeparam name="T">The type of the collection item.</typeparam>
         /// <param name="action">The change action.</param>
         /// <param name="oldItems">The old items.</param>
         /// <param name="newItems">The new items.</param>
@@ -145,7 +149,7 @@ namespace IX.Observable
         /// <remarks>
         /// <para>The developer is solely responsible for the calling of this method.</para>
         /// </remarks>
-        protected void RaiseCollectionChanged(NotifyCollectionChangedAction action, IList oldItems = null, IList newItems = null, int oldIndex = -1, int newIndex = -1)
+        protected void RaiseCollectionChanged<T>(NotifyCollectionChangedAction action, IEnumerable<T> oldItems = null, IEnumerable<T> newItems = null, int oldIndex = -1, int newIndex = -1)
         {
             if (this.CollectionChanged == null)
             {
@@ -159,19 +163,19 @@ namespace IX.Observable
                 case NotifyCollectionChangedAction.Add:
                     if (newIndex != -1)
                     {
-                        args = new NotifyCollectionChangedEventArgs(action, newItems, newIndex);
+                        args = new NotifyCollectionChangedEventArgs(action, newItems.ToList(), newIndex);
                     }
                     else
                     {
-                        args = new NotifyCollectionChangedEventArgs(action, newItems);
+                        args = new NotifyCollectionChangedEventArgs(action, newItems.ToList());
                     }
 
                     break;
                 case NotifyCollectionChangedAction.Remove:
-                    args = new NotifyCollectionChangedEventArgs(action, oldItems, oldIndex);
+                    args = new NotifyCollectionChangedEventArgs(action, oldItems.ToList(), oldIndex);
                     break;
                 case NotifyCollectionChangedAction.Replace:
-                    args = new NotifyCollectionChangedEventArgs(action, newItems, oldItems);
+                    args = new NotifyCollectionChangedEventArgs(action, newItems.ToList(), oldItems.ToList());
                     break;
                 case NotifyCollectionChangedAction.Reset:
                     args = new NotifyCollectionChangedEventArgs(action);
@@ -179,7 +183,7 @@ namespace IX.Observable
                 default:
                     if (newIndex != -1 && oldIndex != -1)
                     {
-                        args = new NotifyCollectionChangedEventArgs(action, oldItems, newIndex, oldIndex);
+                        args = new NotifyCollectionChangedEventArgs(action, oldItems.ToList(), newIndex, oldIndex);
                     }
                     else
                     {
@@ -195,12 +199,13 @@ namespace IX.Observable
         /// <summary>
         /// In a child class, triggers a collection changed event for a single change.
         /// </summary>
+        /// <typeparam name="T">The type of the collection item.</typeparam>
         /// <param name="action">The change action.</param>
         /// <param name="oldItem">The old item.</param>
         /// <param name="newItem">The new item.</param>
         /// <param name="oldIndex">The old index of the change, if any.</param>
         /// <param name="newIndex">The new index of the change, if any.</param>
-        protected void RaiseCollectionChanged(NotifyCollectionChangedAction action, object oldItem = null, object newItem = null, int oldIndex = -1, int newIndex = -1)
+        protected void RaiseCollectionChanged<T>(NotifyCollectionChangedAction action, T oldItem = default(T), T newItem = default(T), int oldIndex = -1, int newIndex = -1)
         {
             if (this.CollectionChanged == null)
             {

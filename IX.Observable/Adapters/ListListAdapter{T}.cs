@@ -2,6 +2,7 @@
 // Copyright (c) Adrian Mos with all rights reserved.
 // </copyright>
 
+using System;
 using System.Collections.Generic;
 
 namespace IX.Observable.Adapters
@@ -34,6 +35,13 @@ namespace IX.Observable.Adapters
         {
             this.list.Add(item);
             return this.list.Count - 1;
+        }
+
+        public override int AddRange(IEnumerable<T> items)
+        {
+            var index = this.list.Count;
+            this.list.AddRange(items);
+            return index;
         }
 
         public override void Clear() => this.list.Clear();

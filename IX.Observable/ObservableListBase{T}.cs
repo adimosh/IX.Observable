@@ -5,10 +5,13 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.Linq;
 using System.Threading;
 using IX.Observable.Adapters;
 using IX.Observable.SynchronizationLockers;
 using IX.Observable.UndoLevels;
+using IX.StandardExtensions;
 
 namespace IX.Observable
 {
@@ -26,7 +29,7 @@ namespace IX.Observable
         /// Initializes a new instance of the <see cref="ObservableListBase{T}"/> class.
         /// </summary>
         /// <param name="internalContainer">The internal container.</param>
-        public ObservableListBase(ListAdapter<T> internalContainer)
+        protected ObservableListBase(ListAdapter<T> internalContainer)
             : base(internalContainer)
         {
         }
@@ -36,7 +39,7 @@ namespace IX.Observable
         /// </summary>
         /// <param name="internalContainer">The internal container.</param>
         /// <param name="context">The context.</param>
-        public ObservableListBase(ListAdapter<T> internalContainer, SynchronizationContext context)
+        protected ObservableListBase(ListAdapter<T> internalContainer, SynchronizationContext context)
             : base(internalContainer, context)
         {
         }
@@ -130,6 +133,37 @@ namespace IX.Observable
         /// <param name="item">The item.</param>
         /// <returns>The index of the item, or <c>-1</c> if not found.</returns>
         public virtual int IndexOf(T item) => this.CheckDisposed(() => this.ReadLock(() => this.InternalListContainer.IndexOf(item)));
+
+        /// <summary>
+        /// Adds an item to the <see cref="ObservableCollectionBase{T}" />.
+        /// </summary>
+        /// <param name="items">The objects to add to the <see cref="ObservableCollectionBase{T}" />.</param>
+        /// <remarks>
+        /// <para>On concurrent collections, this method is write-synchronized.</para>
+        /// </remarks>
+        public virtual void AddRange(IEnumerable<T> items)
+        {
+            this.CheckDisposed();
+
+            int newIndex;
+            using (this.WriteLock())
+            {
+                newIndex = ((ListAdapter<T>)this.InternalContainer).AddRange(items);
+                this.PushUndoLevel(new AddMultipleUndoLevel<T> { AddedItems = items.ToArray(), Index = newIndex });
+            }
+
+            if (newIndex == -1)
+            {
+                this.RaiseCollectionChanged();
+            }
+            else
+            {
+                this.RaiseCollectionChangedAddMultiple(items, newIndex);
+            }
+
+            this.RaisePropertyChanged(nameof(this.Count));
+            this.ContentsMayHaveChanged();
+        }
 
         /// <summary>
         /// Inserts an item at the specified index.
@@ -263,6 +297,22 @@ namespace IX.Observable
         }
 
         /// <summary>
+        /// Called when items are added to a collection.
+        /// </summary>
+        /// <param name="addedItems">The added items.</param>
+        /// <param name="index">The index.</param>
+        protected virtual void RaiseCollectionChangedAddMultiple(IEnumerable<T> addedItems, int index)
+            => this.RaiseCollectionChanged(NotifyCollectionChangedAction.Add, newItem: addedItems, newIndex: index);
+
+        /// <summary>
+        /// Called when items are removed from a collection.
+        /// </summary>
+        /// <param name="removedItems">The removed items.</param>
+        /// <param name="index">The index.</param>
+        protected virtual void RaiseCollectionChangedRemoveMultiple(IEnumerable<T> removedItems, int index)
+            => this.RaiseCollectionChanged(NotifyCollectionChangedAction.Remove, oldItems: removedItems, oldIndex: index);
+
+        /// <summary>
         /// Has the last operation undone.
         /// </summary>
         /// <param name="undoRedoLevel">A level of undo, with contents.</param>
@@ -287,6 +337,26 @@ namespace IX.Observable
                         toInvokeOutsideLock = () =>
                         {
                             this.RaiseCollectionChangedRemove(item, index);
+                            this.RaisePropertyChanged(nameof(this.Count));
+                            this.ContentsMayHaveChanged();
+                        };
+
+                        break;
+                    }
+
+                case AddMultipleUndoLevel<T> amul:
+                    {
+                        var index = amul.Index;
+
+                        for (var i = 0; i < amul.AddedItems.Length; i++)
+                        {
+                            this.InternalListContainer.RemoveAt(index);
+                        }
+
+                        IEnumerable<T> items = amul.AddedItems;
+                        toInvokeOutsideLock = () =>
+                        {
+                            this.RaiseCollectionChangedRemoveMultiple(items, index);
                             this.RaisePropertyChanged(nameof(this.Count));
                             this.ContentsMayHaveChanged();
                         };
@@ -382,6 +452,23 @@ namespace IX.Observable
                         toInvokeOutsideLock = () =>
                         {
                             this.RaiseCollectionChangedAdd(item, index);
+                            this.RaisePropertyChanged(nameof(this.Count));
+                            this.ContentsMayHaveChanged();
+                        };
+
+                        break;
+                    }
+
+                case AddMultipleUndoLevel<T> amul:
+                    {
+                        var index = amul.Index;
+                        IEnumerable<T> items = amul.AddedItems;
+
+                        items.Reverse().ForEach(p => this.InternalListContainer.Insert(index, p));
+
+                        toInvokeOutsideLock = () =>
+                        {
+                            this.RaiseCollectionChangedAddMultiple(items, index);
                             this.RaisePropertyChanged(nameof(this.Count));
                             this.ContentsMayHaveChanged();
                         };

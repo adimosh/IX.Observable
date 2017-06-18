@@ -79,6 +79,13 @@ namespace IX.Observable.Adapters
         int IList.Add(object value) => this.Add(this.GetItemOfProperTypeFromObject(value));
 
         /// <summary>
+        /// Adds a range of items to the list.
+        /// </summary>
+        /// <param name="items">The items.</param>
+        /// <returns>The index of the firstly-introduced item.</returns>
+        public abstract int AddRange(IEnumerable<T> items);
+
+        /// <summary>
         /// Determines whether the collection contains the specified value.
         /// </summary>
         /// <param name="value">The value.</param>

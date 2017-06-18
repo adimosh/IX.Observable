@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using IX.StandardExtensions;
 
 namespace IX.Observable.Adapters
 {
@@ -93,6 +94,15 @@ namespace IX.Observable.Adapters
             this.master.Add(item);
 
             return this.MasterCount - 1;
+        }
+
+        public override int AddRange(IEnumerable<T> items)
+        {
+            this.InitializeMissingMaster();
+
+            var index = this.master.Count;
+            items.ForEach(p => this.master.Add(p));
+            return index;
         }
 
         public override void Clear()

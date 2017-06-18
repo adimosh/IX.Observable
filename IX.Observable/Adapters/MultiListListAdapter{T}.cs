@@ -49,6 +49,8 @@ namespace IX.Observable.Adapters
 
         public override int Add(T item) => throw new InvalidOperationException();
 
+        public override int AddRange(IEnumerable<T> items) => throw new InvalidOperationException();
+
         public override void Clear() => throw new InvalidOperationException();
 
         public override bool Contains(T item) => this.lists.Any(p => p.Contains(item));

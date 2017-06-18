@@ -67,6 +67,74 @@ namespace IX.Observable.UnitTests
         }
 
         /// <summary>
+        /// Observables the list undo at add.
+        /// </summary>
+        [Fact(DisplayName = "ObservableList, Undo with AddRange")]
+        public void ObservableListUndoAtAddRange()
+        {
+            // ARRANGE
+            var list = new ObservableList<int>
+            {
+                1,
+                7,
+                19,
+                23,
+                4,
+            };
+
+            list.AddRange(new int[] { 6, 5, 2 });
+
+            Assert.True(list.Contains(6));
+            Assert.True(list.Contains(5));
+            Assert.True(list.Contains(2));
+
+            // ACT
+            list.Undo();
+
+            // ASSERT
+            Assert.False(list.Contains(6));
+            Assert.False(list.Contains(5));
+            Assert.False(list.Contains(2));
+            Assert.True(list.Count == 5);
+        }
+
+        /// <summary>
+        /// Observables the list redo at add.
+        /// </summary>
+        [Fact(DisplayName = "ObservableList, Redo with undone AddRange")]
+        public void ObservableListRedoAtAddRange()
+        {
+            // ARRANGE
+            var list = new ObservableList<int>
+            {
+                1,
+                7,
+                19,
+                23,
+                4,
+            };
+
+            list.AddRange(new int[] { 6, 5, 2 });
+            Assert.True(list.Contains(6));
+            Assert.True(list.Contains(5));
+            Assert.True(list.Contains(2));
+            list.Undo();
+            Assert.False(list.Contains(6));
+            Assert.False(list.Contains(5));
+            Assert.False(list.Contains(2));
+            Assert.True(list.Count == 5);
+
+            // ACT
+            list.Redo();
+
+            // ASSERT
+            Assert.True(list.Contains(6));
+            Assert.True(list.Contains(5));
+            Assert.True(list.Contains(2));
+            Assert.True(list.Count == 8);
+        }
+
+        /// <summary>
         /// Observables the list undo at clear.
         /// </summary>
         [Fact(DisplayName = "ObservableList, Undo with Clear")]
