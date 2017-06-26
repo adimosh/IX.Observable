@@ -81,6 +81,17 @@ namespace IX.Observable
         }
 
         /// <summary>
+        ///   Looks up a localized string similar to You must first invoke the MoveNext method before you can call Current..
+        /// </summary>
+        internal static string MoveNextNotInvoked
+        {
+            get
+            {
+                return ResourceManager.GetString("MoveNextNotInvoked", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to The type of the argument is not a compatible type to the list..
         /// </summary>
         internal static string OperationItemTypeError

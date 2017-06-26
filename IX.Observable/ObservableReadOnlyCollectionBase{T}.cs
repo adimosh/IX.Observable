@@ -149,32 +149,18 @@ namespace IX.Observable
         /// Returns a locking enumerator that iterates through the collection.
         /// </summary>
         /// <returns>
-        /// An enumerator that can be used to iterate through the collection.
+        /// An atomic enumerator of type <see cref="AtomicEnumerator{T}"/> that can be used to iterate through the collection in a thread-safe manner.
         /// </returns>
         /// <remarks>
-        /// <para>In concurrent collections, the enumerator, by default, locks the collection in place and ensures that any attempts to modify from the same thread will
-        /// result in an exception, whereas from a different thread will result in the other thread patiently waiting for its turn to write.</para>
-        /// <para>This implementation focuses on the normal use of enumerators, which is to dispose of their IEnumerator at the end of their enumeration cycle.</para>
-        /// <para>If the enumerator is never disposed of, it will never release the read lock, thus making the other threads time out.</para>
-        /// <para>Please make sure that you dispose the enumerator object at all times in order to avoid deadlocking and timeouts.</para>
+        /// <para>This enumerator returns an atomic enumerator.</para>
+        /// <para>The atomic enumerator read-locks the collection whenever the <see cref="IEnumerator.MoveNext"/> method is called, and the result is cached.</para>
+        /// <para>The collection, however, cannot be held responsible for changes to the item that is held in <see cref="IEnumerator{T}.Current"/>.</para>
         /// </remarks>
-        /// <exception cref="TimeoutException">There was a timeout acquiring the necessary lock.</exception>
         public virtual IEnumerator<T> GetEnumerator()
         {
             this.CheckDisposed();
 
-            using (this.ReadLock())
-            {
-                using (IEnumerator<T> enumerator = this.InternalContainer.GetEnumerator())
-                {
-                    while (enumerator.MoveNext())
-                    {
-                        yield return enumerator.Current;
-                    }
-                }
-
-                yield break;
-            }
+            return new AtomicEnumerator<T>(this.InternalContainer.GetEnumerator(), () => this.ReadLock());
         }
 
         /// <summary>

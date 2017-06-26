@@ -120,6 +120,9 @@
   <data name="DictionaryItemAlreadyExists" xml:space="preserve">
     <value>An item with the same key already exists in this dictionary.</value>
   </data>
+  <data name="MoveNextNotInvoked" xml:space="preserve">
+    <value>You must first invoke the MoveNext method before you can call Current.</value>
+  </data>
   <data name="OperationItemTypeError" xml:space="preserve">
     <value>The type of the argument is not a compatible type to the list.</value>
   </data>
