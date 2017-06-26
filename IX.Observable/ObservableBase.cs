@@ -119,7 +119,28 @@ namespace IX.Observable
                 return;
             }
 
-            this.AsyncPost((state) => this.PropertyChanged?.Invoke(state.sender, state.args), new { sender = this, args = new PropertyChangedEventArgs(propertyName) });
+            this.AsyncPost(
+                (state) =>
+                {
+                    try
+                    {
+                        this.PropertyChanged?.Invoke(state.sender, state.args);
+                    }
+                    catch (Exception ex)
+                    {
+                        this.AsyncPost(
+                            (errorState) =>
+                            {
+                                try
+                                {
+                                    this.ExceptionOccurredWhileNotifying?.Invoke(errorState.sender, errorState.args);
+                                }
+                                catch
+                                {
+                                }
+                            }, new { sender = state.sender, args = new ExceptionOccurredEventArgs(ex) });
+                    }
+                }, new { sender = this, args = new PropertyChangedEventArgs(propertyName) });
         }
 
         /// <summary>
@@ -134,7 +155,7 @@ namespace IX.Observable
 
             var args = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset);
 
-            this.AsyncPost((state) => this.CollectionChanged?.Invoke(state.sender, state.args), new { sender = this, args });
+            this.InvokeCollectionChanged(args);
         }
 
         /// <summary>

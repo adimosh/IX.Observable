@@ -47,7 +47,7 @@ namespace IX.Observable
         /// <summary>
         /// Gets a value indicating whether or not this list is of a fixed size.
         /// </summary>
-        public virtual bool IsFixedSize => this.InternalListContainer.IsFixedSize;
+        public virtual bool IsFixedSize => this.CheckDisposed(() => this.ReadLock(() => this.InternalListContainer?.IsFixedSize ?? false));
 
         /// <summary>
         /// Gets the internal list container.

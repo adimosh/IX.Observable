@@ -76,6 +76,8 @@ namespace IX.Observable
             get => this.undoStack.Limit;
             set
             {
+                this.CheckDisposed();
+
                 if (this.undoStack.Limit != value)
                 {
                     this.undoStack.Limit = value;
@@ -331,6 +333,8 @@ namespace IX.Observable
         /// <exception cref="ItemNotCapturedIntoUndoContextException">There is no capturing context.</exception>
         public void UndoStateChanges(StateChange[] stateChanges)
         {
+            this.CheckDisposed();
+
             if (!this.isCapturedIntoUndoContext)
             {
                 throw new ItemNotCapturedIntoUndoContextException();
@@ -381,6 +385,8 @@ namespace IX.Observable
         /// <exception cref="ItemNotCapturedIntoUndoContextException">There is no capturing context.</exception>
         public void RedoStateChanges(StateChange[] stateChanges)
         {
+            this.CheckDisposed();
+
             if (!this.isCapturedIntoUndoContext)
             {
                 throw new ItemNotCapturedIntoUndoContextException();
