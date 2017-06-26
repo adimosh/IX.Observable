@@ -93,6 +93,8 @@ namespace IX.Observable
             {
                 result = this.existingEnumerator.MoveNext();
 
+                this.movedNext = true;
+
                 if (result)
                 {
                     this.current = this.existingEnumerator.Current;
