@@ -56,7 +56,7 @@ namespace IX.Observable.Adapters
                 }
                 else
                 {
-                    throw new InvalidCastException();
+                    throw new ArgumentOfWrongTypeException();
                 }
             }
         }

@@ -70,6 +70,28 @@ namespace IX.Observable
         }
 
         /// <summary>
+        ///   Looks up a localized string similar to A boxed argument is of the wrong type..
+        /// </summary>
+        internal static string ArgumentOfWrongTypeException
+        {
+            get
+            {
+                return ResourceManager.GetString("ArgumentOfWrongTypeException", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The boxed argument {0} is of the wrong type..
+        /// </summary>
+        internal static string ArgumentOfWrongTypeExceptionWithParameter
+        {
+            get
+            {
+                return ResourceManager.GetString("ArgumentOfWrongTypeExceptionWithParameter", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to An item with the same key already exists in this dictionary..
         /// </summary>
         internal static string DictionaryItemAlreadyExists

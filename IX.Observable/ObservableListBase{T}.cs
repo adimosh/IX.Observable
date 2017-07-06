@@ -122,8 +122,10 @@ namespace IX.Observable
 
                     return;
                 }
-
-                throw new InvalidCastException();
+                else
+                {
+                    throw new ArgumentOfWrongTypeException();
+                }
             }
         }
 
@@ -228,7 +230,7 @@ namespace IX.Observable
                 return this.CountAfterAdd - 1;
             }
 
-            throw new InvalidCastException();
+            throw new ArgumentOfWrongTypeException(nameof(value));
         }
 
         /// <summary>
@@ -245,7 +247,7 @@ namespace IX.Observable
                 return this.Contains(v);
             }
 
-            throw new InvalidCastException();
+            return false;
         }
 
         /// <summary>
@@ -260,7 +262,7 @@ namespace IX.Observable
                 return this.IndexOf(v);
             }
 
-            throw new InvalidCastException();
+            return -1;
         }
 
         /// <summary>
@@ -277,7 +279,7 @@ namespace IX.Observable
                 return;
             }
 
-            throw new InvalidCastException();
+            throw new ArgumentOfWrongTypeException(nameof(value));
         }
 
         /// <summary>
@@ -289,11 +291,7 @@ namespace IX.Observable
             if (value is T v)
             {
                 this.Remove(v);
-
-                return;
             }
-
-            throw new InvalidCastException();
         }
 
         /// <summary>
