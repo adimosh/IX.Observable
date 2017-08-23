@@ -213,7 +213,7 @@ namespace IX.Observable
         /// <returns><c>true</c> if the removal was successful, <c>false</c> otherwise.</returns>
         public bool Remove(TKey key)
         {
-            this.CheckDisposed();
+            this.ThrowIfCurrentObjectDisposed();
 
             bool result;
             var container = (DictionaryCollectionAdapter<TKey, TValue>)this.InternalContainer;
@@ -249,7 +249,7 @@ namespace IX.Observable
         /// <returns><c>true</c> if the value was successfully fetched, <c>false</c> otherwise.</returns>
         public bool TryGetValue(TKey key, out TValue value)
         {
-            this.CheckDisposed();
+            this.ThrowIfCurrentObjectDisposed();
 
             using (this.ReadLock())
             {
@@ -454,7 +454,7 @@ namespace IX.Observable
 
         private void BroadcastChange()
         {
-            this.RaiseCollectionChanged();
+            this.RaiseCollectionReset();
             this.RaisePropertyChanged(nameof(this.Keys));
             this.RaisePropertyChanged(nameof(this.Values));
             this.RaisePropertyChanged(nameof(this.Count));

@@ -76,7 +76,7 @@ namespace IX.Observable
             get => this.undoStack.Limit;
             set
             {
-                this.CheckDisposed();
+                this.ThrowIfCurrentObjectDisposed();
 
                 if (this.undoStack.Limit != value)
                 {
@@ -117,7 +117,7 @@ namespace IX.Observable
         /// <para>The concept of the undo/redo context is incompatible with serialization. Any collection that is serialized will be free of any original context
         /// when deserialized.</para>
         /// </remarks>
-        protected IUndoableItem ParentUndoContext { get => this.parentUndoableContext; }
+        protected IUndoableItem ParentUndoContext => this.parentUndoableContext;
 
         /// <summary>
         /// Adds an item to the <see cref="ObservableCollectionBase{T}" />.
@@ -128,7 +128,7 @@ namespace IX.Observable
         /// </remarks>
         public virtual void Add(T item)
         {
-            this.CheckDisposed();
+            this.ThrowIfCurrentObjectDisposed();
 
             int newIndex;
             using (this.WriteLock())
@@ -139,7 +139,7 @@ namespace IX.Observable
 
             if (newIndex == -1)
             {
-                this.RaiseCollectionChanged();
+                this.RaiseCollectionReset();
             }
             else
             {
@@ -158,7 +158,7 @@ namespace IX.Observable
         /// </remarks>
         public virtual void Clear()
         {
-            this.CheckDisposed();
+            this.ThrowIfCurrentObjectDisposed();
 
             using (this.WriteLock())
             {
@@ -170,7 +170,7 @@ namespace IX.Observable
                 this.PushUndoLevel(new ClearUndoLevel<T> { OriginalItems = tempArray });
             }
 
-            this.RaiseCollectionChanged();
+            this.RaiseCollectionReset();
             this.RaisePropertyChanged(nameof(this.Count));
             this.ContentsMayHaveChanged();
         }
@@ -188,7 +188,7 @@ namespace IX.Observable
         /// </remarks>
         public virtual bool Remove(T item)
         {
-            this.CheckDisposed();
+            this.ThrowIfCurrentObjectDisposed();
 
             int oldIndex;
             using (this.WriteLock())
@@ -207,7 +207,7 @@ namespace IX.Observable
             }
             else if (oldIndex < -1)
             {
-                this.RaiseCollectionChanged();
+                this.RaiseCollectionReset();
                 this.RaisePropertyChanged(nameof(this.Count));
                 this.ContentsMayHaveChanged();
 
@@ -333,7 +333,7 @@ namespace IX.Observable
         /// <exception cref="ItemNotCapturedIntoUndoContextException">There is no capturing context.</exception>
         public void UndoStateChanges(StateChange[] stateChanges)
         {
-            this.CheckDisposed();
+            this.ThrowIfCurrentObjectDisposed();
 
             if (!this.isCapturedIntoUndoContext)
             {
@@ -385,7 +385,7 @@ namespace IX.Observable
         /// <exception cref="ItemNotCapturedIntoUndoContextException">There is no capturing context.</exception>
         public void RedoStateChanges(StateChange[] stateChanges)
         {
-            this.CheckDisposed();
+            this.ThrowIfCurrentObjectDisposed();
 
             if (!this.isCapturedIntoUndoContext)
             {
@@ -501,7 +501,7 @@ namespace IX.Observable
         /// <param name="addedItem">The added item.</param>
         /// <param name="index">The index.</param>
         protected virtual void RaiseCollectionChangedAdd(T addedItem, int index)
-            => this.RaiseCollectionChanged(NotifyCollectionChangedAction.Add, newItem: addedItem, newIndex: index);
+            => this.RaiseCollectionAdd(index, addedItem);
 
         /// <summary>
         /// Called when an item in a collection is changed.
@@ -510,7 +510,7 @@ namespace IX.Observable
         /// <param name="newItem">The new item.</param>
         /// <param name="index">The index.</param>
         protected virtual void RaiseCollectionChangedChanged(T oldItem, T newItem, int index)
-            => this.RaiseCollectionChanged(NotifyCollectionChangedAction.Replace, oldItem, newItem, index, index);
+            => this.RaiseCollectionReplace(index, oldItem, newItem);
 
         /// <summary>
         /// Called when an item is removed from a collection.
@@ -518,6 +518,6 @@ namespace IX.Observable
         /// <param name="removedItem">The removed item.</param>
         /// <param name="index">The index.</param>
         protected virtual void RaiseCollectionChangedRemove(T removedItem, int index)
-            => this.RaiseCollectionChanged(NotifyCollectionChangedAction.Remove, oldItem: removedItem, oldIndex: index);
+            => this.RaiseCollectionRemove(index, removedItem);
     }
 }

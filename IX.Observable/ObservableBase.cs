@@ -3,35 +3,23 @@
 // </copyright>
 
 using System;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.ComponentModel;
-using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using IX.Observable.SynchronizationLockers;
+using IX.StandardExtensions.ComponentModel;
 
 namespace IX.Observable
 {
     /// <summary>
     /// A base class for collections that are observable.
     /// </summary>
-    /// <seealso cref="INotifyPropertyChanged" />
-    /// <seealso cref="INotifyCollectionChanged" />
-    public abstract class ObservableBase : INotifyPropertyChanged, INotifyCollectionChanged, IDisposable
+    /// <seealso cref="NotifyCollectionChangedInvokerBase" />
+    public abstract class ObservableBase : NotifyCollectionChangedInvokerBase
     {
-        /// <summary>
-        /// Indicates whether this instance is disposed.
-        /// </summary>
-        private bool isDisposed;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="ObservableBase"/> class.
         /// </summary>
         protected ObservableBase()
-            : this(
-                  EnvironmentSettings.AlwaysSuppressDefaultSynchronizationContext ? null :
-                  (EnvironmentSettings.SpecificSynchronizationContext ?? SynchronizationContext.Current))
+            : base()
         {
         }
 
@@ -40,42 +28,9 @@ namespace IX.Observable
         /// </summary>
         /// <param name="context">The synchronization context to use, if any.</param>
         protected ObservableBase(SynchronizationContext context)
+            : base(context)
         {
-            this.SynchronizationContext = context;
         }
-
-        /// <summary>
-        /// Finalizes an instance of the <see cref="ObservableBase"/> class.
-        /// </summary>
-        ~ObservableBase()
-        {
-            this.Dispose(false);
-            this.isDisposed = true;
-        }
-
-        /// <summary>
-        /// Triggers when there is a change in any of this object's properties.
-        /// </summary>
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        /// <summary>
-        /// Triggers when there is a change in the collection.
-        /// </summary>
-        public event NotifyCollectionChangedEventHandler CollectionChanged;
-
-        /// <summary>
-        /// Triggered when an exception has occurred during a <see cref="CollectionChanged"/> or <see cref="PropertyChanged"/> event invocation.
-        /// </summary>
-        public event EventHandler<ExceptionOccurredEventArgs> ExceptionOccurredWhileNotifying;
-
-        /// <summary>
-        /// Gets or sets the synchronization context that should be used when posting messages. This field can be <c>null</c> (<c>Nothing</c> in Visual Basic).
-        /// </summary>
-        /// <value>The synchronization context.</value>
-        /// <remarks>
-        /// <para>Please be careful when setting this property, as setting a wrong synchronization context can have unpredictable effects in UI threads.</para>
-        /// </remarks>
-        public SynchronizationContext SynchronizationContext { get; set; }
 
         /// <summary>
         /// Gets a synchronization lock item to be used when trying to synchronize read/write operations between threads.
@@ -86,235 +41,6 @@ namespace IX.Observable
         /// the same instance of <see cref="ReaderWriterLockSlim"/> that is returned here to synchronize.</para>
         /// </remarks>
         protected virtual ReaderWriterLockSlim SynchronizationLock => null;
-
-        /// <summary>
-        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
-        /// </summary>
-        public void Dispose()
-        {
-            if (this.isDisposed)
-            {
-                return;
-            }
-
-            GC.SuppressFinalize(this);
-            this.Dispose(false);
-            this.isDisposed = true;
-        }
-
-        /// <summary>
-        /// In a child class, triggers a property changed event.
-        /// </summary>
-        /// <param name="propertyName">The name of the property.</param>
-        /// <exception cref="ArgumentNullException"><paramref name="propertyName"/> is <c>null</c> (<c>Nothing</c> in Visual Basic).</exception>
-        protected void RaisePropertyChanged(string propertyName)
-        {
-            if (string.IsNullOrWhiteSpace(propertyName))
-            {
-                throw new ArgumentNullException(nameof(propertyName));
-            }
-
-            if (this.PropertyChanged == null)
-            {
-                return;
-            }
-
-            this.AsyncPost(
-                (state) =>
-                {
-                    try
-                    {
-                        this.PropertyChanged?.Invoke(state.sender, state.args);
-                    }
-                    catch (Exception ex)
-                    {
-                        this.AsyncPost(
-                            (errorState) =>
-                            {
-                                try
-                                {
-                                    this.ExceptionOccurredWhileNotifying?.Invoke(errorState.sender, errorState.args);
-                                }
-                                catch
-                                {
-                                }
-                            }, new { sender = state.sender, args = new ExceptionOccurredEventArgs(ex) });
-                    }
-                }, new { sender = this, args = new PropertyChangedEventArgs(propertyName) });
-        }
-
-        /// <summary>
-        /// In a child class, triggers a collection changed event for a reset change.
-        /// </summary>
-        protected void RaiseCollectionChanged()
-        {
-            if (this.CollectionChanged == null)
-            {
-                return;
-            }
-
-            var args = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset);
-
-            this.InvokeCollectionChanged(args);
-        }
-
-        /// <summary>
-        /// In a child class, triggers a collection changed event for a list of changes.
-        /// </summary>
-        /// <typeparam name="T">The type of the collection item.</typeparam>
-        /// <param name="action">The change action.</param>
-        /// <param name="oldItems">The old items.</param>
-        /// <param name="newItems">The new items.</param>
-        /// <param name="oldIndex">The old index of the change, if any.</param>
-        /// <param name="newIndex">The new index of the change, if any.</param>
-        /// <remarks>
-        /// <para>The developer is solely responsible for the calling of this method.</para>
-        /// </remarks>
-        protected void RaiseCollectionChanged<T>(NotifyCollectionChangedAction action, IEnumerable<T> oldItems = null, IEnumerable<T> newItems = null, int oldIndex = -1, int newIndex = -1)
-        {
-            if (this.CollectionChanged == null)
-            {
-                return;
-            }
-
-            NotifyCollectionChangedEventArgs args;
-
-            switch (action)
-            {
-                case NotifyCollectionChangedAction.Add:
-                    if (newIndex != -1)
-                    {
-                        args = new NotifyCollectionChangedEventArgs(action, newItems.ToList(), newIndex);
-                    }
-                    else
-                    {
-                        args = new NotifyCollectionChangedEventArgs(action, newItems.ToList());
-                    }
-
-                    break;
-                case NotifyCollectionChangedAction.Remove:
-                    args = new NotifyCollectionChangedEventArgs(action, oldItems.ToList(), oldIndex);
-                    break;
-                case NotifyCollectionChangedAction.Replace:
-                    args = new NotifyCollectionChangedEventArgs(action, newItems.ToList(), oldItems.ToList());
-                    break;
-                case NotifyCollectionChangedAction.Reset:
-                    args = new NotifyCollectionChangedEventArgs(action);
-                    break;
-                default:
-                    if (newIndex != -1 && oldIndex != -1)
-                    {
-                        args = new NotifyCollectionChangedEventArgs(action, oldItems.ToList(), newIndex, oldIndex);
-                    }
-                    else
-                    {
-                        args = new NotifyCollectionChangedEventArgs(action);
-                    }
-
-                    break;
-            }
-
-            this.InvokeCollectionChanged(args);
-        }
-
-        /// <summary>
-        /// In a child class, triggers a collection changed event for a single change.
-        /// </summary>
-        /// <typeparam name="T">The type of the collection item.</typeparam>
-        /// <param name="action">The change action.</param>
-        /// <param name="oldItem">The old item.</param>
-        /// <param name="newItem">The new item.</param>
-        /// <param name="oldIndex">The old index of the change, if any.</param>
-        /// <param name="newIndex">The new index of the change, if any.</param>
-        protected void RaiseCollectionChanged<T>(NotifyCollectionChangedAction action, T oldItem = default(T), T newItem = default(T), int oldIndex = -1, int newIndex = -1)
-        {
-            if (this.CollectionChanged == null)
-            {
-                return;
-            }
-
-            NotifyCollectionChangedEventArgs args;
-
-            switch (action)
-            {
-                case NotifyCollectionChangedAction.Add:
-                    if (newIndex != -1)
-                    {
-                        args = new NotifyCollectionChangedEventArgs(action, newItem, newIndex);
-                    }
-                    else
-                    {
-                        args = new NotifyCollectionChangedEventArgs(action, newItem);
-                    }
-
-                    break;
-                case NotifyCollectionChangedAction.Remove:
-                    args = new NotifyCollectionChangedEventArgs(action, oldItem, oldIndex);
-                    break;
-                case NotifyCollectionChangedAction.Replace:
-                    args = new NotifyCollectionChangedEventArgs(action, newItem, oldItem, newIndex);
-                    break;
-                case NotifyCollectionChangedAction.Reset:
-                    args = new NotifyCollectionChangedEventArgs(action);
-                    break;
-                default:
-                    if (newIndex != -1 && oldIndex != -1)
-                    {
-                        args = new NotifyCollectionChangedEventArgs(action, oldItem, newIndex, oldIndex);
-                    }
-                    else
-                    {
-                        args = new NotifyCollectionChangedEventArgs(action);
-                    }
-
-                    break;
-            }
-
-            this.InvokeCollectionChanged(args);
-        }
-
-        /// <summary>
-        /// Asynchronously defers the execution of a method, either on the synchronization context, or on a new thread.
-        /// </summary>
-        /// <typeparam name="T">The type of the transport object, if any.</typeparam>
-        /// <param name="postAction">The action to post.</param>
-        /// <param name="stateTransport">The object used to do state transportation.</param>
-        protected void AsyncPost<T>(Action<T> postAction, T stateTransport)
-        {
-            if (this.SynchronizationContext == null)
-            {
-                Task.Run(() => postAction(stateTransport)).ConfigureAwait(false);
-            }
-            else
-            {
-                this.SynchronizationContext.Post(
-                    (state) =>
-                {
-                    var st = (T)state;
-                    postAction(st);
-                }, stateTransport);
-            }
-        }
-
-        /// <summary>
-        /// Asynchronously defers the execution of a method, either on the synchronization context, or on a new thread.
-        /// </summary>
-        /// <param name="postAction">The action to post.</param>
-        protected void AsyncPost(Action postAction)
-        {
-            if (this.SynchronizationContext == null)
-            {
-                Task.Run(postAction);
-            }
-            else
-            {
-                this.SynchronizationContext.Post(
-                    (state) =>
-                {
-                    postAction();
-                }, null);
-            }
-        }
 
         /// <summary>
         /// Produces a reader lock in concurrent collections.
@@ -373,28 +99,13 @@ namespace IX.Observable
         protected ReadWriteSynchronizationLocker ReadWriteLock() => new ReadWriteSynchronizationLocker(this.SynchronizationLock);
 
         /// <summary>
-        /// Checks whether or not this object is disposed and throws an <see cref="ObjectDisposedException" />.
-        /// </summary>
-        /// <exception cref="ObjectDisposedException">This instance is disposed.</exception>
-        protected void CheckDisposed()
-        {
-            if (this.isDisposed)
-            {
-                throw new ObjectDisposedException(this.GetType().FullName);
-            }
-        }
-
-        /// <summary>
         /// Checks whether or not this object is disposed and throws an <see cref="ObjectDisposedException" />, and, if not, invokes an action.
         /// </summary>
         /// <param name="action">The action to invoke.</param>
         /// <exception cref="ObjectDisposedException">This instance is disposed.</exception>
         protected void CheckDisposed(Action action)
         {
-            if (this.isDisposed)
-            {
-                throw new ObjectDisposedException(this.GetType().FullName);
-            }
+            this.ThrowIfCurrentObjectDisposed();
 
             action();
         }
@@ -408,41 +119,9 @@ namespace IX.Observable
         /// <exception cref="ObjectDisposedException">This instance is disposed.</exception>
         protected T CheckDisposed<T>(Func<T> action)
         {
-            if (this.isDisposed)
-            {
-                throw new ObjectDisposedException(this.GetType().FullName);
-            }
+            this.ThrowIfCurrentObjectDisposed();
 
             return action();
         }
-
-        /// <summary>
-        /// Disposes of this instance and performs necessary cleanup.
-        /// </summary>
-        /// <param name="managedDispose">Indicates whether or not the call came from <see cref="IDisposable"/> or from the destructor.</param>
-        protected abstract void Dispose(bool managedDispose);
-
-        private void InvokeCollectionChanged(NotifyCollectionChangedEventArgs args) => this.AsyncPost(
-            (state) =>
-            {
-                try
-                {
-                    this.CollectionChanged?.Invoke(state.sender, state.args);
-                }
-                catch (Exception ex)
-                {
-                    this.AsyncPost(
-                        (errorState) =>
-                        {
-                            try
-                            {
-                                this.ExceptionOccurredWhileNotifying?.Invoke(errorState.sender, errorState.args);
-                            }
-                            catch
-                            {
-                            }
-                        }, new { sender = state.sender, args = new ExceptionOccurredEventArgs(ex) });
-                }
-            }, new { sender = this, args });
     }
 }

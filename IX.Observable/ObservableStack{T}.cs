@@ -91,7 +91,7 @@ namespace IX.Observable
         /// <returns>The topmost element in the stack, if any.</returns>
         public T Pop()
         {
-            this.CheckDisposed();
+            this.ThrowIfCurrentObjectDisposed();
 
             T item;
             int index;
@@ -115,7 +115,7 @@ namespace IX.Observable
         /// <param name="item">The item to push.</param>
         public void Push(T item)
         {
-            this.CheckDisposed();
+            this.ThrowIfCurrentObjectDisposed();
 
             int index;
 
@@ -223,7 +223,7 @@ namespace IX.Observable
                         {
                             this.RaisePropertyChanged(nameof(this.Count));
                             this.RaisePropertyChanged(Constants.ItemsName);
-                            this.RaiseCollectionChanged();
+                            this.RaiseCollectionReset();
                         };
 
                         break;
@@ -325,7 +325,7 @@ namespace IX.Observable
                         {
                             this.RaisePropertyChanged(nameof(this.Count));
                             this.RaisePropertyChanged(Constants.ItemsName);
-                            this.RaiseCollectionChanged();
+                            this.RaiseCollectionReset();
                         };
 
                         break;

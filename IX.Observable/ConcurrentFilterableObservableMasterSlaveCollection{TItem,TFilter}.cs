@@ -73,7 +73,7 @@ namespace IX.Observable
 
                 this.ClearCachedContents();
 
-                this.RaiseCollectionChanged();
+                this.RaiseCollectionReset();
                 this.RaisePropertyChanged(nameof(this.Count));
                 this.RaisePropertyChanged(Constants.ItemsName);
             }
@@ -123,7 +123,7 @@ namespace IX.Observable
         {
             if (this.IsFilter())
             {
-                this.RaiseCollectionChanged();
+                this.RaiseCollectionReset();
             }
             else
             {
@@ -141,7 +141,7 @@ namespace IX.Observable
         {
             if (this.IsFilter())
             {
-                this.RaiseCollectionChanged();
+                this.RaiseCollectionReset();
             }
             else
             {
@@ -158,7 +158,7 @@ namespace IX.Observable
         {
             if (this.IsFilter())
             {
-                this.RaiseCollectionChanged();
+                this.RaiseCollectionReset();
             }
             else
             {

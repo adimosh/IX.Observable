@@ -70,7 +70,7 @@ namespace IX.Observable
 
                 this.ClearCachedContents();
 
-                this.RaiseCollectionChanged();
+                this.RaiseCollectionReset();
                 this.RaisePropertyChanged(nameof(this.Count));
                 this.RaisePropertyChanged(Constants.ItemsName);
             }
@@ -125,12 +125,16 @@ namespace IX.Observable
             return base.GetEnumerator();
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Called when an item is added to a collection.
+        /// </summary>
+        /// <param name="addedItem">The added item.</param>
+        /// <param name="index">The index.</param>
         protected override void RaiseCollectionChangedAdd(TItem addedItem, int index)
         {
             if (this.IsFilter())
             {
-                this.RaiseCollectionChanged();
+                this.RaiseCollectionReset();
             }
             else
             {
@@ -138,12 +142,17 @@ namespace IX.Observable
             }
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Called when an item in a collection is changed.
+        /// </summary>
+        /// <param name="oldItem">The old item.</param>
+        /// <param name="newItem">The new item.</param>
+        /// <param name="index">The index.</param>
         protected override void RaiseCollectionChangedChanged(TItem oldItem, TItem newItem, int index)
         {
             if (this.IsFilter())
             {
-                this.RaiseCollectionChanged();
+                this.RaiseCollectionReset();
             }
             else
             {
@@ -151,12 +160,16 @@ namespace IX.Observable
             }
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Called when an item is removed from a collection.
+        /// </summary>
+        /// <param name="removedItem">The removed item.</param>
+        /// <param name="index">The index.</param>
         protected override void RaiseCollectionChangedRemove(TItem removedItem, int index)
         {
             if (this.IsFilter())
             {
-                this.RaiseCollectionChanged();
+                this.RaiseCollectionReset();
             }
             else
             {

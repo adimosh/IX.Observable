@@ -5,7 +5,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Linq;
 using System.Threading;
 using IX.Observable.Adapters;
@@ -79,7 +78,7 @@ namespace IX.Observable
 
             set
             {
-                this.CheckDisposed();
+                this.ThrowIfCurrentObjectDisposed();
 
                 T oldValue;
 
@@ -145,7 +144,7 @@ namespace IX.Observable
         /// </remarks>
         public virtual void AddRange(IEnumerable<T> items)
         {
-            this.CheckDisposed();
+            this.ThrowIfCurrentObjectDisposed();
 
             int newIndex;
             using (this.WriteLock())
@@ -156,7 +155,7 @@ namespace IX.Observable
 
             if (newIndex == -1)
             {
-                this.RaiseCollectionChanged();
+                this.RaiseCollectionReset();
             }
             else
             {
@@ -174,7 +173,7 @@ namespace IX.Observable
         /// <param name="item">The item.</param>
         public virtual void Insert(int index, T item)
         {
-            this.CheckDisposed();
+            this.ThrowIfCurrentObjectDisposed();
 
             using (this.WriteLock())
             {
@@ -193,7 +192,7 @@ namespace IX.Observable
         /// <param name="index">The index at which to remove an item from.</param>
         public virtual void RemoveAt(int index)
         {
-            this.CheckDisposed();
+            this.ThrowIfCurrentObjectDisposed();
 
             T item;
 
@@ -300,7 +299,7 @@ namespace IX.Observable
         /// <param name="addedItems">The added items.</param>
         /// <param name="index">The index.</param>
         protected virtual void RaiseCollectionChangedAddMultiple(IEnumerable<T> addedItems, int index)
-            => this.RaiseCollectionChanged(NotifyCollectionChangedAction.Add, newItem: addedItems, newIndex: index);
+            => this.RaiseCollectionAdd(index, addedItems);
 
         /// <summary>
         /// Called when items are removed from a collection.
@@ -308,7 +307,7 @@ namespace IX.Observable
         /// <param name="removedItems">The removed items.</param>
         /// <param name="index">The index.</param>
         protected virtual void RaiseCollectionChangedRemoveMultiple(IEnumerable<T> removedItems, int index)
-            => this.RaiseCollectionChanged(NotifyCollectionChangedAction.Remove, oldItems: removedItems, oldIndex: index);
+            => this.RaiseCollectionRemove(index, removedItems);
 
         /// <summary>
         /// Has the last operation undone.
@@ -388,7 +387,7 @@ namespace IX.Observable
 
                         toInvokeOutsideLock = () =>
                         {
-                            this.RaiseCollectionChanged();
+                            this.RaiseCollectionReset();
                             this.RaisePropertyChanged(nameof(this.Count));
                             this.ContentsMayHaveChanged();
                         };
@@ -497,7 +496,7 @@ namespace IX.Observable
 
                         toInvokeOutsideLock = () =>
                         {
-                            this.RaiseCollectionChanged();
+                            this.RaiseCollectionReset();
                             this.RaisePropertyChanged(nameof(this.Count));
                             this.ContentsMayHaveChanged();
                         };

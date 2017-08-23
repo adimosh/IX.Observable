@@ -51,7 +51,7 @@ namespace IX.Observable
                 ((MultiListListAdapter<T>)this.InternalContainer).SetList(list);
             }
 
-            this.RaiseCollectionChanged();
+            this.RaiseCollectionReset();
             this.RaisePropertyChanged(nameof(this.Count));
             this.RaisePropertyChanged(Constants.ItemsName);
         }
@@ -69,25 +69,29 @@ namespace IX.Observable
                 ((MultiListListAdapter<T>)this.InternalContainer).RemoveList(list);
             }
 
-            this.RaiseCollectionChanged();
+            this.RaiseCollectionReset();
             this.RaisePropertyChanged(nameof(this.Count));
             this.RaisePropertyChanged(Constants.ItemsName);
         }
 
         /// <summary>
-        /// Disposes of this instance and performs necessary cleanup.
+        /// Disposes the managed context.
         /// </summary>
-        /// <param name="managedDispose">Indicates whether or not the call came from <see cref="global::System.IDisposable"/> or from the destructor.</param>
-        protected override void Dispose(bool managedDispose)
+        protected override void DisposeManagedContext()
         {
-            if (managedDispose)
-            {
-                this.locker.Dispose();
-            }
+            this.locker.Dispose();
 
-            base.Dispose(managedDispose);
+            base.DisposeManagedContext();
+        }
 
+        /// <summary>
+        /// Disposes the general context.
+        /// </summary>
+        protected override void DisposeGeneralContext()
+        {
             this.locker = null;
+
+            base.DisposeGeneralContext();
         }
     }
 }

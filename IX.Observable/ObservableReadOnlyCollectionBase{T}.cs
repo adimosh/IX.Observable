@@ -158,7 +158,7 @@ namespace IX.Observable
         /// </remarks>
         public virtual IEnumerator<T> GetEnumerator()
         {
-            this.CheckDisposed();
+            this.ThrowIfCurrentObjectDisposed();
 
             return new AtomicEnumerator<T>(this.InternalContainer.GetEnumerator(), () => this.ReadLock());
         }
@@ -181,7 +181,7 @@ namespace IX.Observable
         /// </remarks>
         void ICollection.CopyTo(Array array, int index)
         {
-            this.CheckDisposed();
+            this.ThrowIfCurrentObjectDisposed();
 
             T[] tempArray;
 
@@ -225,26 +225,32 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Disposes of this instance and performs necessary cleanup.
+        /// Disposes the managed context.
         /// </summary>
-        /// <param name="managedDispose">Indicates whether or not the call came from <see cref="IDisposable"/> or from the destructor.</param>
-        protected override void Dispose(bool managedDispose)
+        protected override void DisposeManagedContext()
         {
-            if (managedDispose)
+            try
             {
-                try
-                {
-                    this.internalContainer.Clear();
-                }
-                catch
-                {
-                }
+                this.internalContainer.Clear();
+            }
+            catch
+            {
             }
 
-            this.internalContainer = null;
+            base.DisposeManagedContext();
         }
 
-        private void InternalContainer_MustReset(object sender, EventArgs e) => this.AsyncPost(() =>
+        /// <summary>
+        /// Disposes the general context.
+        /// </summary>
+        protected override void DisposeGeneralContext()
+        {
+            this.internalContainer = null;
+
+            base.DisposeGeneralContext();
+        }
+
+        private void InternalContainer_MustReset(object sender, EventArgs e) => this.Invoke(() =>
         {
             bool shouldReset;
             lock (this.resetCountLocker)
@@ -262,7 +268,7 @@ namespace IX.Observable
 
             if (shouldReset)
             {
-                this.RaiseCollectionChanged();
+                this.RaiseCollectionReset();
                 this.RaisePropertyChanged(nameof(this.Count));
                 this.ContentsMayHaveChanged();
             }

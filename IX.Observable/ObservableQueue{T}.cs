@@ -85,7 +85,7 @@ namespace IX.Observable
         /// <returns>The dequeued item.</returns>
         public T Dequeue()
         {
-            this.CheckDisposed();
+            this.ThrowIfCurrentObjectDisposed();
 
             T item;
 
@@ -108,7 +108,7 @@ namespace IX.Observable
         /// <param name="item">The item to enqueue.</param>
         public void Enqueue(T item)
         {
-            this.CheckDisposed();
+            this.ThrowIfCurrentObjectDisposed();
 
             int newIndex;
 
@@ -238,7 +238,7 @@ namespace IX.Observable
                         {
                             this.RaisePropertyChanged(nameof(this.Count));
                             this.RaisePropertyChanged(Constants.ItemsName);
-                            this.RaiseCollectionChanged();
+                            this.RaiseCollectionReset();
                         };
 
                         break;
@@ -338,7 +338,7 @@ namespace IX.Observable
                         {
                             this.RaisePropertyChanged(nameof(this.Count));
                             this.RaisePropertyChanged(Constants.ItemsName);
-                            this.RaiseCollectionChanged();
+                            this.RaiseCollectionReset();
                         };
 
                         break;

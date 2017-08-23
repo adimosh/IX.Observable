@@ -62,14 +62,14 @@ namespace IX.Observable
         public void SetMasterList<TList>(TList list)
                     where TList : class, IList<T>, INotifyCollectionChanged
         {
-            this.CheckDisposed();
+            this.ThrowIfCurrentObjectDisposed();
 
             using (this.WriteLock())
             {
                 ((MultiListMasterSlaveListAdapter<T>)this.InternalContainer).SetMaster(list);
             }
 
-            this.RaiseCollectionChanged();
+            this.RaiseCollectionReset();
             this.RaisePropertyChanged(nameof(this.Count));
             this.RaisePropertyChanged(Constants.ItemsName);
         }
@@ -82,14 +82,14 @@ namespace IX.Observable
         public void SetSlaveList<TList>(TList list)
                     where TList : class, IEnumerable<T>, INotifyCollectionChanged
         {
-            this.CheckDisposed();
+            this.ThrowIfCurrentObjectDisposed();
 
             using (this.WriteLock())
             {
                 ((MultiListMasterSlaveListAdapter<T>)this.InternalContainer).SetSlave(list);
             }
 
-            this.RaiseCollectionChanged();
+            this.RaiseCollectionReset();
             this.RaisePropertyChanged(nameof(this.Count));
             this.RaisePropertyChanged(Constants.ItemsName);
         }
@@ -102,14 +102,14 @@ namespace IX.Observable
         public void RemoveSlaveList<TList>(TList list)
                     where TList : class, IEnumerable<T>, INotifyCollectionChanged
         {
-            this.CheckDisposed();
+            this.ThrowIfCurrentObjectDisposed();
 
             using (this.WriteLock())
             {
                 ((MultiListMasterSlaveListAdapter<T>)this.InternalContainer).RemoveSlave(list);
             }
 
-            this.RaiseCollectionChanged();
+            this.RaiseCollectionReset();
             this.RaisePropertyChanged(nameof(this.Count));
             this.RaisePropertyChanged(Constants.ItemsName);
         }
@@ -133,7 +133,7 @@ namespace IX.Observable
         /// </remarks>
         public override void Clear()
         {
-            this.CheckDisposed();
+            this.ThrowIfCurrentObjectDisposed();
 
             using (this.WriteLock())
             {
@@ -149,7 +149,7 @@ namespace IX.Observable
                 this.PushUndoLevel(new ClearUndoLevel<T> { OriginalItems = originalArray });
             }
 
-            this.RaiseCollectionChanged();
+            this.RaiseCollectionReset();
             this.RaisePropertyChanged(nameof(this.Count));
             this.ContentsMayHaveChanged();
         }
@@ -190,7 +190,7 @@ namespace IX.Observable
         /// <param name="index">The index at which to remove an item from.</param>
         public override void RemoveAt(int index)
         {
-            this.CheckDisposed();
+            this.ThrowIfCurrentObjectDisposed();
 
             T item;
 
