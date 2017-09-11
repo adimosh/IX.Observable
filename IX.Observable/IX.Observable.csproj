@@ -88,7 +88,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <DotNetCliToolReference Include="dotnet-csprojVersioning" Version="1.0.0" />
+    <DotNetCliToolReference Include="dotnet-csprojVersioning" Version="1.0.0.4" />
   </ItemGroup>
 
   <ItemGroup>
@@ -98,8 +98,8 @@
   <ItemGroup>
     <PackageReference Include="IX.Abstractions" Version="0.1.4.4" />
     <PackageReference Include="IX.Abstractions.Collections" Version="0.1.4.4" />
-    <PackageReference Include="IX.StandardExtensions.ComponentModel" Version="0.1.1.29" />
-    <PackageReference Include="IX.Undoable" Version="0.1.1.10" />
+    <PackageReference Include="IX.StandardExtensions.ComponentModel" Version="0.1.1.30" />
+    <PackageReference Include="IX.Undoable" Version="0.1.1.11" />
   </ItemGroup>
 
   <ItemGroup>
