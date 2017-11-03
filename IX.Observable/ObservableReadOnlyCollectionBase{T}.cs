@@ -149,7 +149,7 @@ namespace IX.Observable
         /// Returns a locking enumerator that iterates through the collection.
         /// </summary>
         /// <returns>
-        /// An atomic enumerator of type <see cref="AtomicEnumerator{T}"/> that can be used to iterate through the collection in a thread-safe manner.
+        /// An atomic enumerator of type <see cref="StandardExtensions.Threading.AtomicEnumerator{T}"/> that can be used to iterate through the collection in a thread-safe manner.
         /// </returns>
         /// <remarks>
         /// <para>This enumerator returns an atomic enumerator.</para>
@@ -160,7 +160,7 @@ namespace IX.Observable
         {
             this.ThrowIfCurrentObjectDisposed();
 
-            return new AtomicEnumerator<T>(this.InternalContainer.GetEnumerator(), () => this.ReadLock());
+            return new StandardExtensions.Threading.AtomicEnumerator<T>(this.InternalContainer.GetEnumerator(), () => this.ReadLock());
         }
 
         /// <summary>

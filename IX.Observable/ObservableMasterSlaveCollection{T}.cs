@@ -9,8 +9,8 @@ using System.Diagnostics;
 using System.Threading;
 using IX.Observable.Adapters;
 using IX.Observable.DebugAide;
-using IX.Observable.SynchronizationLockers;
 using IX.Observable.UndoLevels;
+using IX.StandardExtensions.Threading;
 
 namespace IX.Observable
 {

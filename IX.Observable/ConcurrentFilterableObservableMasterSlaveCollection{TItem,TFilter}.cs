@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using IX.Observable.DebugAide;
+using IX.StandardExtensions.Threading;
 
 namespace IX.Observable
 {
@@ -187,76 +188,43 @@ namespace IX.Observable
 
         private IList<TItem> CheckAndCache()
         {
-            if (this.cacheLocker.TryEnterUpgradeableReadLock(Constants.ConcurrentLockAcquisitionTimeout))
+            using (var locker = new ReadWriteSynchronizationLocker(this.cacheLocker))
             {
-                try
+                if (this.cachedFilteredElements == null)
                 {
-                    if (this.cachedFilteredElements == null)
+                    locker.Upgrade();
+
+                    this.cachedFilteredElements = new List<TItem>(this.InternalListContainer.Count);
+
+                    using (IEnumerator<TItem> enumerator = this.EnumerateFiltered())
                     {
-                        if (this.cacheLocker.TryEnterWriteLock(Constants.ConcurrentLockAcquisitionTimeout))
+                        while (enumerator.MoveNext())
                         {
-                            try
-                            {
-                                this.cachedFilteredElements = new List<TItem>(this.InternalListContainer.Count);
-
-                                using (IEnumerator<TItem> enumerator = this.EnumerateFiltered())
-                                {
-                                    while (enumerator.MoveNext())
-                                    {
-                                        TItem current = enumerator.Current;
-                                        this.cachedFilteredElements.Add(current);
-                                    }
-                                }
-                            }
-                            finally
-                            {
-                                this.cacheLocker.ExitWriteLock();
-                            }
-
-                            return this.cachedFilteredElements;
+                            TItem current = enumerator.Current;
+                            this.cachedFilteredElements.Add(current);
                         }
+                    }
 
-                        throw new TimeoutException();
-                    }
-                    else
-                    {
-                        return this.cachedFilteredElements;
-                    }
+                    return this.cachedFilteredElements;
                 }
-                finally
+                else
                 {
-                    if (this.cacheLocker.IsUpgradeableReadLockHeld)
-                    {
-                        this.cacheLocker.ExitUpgradeableReadLock();
-                    }
+                    return this.cachedFilteredElements;
                 }
             }
-
-            throw new TimeoutException();
         }
 
         private void ClearCachedContents()
         {
-            if (this.cacheLocker.TryEnterWriteLock(Constants.ConcurrentLockAcquisitionTimeout))
+            using (new WriteOnlySynchronizationLocker(this.cacheLocker))
             {
-                try
+                if (this.cachedFilteredElements != null)
                 {
-                    if (this.cachedFilteredElements != null)
-                    {
-                        IList<TItem> coll = this.cachedFilteredElements;
-                        this.cachedFilteredElements = null;
-                        coll.Clear();
-                    }
+                    IList<TItem> coll = this.cachedFilteredElements;
+                    this.cachedFilteredElements = null;
+                    coll.Clear();
                 }
-                finally
-                {
-                    this.cacheLocker.ExitWriteLock();
-                }
-
-                return;
             }
-
-            throw new TimeoutException();
         }
 
         private bool IsFilter() => !EqualityComparer<TFilter>.Default.Equals(this.Filter, default(TFilter));

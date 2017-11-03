@@ -7,8 +7,8 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Threading;
 using IX.Observable.Adapters;
-using IX.Observable.SynchronizationLockers;
 using IX.Observable.UndoLevels;
+using IX.StandardExtensions.Threading;
 using IX.System.Collections.Generic;
 using IX.Undoable;
 

@@ -97,13 +97,15 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="IX.Abstractions.Threading" Version="0.1.4.7" />
+    <PackageReference Include="IX.StandardExtensions.Threading" Version="0.1.1.34" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.0-beta004" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="IX.Abstractions" Version="0.1.4.4" />
-    <PackageReference Include="IX.Abstractions.Collections" Version="0.1.4.4" />
-    <PackageReference Include="IX.StandardExtensions.ComponentModel" Version="0.1.1.31" />
+    <PackageReference Include="IX.Abstractions" Version="0.1.4.7" />
+    <PackageReference Include="IX.Abstractions.Collections" Version="0.1.4.7" />
+    <PackageReference Include="IX.StandardExtensions.ComponentModel" Version="0.1.1.34" />
     <PackageReference Include="IX.Undoable" Version="0.1.1.11" />
   </ItemGroup>
 
@@ -116,15 +118,15 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Update="Resources.de.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
+      <Generator></Generator>
       <DependentUpon>Resources.resx</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Update="Resources.en.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
+      <Generator></Generator>
       <DependentUpon>Resources.resx</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Update="Resources.fr.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
+      <Generator></Generator>
       <DependentUpon>Resources.resx</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Update="Resources.resx">
@@ -132,7 +134,7 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Update="Resources.ro.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
+      <Generator></Generator>
       <DependentUpon>Resources.resx</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>

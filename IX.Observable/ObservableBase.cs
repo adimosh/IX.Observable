@@ -4,8 +4,8 @@
 
 using System;
 using System.Threading;
-using IX.Observable.SynchronizationLockers;
 using IX.StandardExtensions.ComponentModel;
+using IX.StandardExtensions.Threading;
 
 namespace IX.Observable
 {

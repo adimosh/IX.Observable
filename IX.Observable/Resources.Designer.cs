@@ -8,8 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace IX.Observable
-{
+namespace IX.Observable {
     using global::System.Reflection;
 
 
@@ -20,106 +19,79 @@ namespace IX.Observable
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Resources
-    {
-
+    internal class Resources {
+        
         private static global::System.Resources.ResourceManager resourceMan;
-
+        
         private static global::System.Globalization.CultureInfo resourceCulture;
-
+        
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal Resources()
-        {
+        internal Resources() {
         }
-
+        
         /// <summary>
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager
-        {
-            get
-            {
-                if (object.ReferenceEquals(resourceMan, null))
-                {
+        internal static global::System.Resources.ResourceManager ResourceManager {
+            get {
+                if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("IX.Observable.Resources", typeof(Resources).GetTypeInfo().Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
             }
         }
-
+        
         /// <summary>
         ///   Overrides the current thread's CurrentUICulture property for all
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture
-        {
-            get
-            {
+        internal static global::System.Globalization.CultureInfo Culture {
+            get {
                 return resourceCulture;
             }
-            set
-            {
+            set {
                 resourceCulture = value;
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to A boxed argument is of the wrong type..
         /// </summary>
-        internal static string ArgumentOfWrongTypeException
-        {
-            get
-            {
+        internal static string ArgumentOfWrongTypeException {
+            get {
                 return ResourceManager.GetString("ArgumentOfWrongTypeException", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to The boxed argument {0} is of the wrong type..
         /// </summary>
-        internal static string ArgumentOfWrongTypeExceptionWithParameter
-        {
-            get
-            {
+        internal static string ArgumentOfWrongTypeExceptionWithParameter {
+            get {
                 return ResourceManager.GetString("ArgumentOfWrongTypeExceptionWithParameter", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to An item with the same key already exists in this dictionary..
         /// </summary>
-        internal static string DictionaryItemAlreadyExists
-        {
-            get
-            {
+        internal static string DictionaryItemAlreadyExists {
+            get {
                 return ResourceManager.GetString("DictionaryItemAlreadyExists", resourceCulture);
             }
         }
-
-        /// <summary>
-        ///   Looks up a localized string similar to You must first invoke the MoveNext method before you can call Current..
-        /// </summary>
-        internal static string MoveNextNotInvoked
-        {
-            get
-            {
-                return ResourceManager.GetString("MoveNextNotInvoked", resourceCulture);
-            }
-        }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to The type of the argument is not a compatible type to the list..
         /// </summary>
-        internal static string OperationItemTypeError
-        {
-            get
-            {
+        internal static string OperationItemTypeError {
+            get {
                 return ResourceManager.GetString("OperationItemTypeError", resourceCulture);
             }
         }

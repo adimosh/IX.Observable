@@ -8,9 +8,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using IX.Observable.Adapters;
-using IX.Observable.SynchronizationLockers;
 using IX.Observable.UndoLevels;
 using IX.StandardExtensions;
+using IX.StandardExtensions.Threading;
 
 namespace IX.Observable
 {
