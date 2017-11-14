@@ -98,15 +98,15 @@
 
   <ItemGroup>
     <PackageReference Include="IX.Abstractions.Threading" Version="0.1.4.8" />
-    <PackageReference Include="IX.StandardExtensions.Threading" Version="0.1.1.35" />
+    <PackageReference Include="IX.StandardExtensions.Threading" Version="0.1.1.36" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.0-beta004" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="IX.Abstractions" Version="0.1.4.8" />
     <PackageReference Include="IX.Abstractions.Collections" Version="0.1.4.8" />
-    <PackageReference Include="IX.StandardExtensions.ComponentModel" Version="0.1.1.35" />
-    <PackageReference Include="IX.Undoable" Version="0.1.1.11" />
+    <PackageReference Include="IX.StandardExtensions.ComponentModel" Version="0.1.1.36" />
+    <PackageReference Include="IX.Undoable" Version="0.1.1.13" />
   </ItemGroup>
 
   <ItemGroup>
