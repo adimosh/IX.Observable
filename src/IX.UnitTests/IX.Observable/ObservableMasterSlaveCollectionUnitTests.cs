@@ -53,7 +53,6 @@ namespace IX.UnitTests.IX.Observable
         public void ObservableMasterSlaveCollectionUndoAtAdd(ObservableMasterSlaveCollection<int> list)
         {
             // ARRANGE
-            EnvironmentSettings.InvokeSynchronouslyOnCurrentThread = true;
             EnvironmentSettings.AlwaysSuppressCurrentSynchronizationContext = true;
 
             // ACT
@@ -76,7 +75,6 @@ namespace IX.UnitTests.IX.Observable
         public void ObservableMasterSlaveCollectionRedoAtAdd(ObservableMasterSlaveCollection<int> list)
         {
             // ARRANGE
-            EnvironmentSettings.InvokeSynchronouslyOnCurrentThread = true;
             EnvironmentSettings.AlwaysSuppressCurrentSynchronizationContext = true;
 
             list.Add(6);
@@ -100,7 +98,6 @@ namespace IX.UnitTests.IX.Observable
         public void ObservableMasterSlaveCollectionUndoAtClear(ObservableMasterSlaveCollection<int> list)
         {
             // ARRANGE
-            EnvironmentSettings.InvokeSynchronouslyOnCurrentThread = true;
             EnvironmentSettings.AlwaysSuppressCurrentSynchronizationContext = true;
 
             list.Clear();
@@ -131,7 +128,6 @@ namespace IX.UnitTests.IX.Observable
         public void ObservableMasterSlaveCollectionRedoAtClear(ObservableMasterSlaveCollection<int> list)
         {
             // ARRANGE
-            EnvironmentSettings.InvokeSynchronouslyOnCurrentThread = true;
             EnvironmentSettings.AlwaysSuppressCurrentSynchronizationContext = true;
 
             list.Clear();
@@ -164,7 +160,6 @@ namespace IX.UnitTests.IX.Observable
         public void ObservableMasterSlaveCollectionUndoAtInsert(ObservableMasterSlaveCollection<int> list)
         {
             // ARRANGE
-            EnvironmentSettings.InvokeSynchronouslyOnCurrentThread = true;
             EnvironmentSettings.AlwaysSuppressCurrentSynchronizationContext = true;
 
             // ACT
@@ -191,7 +186,6 @@ namespace IX.UnitTests.IX.Observable
         public void ObservableMasterSlaveCollectionRedoAtInsert(ObservableMasterSlaveCollection<int> list)
         {
             // ARRANGE
-            EnvironmentSettings.InvokeSynchronouslyOnCurrentThread = true;
             EnvironmentSettings.AlwaysSuppressCurrentSynchronizationContext = true;
 
             list.Insert(
@@ -218,7 +212,6 @@ namespace IX.UnitTests.IX.Observable
         public void ObservableMasterSlaveCollectionUndoAtRemoveAt(ObservableMasterSlaveCollection<int> list)
         {
             // ARRANGE
-            EnvironmentSettings.InvokeSynchronouslyOnCurrentThread = true;
             EnvironmentSettings.AlwaysSuppressCurrentSynchronizationContext = true;
 
             // ACT
@@ -243,7 +236,6 @@ namespace IX.UnitTests.IX.Observable
         public void ObservableMasterSlaveCollectionRedoAtRemoveAt(ObservableMasterSlaveCollection<int> list)
         {
             // ARRANGE
-            EnvironmentSettings.InvokeSynchronouslyOnCurrentThread = true;
             EnvironmentSettings.AlwaysSuppressCurrentSynchronizationContext = true;
 
             list.RemoveAt(2);
@@ -267,7 +259,6 @@ namespace IX.UnitTests.IX.Observable
         public void ObservableMasterSlaveCollectionUndoMultipleOperations(ObservableMasterSlaveCollection<int> list)
         {
             // ARRANGE
-            EnvironmentSettings.InvokeSynchronouslyOnCurrentThread = true;
             EnvironmentSettings.AlwaysSuppressCurrentSynchronizationContext = true;
 
             list.Add(18);
@@ -323,7 +314,6 @@ namespace IX.UnitTests.IX.Observable
         public void ObservableMasterSlaveCollectionMultipleUndoOperations(ObservableMasterSlaveCollection<int> list)
         {
             // ARRANGE
-            EnvironmentSettings.InvokeSynchronouslyOnCurrentThread = true;
             EnvironmentSettings.AlwaysSuppressCurrentSynchronizationContext = true;
 
             list.HistoryLevels = 3;
@@ -358,7 +348,6 @@ namespace IX.UnitTests.IX.Observable
         public void ObservableMasterSlaveCollectionMultipleRedoCutoff(ObservableMasterSlaveCollection<int> list)
         {
             // ARRANGE
-            EnvironmentSettings.InvokeSynchronouslyOnCurrentThread = true;
             EnvironmentSettings.AlwaysSuppressCurrentSynchronizationContext = true;
 
             list.Add(15);
@@ -395,7 +384,6 @@ namespace IX.UnitTests.IX.Observable
         public void ObservableMasterSlaveCollectionUndoAtAddWithSlave(ObservableMasterSlaveCollection<int> list)
         {
             // ARRANGE
-            EnvironmentSettings.InvokeSynchronouslyOnCurrentThread = true;
             EnvironmentSettings.AlwaysSuppressCurrentSynchronizationContext = true;
 
             using (var slaveCollection = new ObservableList<int>
@@ -430,7 +418,6 @@ namespace IX.UnitTests.IX.Observable
         public void ObservableMasterSlaveCollectionRedoAtAddWithSlave(ObservableMasterSlaveCollection<int> list)
         {
             // ARRANGE
-            EnvironmentSettings.InvokeSynchronouslyOnCurrentThread = true;
             EnvironmentSettings.AlwaysSuppressCurrentSynchronizationContext = true;
 
             using (var slaveCollection = new ObservableList<int>
@@ -466,7 +453,6 @@ namespace IX.UnitTests.IX.Observable
         public void ObservableMasterSlaveCollectionUndoAtClearWithSlave(ObservableMasterSlaveCollection<int> list)
         {
             // ARRANGE
-            EnvironmentSettings.InvokeSynchronouslyOnCurrentThread = true;
             EnvironmentSettings.AlwaysSuppressCurrentSynchronizationContext = true;
 
             using (var slaveCollection = new ObservableList<int>
@@ -509,7 +495,6 @@ namespace IX.UnitTests.IX.Observable
         public void ObservableMasterSlaveCollectionRedoAtClearWithSlave(ObservableMasterSlaveCollection<int> list)
         {
             // ARRANGE
-            EnvironmentSettings.InvokeSynchronouslyOnCurrentThread = true;
             EnvironmentSettings.AlwaysSuppressCurrentSynchronizationContext = true;
 
             using (var slaveCollection = new ObservableList<int>
@@ -554,7 +539,6 @@ namespace IX.UnitTests.IX.Observable
         public void ObservableMasterSlaveCollectionUndoAtInsertWithSlave(ObservableMasterSlaveCollection<int> list)
         {
             // ARRANGE
-            EnvironmentSettings.InvokeSynchronouslyOnCurrentThread = true;
             EnvironmentSettings.AlwaysSuppressCurrentSynchronizationContext = true;
 
             using (var slaveCollection = new ObservableList<int>
@@ -593,7 +577,6 @@ namespace IX.UnitTests.IX.Observable
         public void ObservableMasterSlaveCollectionRedoAtInsertWithSlave(ObservableMasterSlaveCollection<int> list)
         {
             // ARRANGE
-            EnvironmentSettings.InvokeSynchronouslyOnCurrentThread = true;
             EnvironmentSettings.AlwaysSuppressCurrentSynchronizationContext = true;
 
             list.Insert(
@@ -632,7 +615,6 @@ namespace IX.UnitTests.IX.Observable
         public void ObservableMasterSlaveCollectionUndoAtRemoveAtWithSlave(ObservableMasterSlaveCollection<int> list)
         {
             // ARRANGE
-            EnvironmentSettings.InvokeSynchronouslyOnCurrentThread = true;
             EnvironmentSettings.AlwaysSuppressCurrentSynchronizationContext = true;
 
             using (var slaveCollection = new ObservableList<int>
@@ -669,7 +651,6 @@ namespace IX.UnitTests.IX.Observable
         public void ObservableMasterSlaveCollectionRedoAtRemoveAtWithSlave(ObservableMasterSlaveCollection<int> list)
         {
             // ARRANGE
-            EnvironmentSettings.InvokeSynchronouslyOnCurrentThread = true;
             EnvironmentSettings.AlwaysSuppressCurrentSynchronizationContext = true;
 
             using (var slaveCollection = new ObservableList<int>
@@ -706,7 +687,6 @@ namespace IX.UnitTests.IX.Observable
             ObservableMasterSlaveCollection<int> list)
         {
             // ARRANGE
-            EnvironmentSettings.InvokeSynchronouslyOnCurrentThread = true;
             EnvironmentSettings.AlwaysSuppressCurrentSynchronizationContext = true;
 
             using (var slaveCollection = new ObservableList<int>
@@ -775,7 +755,6 @@ namespace IX.UnitTests.IX.Observable
             ObservableMasterSlaveCollection<int> list)
         {
             // ARRANGE
-            EnvironmentSettings.InvokeSynchronouslyOnCurrentThread = true;
             EnvironmentSettings.AlwaysSuppressCurrentSynchronizationContext = true;
 
             using (var slaveCollection = new ObservableList<int>
@@ -823,7 +802,6 @@ namespace IX.UnitTests.IX.Observable
             ObservableMasterSlaveCollection<int> list)
         {
             // ARRANGE
-            EnvironmentSettings.InvokeSynchronouslyOnCurrentThread = true;
             EnvironmentSettings.AlwaysSuppressCurrentSynchronizationContext = true;
 
             using (var slaveCollection = new ObservableList<int>
