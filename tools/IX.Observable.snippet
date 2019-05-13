@@ -1,0 +1,89 @@
+﻿<CodeSnippets xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>Common observable property</Title>
+      <Shortcut>obsprop</Shortcut>
+      <Description>Code Snippet for a standard-issue observable property with a backing field</Description>
+      <Author>Adrian Mos</Author>
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations>
+        <Literal>
+          <ID>type</ID>
+          <Default>string</Default>
+        </Literal>
+        <Literal>
+          <ID>name</ID>
+          <Default>ObservableProperty</Default>
+        </Literal>
+        <Literal>
+          <ID>field</ID>
+          <Default>backingField</Default>
+        </Literal>
+      </Declarations>
+      <Code Language="csharp" Format="CData">
+        <![CDATA[
+                    private $type$ $field$;
+                    
+                    public $type$ $name$
+                    {
+                        get => this.$field$;
+                        set
+                        {
+                            if (this.$field$ != value)
+                            {
+                                return;
+                            }
+                            
+                            this.$field$ = value;
+                            
+                            this.RaisePropertyChanged(nameof(this.$name$));
+                        }
+                    }
+                ]]>
+      </Code>
+    </Snippet>
+  </CodeSnippet>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>Dispose observable list and its sub-items</Title>
+      <Shortcut>displistitems</Shortcut>
+      <Description>Code Snippet for disposing an ObservableList and all its disposable sub-items</Description>
+      <Author>Adrian Mos</Author>
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations>
+        <Literal>
+          <ID>field</ID>
+          <Default>itemToDispose</Default>
+        </Literal>
+        <Object>
+          <ID>list</ID>
+          <Type>IX.Observable.ObservableList`1</Type>
+          <ToolTip>Replace with the observable list that you want disposed.</ToolTip>
+          <Default>observableList</Default>
+        </Object>
+      </Declarations>
+      <Imports>
+        <Import>
+          <Namespace>System</Namespace>
+        </Import>
+      </Imports>      <Code Language="csharp" Format="CData">
+        <![CDATA[
+                    foreach (IDisposable $field$ in $list$.ClearAndPersist())
+                    {
+                        $field$.Dispose();
+                    }
+
+                    $list$.Dispose();
+                ]]>
+      </Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>
