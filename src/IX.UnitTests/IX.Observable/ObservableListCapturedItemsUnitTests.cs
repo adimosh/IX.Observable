@@ -84,7 +84,6 @@ namespace IX.UnitTests.IX.Observable
         public void UnitTest3()
         {
             // ARRANGE
-            EnvironmentSettings.InvokeSynchronouslyOnCurrentThread = true;
             EnvironmentSettings.AlwaysSuppressCurrentSynchronizationContext = true;
 
             using (var list = new ObservableList<CapturedItem>

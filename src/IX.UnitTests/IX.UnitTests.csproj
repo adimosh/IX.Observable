@@ -26,7 +26,7 @@
   <Import Project="..\StyleCop.targets" />
 
   <ItemGroup>
-    <PackageReference Include="IX.StandardExtensions.TestUtils" Version="0.5.0.71" />
+    <PackageReference Include="IX.StandardExtensions.TestUtils" Version="0.5.0.74" />
   </ItemGroup>
 
   <ItemGroup>

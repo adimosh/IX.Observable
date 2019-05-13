@@ -53,7 +53,6 @@ namespace IX.UnitTests.IX.Observable
         public void ObservableDictionaryUndoAtAdd(ObservableDictionary<int, int> dict)
         {
             // ARRANGE
-            EnvironmentSettings.InvokeSynchronouslyOnCurrentThread = true;
             EnvironmentSettings.AlwaysSuppressCurrentSynchronizationContext = true;
 
             // ACT
@@ -82,7 +81,6 @@ namespace IX.UnitTests.IX.Observable
         public void ObservableDictionaryRedoAtAdd(ObservableDictionary<int, int> dict)
         {
             // ARRANGE
-            EnvironmentSettings.InvokeSynchronouslyOnCurrentThread = true;
             EnvironmentSettings.AlwaysSuppressCurrentSynchronizationContext = true;
 
             dict.Add(
@@ -114,7 +112,6 @@ namespace IX.UnitTests.IX.Observable
         public void ObservableDictionaryUndoAtClear(ObservableDictionary<int, int> dict)
         {
             // ARRANGE
-            EnvironmentSettings.InvokeSynchronouslyOnCurrentThread = true;
             EnvironmentSettings.AlwaysSuppressCurrentSynchronizationContext = true;
 
             dict.Clear();
@@ -165,7 +162,6 @@ namespace IX.UnitTests.IX.Observable
         public void ObservableDictionaryRedoAtClear(ObservableDictionary<int, int> dict)
         {
             // ARRANGE
-            EnvironmentSettings.InvokeSynchronouslyOnCurrentThread = true;
             EnvironmentSettings.AlwaysSuppressCurrentSynchronizationContext = true;
 
             dict.Clear();
@@ -218,7 +214,6 @@ namespace IX.UnitTests.IX.Observable
         public void ObservableDictionaryUndoAtRemove(ObservableDictionary<int, int> dict)
         {
             // ARRANGE
-            EnvironmentSettings.InvokeSynchronouslyOnCurrentThread = true;
             EnvironmentSettings.AlwaysSuppressCurrentSynchronizationContext = true;
 
             // ACT
@@ -245,7 +240,6 @@ namespace IX.UnitTests.IX.Observable
         public void ObservableDictionaryRedoAtRemove(ObservableDictionary<int, int> dict)
         {
             // ARRANGE
-            EnvironmentSettings.InvokeSynchronouslyOnCurrentThread = true;
             EnvironmentSettings.AlwaysSuppressCurrentSynchronizationContext = true;
 
             dict.Remove(7);
@@ -273,7 +267,6 @@ namespace IX.UnitTests.IX.Observable
         public void ObservableDictionaryUndoMultipleOperations(ObservableDictionary<int, int> dict)
         {
             // ARRANGE
-            EnvironmentSettings.InvokeSynchronouslyOnCurrentThread = true;
             EnvironmentSettings.AlwaysSuppressCurrentSynchronizationContext = true;
 
             dict.Add(
@@ -349,7 +342,6 @@ namespace IX.UnitTests.IX.Observable
         public void ObservableDictionaryMultipleUndoOperations(ObservableDictionary<int, int> dict)
         {
             // ARRANGE
-            EnvironmentSettings.InvokeSynchronouslyOnCurrentThread = true;
             EnvironmentSettings.AlwaysSuppressCurrentSynchronizationContext = true;
 
             dict.HistoryLevels = 3;
@@ -402,7 +394,6 @@ namespace IX.UnitTests.IX.Observable
         public void ObservableDictionaryMultipleRedoCutoff(ObservableDictionary<int, int> dict)
         {
             // ARRANGE
-            EnvironmentSettings.InvokeSynchronouslyOnCurrentThread = true;
             EnvironmentSettings.AlwaysSuppressCurrentSynchronizationContext = true;
 
             dict.Add(
@@ -457,7 +448,6 @@ namespace IX.UnitTests.IX.Observable
         public void ObservableDictionaryCount()
         {
             // Arrange
-            EnvironmentSettings.InvokeSynchronouslyOnCurrentThread = true;
             EnvironmentSettings.AlwaysSuppressCurrentSynchronizationContext = true;
 
             var numberOfItems = DataGenerator.RandomNonNegativeInteger(UnitTestConstants.TestsGeneralMagnitude);

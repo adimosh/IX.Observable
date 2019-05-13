@@ -52,7 +52,6 @@ namespace IX.UnitTests.IX.Observable
         public void UnitTest1(ObservableList<int> list)
         {
             // ARRANGE
-            EnvironmentSettings.InvokeSynchronouslyOnCurrentThread = true;
             EnvironmentSettings.AlwaysSuppressCurrentSynchronizationContext = true;
 
             // ACT
@@ -75,7 +74,6 @@ namespace IX.UnitTests.IX.Observable
         public void UnitTest2(ObservableList<int> list)
         {
             // ARRANGE
-            EnvironmentSettings.InvokeSynchronouslyOnCurrentThread = true;
             EnvironmentSettings.AlwaysSuppressCurrentSynchronizationContext = true;
 
             list.Add(6);
@@ -99,7 +97,6 @@ namespace IX.UnitTests.IX.Observable
         public void UnitTest3(ObservableList<int> list)
         {
             // ARRANGE
-            EnvironmentSettings.InvokeSynchronouslyOnCurrentThread = true;
             EnvironmentSettings.AlwaysSuppressCurrentSynchronizationContext = true;
 
             list.AddRange(new[] { 6, 5, 2 });
@@ -129,7 +126,6 @@ namespace IX.UnitTests.IX.Observable
         public void UnitTest4(ObservableList<int> list)
         {
             // ARRANGE
-            EnvironmentSettings.InvokeSynchronouslyOnCurrentThread = true;
             EnvironmentSettings.AlwaysSuppressCurrentSynchronizationContext = true;
 
             list.AddRange(new[] { 6, 5, 2 });
@@ -165,7 +161,6 @@ namespace IX.UnitTests.IX.Observable
         public void UnitTest5(ObservableList<int> list)
         {
             // ARRANGE
-            EnvironmentSettings.InvokeSynchronouslyOnCurrentThread = true;
             EnvironmentSettings.AlwaysSuppressCurrentSynchronizationContext = true;
 
             list.Clear();
@@ -196,7 +191,6 @@ namespace IX.UnitTests.IX.Observable
         public void UnitTest6(ObservableList<int> list)
         {
             // ARRANGE
-            EnvironmentSettings.InvokeSynchronouslyOnCurrentThread = true;
             EnvironmentSettings.AlwaysSuppressCurrentSynchronizationContext = true;
 
             list.Clear();
@@ -229,7 +223,6 @@ namespace IX.UnitTests.IX.Observable
         public void UnitTest7(ObservableList<int> list)
         {
             // ARRANGE
-            EnvironmentSettings.InvokeSynchronouslyOnCurrentThread = true;
             EnvironmentSettings.AlwaysSuppressCurrentSynchronizationContext = true;
 
             // ACT
@@ -262,7 +255,6 @@ namespace IX.UnitTests.IX.Observable
         public void UnitTest8(ObservableList<int> list)
         {
             // ARRANGE
-            EnvironmentSettings.InvokeSynchronouslyOnCurrentThread = true;
             EnvironmentSettings.AlwaysSuppressCurrentSynchronizationContext = true;
 
             list.Insert(
@@ -293,7 +285,6 @@ namespace IX.UnitTests.IX.Observable
         public void UnitTest9(ObservableList<int> list)
         {
             // ARRANGE
-            EnvironmentSettings.InvokeSynchronouslyOnCurrentThread = true;
             EnvironmentSettings.AlwaysSuppressCurrentSynchronizationContext = true;
 
             // ACT
@@ -326,7 +317,6 @@ namespace IX.UnitTests.IX.Observable
         public void UnitTest10(ObservableList<int> list)
         {
             // ARRANGE
-            EnvironmentSettings.InvokeSynchronouslyOnCurrentThread = true;
             EnvironmentSettings.AlwaysSuppressCurrentSynchronizationContext = true;
 
             list.RemoveAt(2);
@@ -356,7 +346,6 @@ namespace IX.UnitTests.IX.Observable
         public void UnitTest11(ObservableList<int> list)
         {
             // ARRANGE
-            EnvironmentSettings.InvokeSynchronouslyOnCurrentThread = true;
             EnvironmentSettings.AlwaysSuppressCurrentSynchronizationContext = true;
 
             list.Add(18);
@@ -428,7 +417,6 @@ namespace IX.UnitTests.IX.Observable
         public void UnitTest12(ObservableList<int> list)
         {
             // ARRANGE
-            EnvironmentSettings.InvokeSynchronouslyOnCurrentThread = true;
             EnvironmentSettings.AlwaysSuppressCurrentSynchronizationContext = true;
 
             list.HistoryLevels = 3;
@@ -463,7 +451,6 @@ namespace IX.UnitTests.IX.Observable
         public void UnitTest13(ObservableList<int> list)
         {
             // ARRANGE
-            EnvironmentSettings.InvokeSynchronouslyOnCurrentThread = true;
             EnvironmentSettings.AlwaysSuppressCurrentSynchronizationContext = true;
 
             list.Add(15);
@@ -500,7 +487,6 @@ namespace IX.UnitTests.IX.Observable
         public void UnitTest14(ObservableList<int> list)
         {
             // ARRANGE
-            EnvironmentSettings.InvokeSynchronouslyOnCurrentThread = true;
             EnvironmentSettings.AlwaysSuppressCurrentSynchronizationContext = true;
 
             // ACT
@@ -578,7 +564,6 @@ namespace IX.UnitTests.IX.Observable
         public void UnitTest15(ObservableList<int> list)
         {
             // ARRANGE
-            EnvironmentSettings.InvokeSynchronouslyOnCurrentThread = true;
             EnvironmentSettings.AlwaysSuppressCurrentSynchronizationContext = true;
 
             // ACT
@@ -653,7 +638,6 @@ namespace IX.UnitTests.IX.Observable
         public void UnitTest16(ObservableList<int> list)
         {
             // ARRANGE
-            EnvironmentSettings.InvokeSynchronouslyOnCurrentThread = true;
             EnvironmentSettings.AlwaysSuppressCurrentSynchronizationContext = true;
 
             // ACT
