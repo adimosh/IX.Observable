@@ -71,22 +71,22 @@ namespace IX.Undoable
         /// <summary>
         /// When implemented, has the state changes received undone from the object.
         /// </summary>
-        /// <param name="stateChanges">The state changes to redo.</param>
+        /// <param name="changesToUndo">The state changes to redo.</param>
         /// <remarks>
         /// <para>This method is to only be used by a capturing undo/redo context. If the implementer is not captured, an
         /// <see cref="ItemNotCapturedIntoUndoContextException"/> should be thrown.</para>
         /// </remarks>
-        void UndoStateChanges(StateChange[] stateChanges);
+        void UndoStateChanges(StateChange[] changesToUndo);
 
         /// <summary>
         /// When implemented, has the state changes received redone into the object.
         /// </summary>
-        /// <param name="stateChanges">The state changes to redo.</param>
+        /// <param name="changesToRedo">The state changes to redo.</param>
         /// <remarks>
         /// <para>This method is to only be used by a capturing undo/redo context. If the implementer is not captured, an
         /// <see cref="ItemNotCapturedIntoUndoContextException"/> should be thrown.</para>
         /// </remarks>
-        void RedoStateChanges(StateChange[] stateChanges);
+        void RedoStateChanges(StateChange[] changesToRedo);
 
         /// <summary>
         /// Allows the implementer to be captured by a containing undo-/redo-capable object so that undo and redo operations
