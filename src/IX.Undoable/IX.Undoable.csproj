@@ -25,9 +25,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="IX.Abstractions.Collections" Version="0.5.0.74" />
-    <PackageReference Include="IX.StandardExtensions" Version="0.5.0.74" />
-    <PackageReference Include="IX.StandardExtensions.ComponentModel" Version="0.5.0.74" />
+    <PackageReference Include="IX.Abstractions.Collections" Version="0.5.0.86" />
+    <PackageReference Include="IX.StandardExtensions" Version="0.5.0.86" />
+    <PackageReference Include="IX.StandardExtensions.ComponentModel" Version="0.5.0.86" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFrameworkIsStandard)'=='true'">

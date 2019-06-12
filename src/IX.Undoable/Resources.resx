@@ -129,4 +129,7 @@
   <data name="ItemNotInEditModeExceptionDefaultMessage" xml:space="preserve">
     <value>The operation could not be completed as the current item is not in edit mode.</value>
   </data>
+  <data name="NoHistoryLevelsException" xml:space="preserve">
+    <value>No undo/redo stacks could be initialized, as there are no history levels defined.</value>
+  </data>
 </root>
