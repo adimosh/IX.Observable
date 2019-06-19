@@ -6,15 +6,14 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Threading;
-
 using IX.Observable.Adapters;
-
 using JetBrains.Annotations;
+using ReaderWriterLockSlim = IX.System.Threading.ReaderWriterLockSlim;
 
 namespace IX.Observable
 {
     /// <summary>
-    /// An observable, composite, thread-safe and read-only list made of multiple lists of the same rank.
+    ///     An observable, composite, thread-safe and read-only list made of multiple lists of the same rank.
     /// </summary>
     /// <typeparam name="T">The type of the list item.</typeparam>
     /// <seealso cref="IDisposable" />
@@ -22,36 +21,31 @@ namespace IX.Observable
     [PublicAPI]
     public class ObservableReadOnlyCompositeList<T> : ObservableReadOnlyCollectionBase<T>
     {
-#pragma warning disable IDISP002 // Dispose member. - It is
-#pragma warning disable IDISP006 // Implement IDisposable. - It is
-        /// <summary>
-        /// The thread synchronization locker.
-        /// </summary>
-        private ReaderWriterLockSlim locker;
-#pragma warning restore IDISP006 // Implement IDisposable.
-#pragma warning restore IDISP002 // Dispose member.
+        private Lazy<ReaderWriterLockSlim> locker;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ObservableReadOnlyCompositeList{T}"/> class.
+        ///     Initializes a new instance of the <see cref="ObservableReadOnlyCompositeList{T}" /> class.
         /// </summary>
         public ObservableReadOnlyCompositeList()
             : base(new MultiListListAdapter<T>())
         {
-            this.locker = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
+            this.locker = EnvironmentSettings.GenerateDefaultLocker();
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ObservableReadOnlyCompositeList{T}"/> class.
+        ///     Initializes a new instance of the <see cref="ObservableReadOnlyCompositeList{T}" /> class.
         /// </summary>
         /// <param name="context">The synchronization context to use, if any.</param>
         public ObservableReadOnlyCompositeList(SynchronizationContext context)
-            : base(new MultiListListAdapter<T>(), context)
+            : base(
+                new MultiListListAdapter<T>(),
+                context)
         {
-            this.locker = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
+            this.locker = EnvironmentSettings.GenerateDefaultLocker();
         }
 
         /// <summary>
-        /// Sets a list.
+        ///     Sets a list.
         /// </summary>
         /// <typeparam name="TList">The type of the list.</typeparam>
         /// <param name="list">The list.</param>
@@ -69,7 +63,7 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Removes a list.
+        ///     Removes a list.
         /// </summary>
         /// <typeparam name="TList">The type of the list.</typeparam>
         /// <param name="list">The list.</param>
@@ -87,21 +81,29 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Disposes the managed context.
+        ///     Disposes the managed context.
         /// </summary>
         protected override void DisposeManagedContext()
         {
-            Interlocked.Exchange(ref this.locker, null)?.Dispose();
+            Lazy<ReaderWriterLockSlim> l = Interlocked.Exchange(
+                ref this.locker,
+                null);
+            if (l?.IsValueCreated ?? false)
+            {
+                l.Value.Dispose();
+            }
 
             base.DisposeManagedContext();
         }
 
         /// <summary>
-        /// Disposes the general context.
+        ///     Disposes the general context.
         /// </summary>
         protected override void DisposeGeneralContext()
         {
-            Interlocked.Exchange(ref this.locker, null);
+            Interlocked.Exchange(
+                ref this.locker,
+                null);
 
             base.DisposeGeneralContext();
         }

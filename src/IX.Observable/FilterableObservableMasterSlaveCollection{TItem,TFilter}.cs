@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using IX.Observable.DebugAide;
+using JetBrains.Annotations;
 
 namespace IX.Observable
 {
@@ -18,6 +19,7 @@ namespace IX.Observable
     /// <seealso cref="IX.Observable.ObservableMasterSlaveCollection{T}" />
     [DebuggerDisplay("Count = {Count}")]
     [DebuggerTypeProxy(typeof(CollectionDebugView<>))]
+    [PublicAPI]
     public class FilterableObservableMasterSlaveCollection<TItem, TFilter> : ObservableMasterSlaveCollection<TItem>
     {
         private TFilter filter;

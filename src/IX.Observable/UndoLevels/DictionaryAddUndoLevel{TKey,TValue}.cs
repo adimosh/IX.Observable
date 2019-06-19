@@ -3,6 +3,7 @@
 // </copyright>
 
 using IX.Undoable;
+using JetBrains.Annotations;
 
 namespace IX.Observable.UndoLevels
 {
@@ -12,6 +13,7 @@ namespace IX.Observable.UndoLevels
     /// <typeparam name="TKey">The type of the key.</typeparam>
     /// <typeparam name="TValue">The type of the value.</typeparam>
     /// <seealso cref="IX.Undoable.StateChange" />
+    [PublicAPI]
     public class DictionaryAddUndoLevel<TKey, TValue> : StateChange
     {
         /// <summary>

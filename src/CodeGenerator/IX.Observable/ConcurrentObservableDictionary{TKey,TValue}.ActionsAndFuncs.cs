@@ -13,7 +13,7 @@ namespace IX.Observable
 #pragma warning restore SA1601 // Partial elements should be documented
     {
         /// <summary>
-        /// Gets a value from the dictionary, optionally generating one if the key is not found.
+        ///     Gets a value from the dictionary, optionally generating one if the key is not found.
         /// </summary>
         /// <typeparam name="TParam1">The type of parameter to be passed to the invoked method at index 0.</typeparam>
         /// <param name="key">The key.</param>
@@ -21,8 +21,8 @@ namespace IX.Observable
         /// <param name="param1">A parameter of type <typeparamref name="TParam1" /> to pass to the invoked method at index 0.</param>
         /// <returns>The value corresponding to the key, that is guaranteed to exist in the dictionary after this method.</returns>
         /// <remarks>
-        /// <para>The <paramref name="valueGenerator" /> method is guaranteed to not be invoked if the key exists.</para>
-        /// <para>When the <paramref name="valueGenerator" /> method is invoked, it will be invoked within the write lock. Please ensure that no member of the dictionary is called within it.</para>
+        ///     <para>The <paramref name="valueGenerator" /> method is guaranteed to not be invoked if the key exists.</para>
+        ///     <para>When the <paramref name="valueGenerator" /> method is invoked, it will be invoked within the write lock. Please ensure that no member of the dictionary is called within it.</para>
         /// </remarks>
         public TValue GetOrAdd<TParam1>(TKey key, Func<TParam1, TValue> valueGenerator, TParam1 param1)
         {
@@ -85,7 +85,7 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Creates an item or changes its state, if one exists.
+        ///     Creates an item or changes its state, if one exists.
         /// </summary>
         /// <typeparam name="TParam1">The type of parameter to be passed to the invoked method at index 0.</typeparam>
         /// <param name="key">The key.</param>
@@ -156,7 +156,7 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Removes a key from the dictionary, then acts on its resulting value.
+        ///     Removes a key from the dictionary, then acts on its resulting value.
         /// </summary>
         /// <typeparam name="TParam1">The type of parameter to be passed to the invoked method at index 0.</typeparam>
         /// <param name="key">The key.</param>
@@ -220,7 +220,7 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Gets a value from the dictionary, optionally generating one if the key is not found.
+        ///     Gets a value from the dictionary, optionally generating one if the key is not found.
         /// </summary>
         /// <typeparam name="TParam1">The type of parameter to be passed to the invoked method at index 0.</typeparam>
         /// <typeparam name="TParam2">The type of parameter to be passed to the invoked method at index 1.</typeparam>
@@ -230,8 +230,8 @@ namespace IX.Observable
         /// <param name="param2">A parameter of type <typeparamref name="TParam2" /> to pass to the invoked method at index 1.</param>
         /// <returns>The value corresponding to the key, that is guaranteed to exist in the dictionary after this method.</returns>
         /// <remarks>
-        /// <para>The <paramref name="valueGenerator" /> method is guaranteed to not be invoked if the key exists.</para>
-        /// <para>When the <paramref name="valueGenerator" /> method is invoked, it will be invoked within the write lock. Please ensure that no member of the dictionary is called within it.</para>
+        ///     <para>The <paramref name="valueGenerator" /> method is guaranteed to not be invoked if the key exists.</para>
+        ///     <para>When the <paramref name="valueGenerator" /> method is invoked, it will be invoked within the write lock. Please ensure that no member of the dictionary is called within it.</para>
         /// </remarks>
         public TValue GetOrAdd<TParam1, TParam2>(TKey key, Func<TParam1, TParam2, TValue> valueGenerator, TParam1 param1, TParam2 param2)
         {
@@ -294,7 +294,7 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Creates an item or changes its state, if one exists.
+        ///     Creates an item or changes its state, if one exists.
         /// </summary>
         /// <typeparam name="TParam1">The type of parameter to be passed to the invoked method at index 0.</typeparam>
         /// <typeparam name="TParam2">The type of parameter to be passed to the invoked method at index 1.</typeparam>
@@ -367,7 +367,7 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Removes a key from the dictionary, then acts on its resulting value.
+        ///     Removes a key from the dictionary, then acts on its resulting value.
         /// </summary>
         /// <typeparam name="TParam1">The type of parameter to be passed to the invoked method at index 0.</typeparam>
         /// <typeparam name="TParam2">The type of parameter to be passed to the invoked method at index 1.</typeparam>
@@ -433,7 +433,7 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Gets a value from the dictionary, optionally generating one if the key is not found.
+        ///     Gets a value from the dictionary, optionally generating one if the key is not found.
         /// </summary>
         /// <typeparam name="TParam1">The type of parameter to be passed to the invoked method at index 0.</typeparam>
         /// <typeparam name="TParam2">The type of parameter to be passed to the invoked method at index 1.</typeparam>
@@ -445,8 +445,8 @@ namespace IX.Observable
         /// <param name="param3">A parameter of type <typeparamref name="TParam3" /> to pass to the invoked method at index 2.</param>
         /// <returns>The value corresponding to the key, that is guaranteed to exist in the dictionary after this method.</returns>
         /// <remarks>
-        /// <para>The <paramref name="valueGenerator" /> method is guaranteed to not be invoked if the key exists.</para>
-        /// <para>When the <paramref name="valueGenerator" /> method is invoked, it will be invoked within the write lock. Please ensure that no member of the dictionary is called within it.</para>
+        ///     <para>The <paramref name="valueGenerator" /> method is guaranteed to not be invoked if the key exists.</para>
+        ///     <para>When the <paramref name="valueGenerator" /> method is invoked, it will be invoked within the write lock. Please ensure that no member of the dictionary is called within it.</para>
         /// </remarks>
         public TValue GetOrAdd<TParam1, TParam2, TParam3>(TKey key, Func<TParam1, TParam2, TParam3, TValue> valueGenerator, TParam1 param1, TParam2 param2, TParam3 param3)
         {
@@ -509,7 +509,7 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Creates an item or changes its state, if one exists.
+        ///     Creates an item or changes its state, if one exists.
         /// </summary>
         /// <typeparam name="TParam1">The type of parameter to be passed to the invoked method at index 0.</typeparam>
         /// <typeparam name="TParam2">The type of parameter to be passed to the invoked method at index 1.</typeparam>
@@ -584,7 +584,7 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Removes a key from the dictionary, then acts on its resulting value.
+        ///     Removes a key from the dictionary, then acts on its resulting value.
         /// </summary>
         /// <typeparam name="TParam1">The type of parameter to be passed to the invoked method at index 0.</typeparam>
         /// <typeparam name="TParam2">The type of parameter to be passed to the invoked method at index 1.</typeparam>
@@ -652,7 +652,7 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Gets a value from the dictionary, optionally generating one if the key is not found.
+        ///     Gets a value from the dictionary, optionally generating one if the key is not found.
         /// </summary>
         /// <typeparam name="TParam1">The type of parameter to be passed to the invoked method at index 0.</typeparam>
         /// <typeparam name="TParam2">The type of parameter to be passed to the invoked method at index 1.</typeparam>
@@ -666,8 +666,8 @@ namespace IX.Observable
         /// <param name="param4">A parameter of type <typeparamref name="TParam4" /> to pass to the invoked method at index 3.</param>
         /// <returns>The value corresponding to the key, that is guaranteed to exist in the dictionary after this method.</returns>
         /// <remarks>
-        /// <para>The <paramref name="valueGenerator" /> method is guaranteed to not be invoked if the key exists.</para>
-        /// <para>When the <paramref name="valueGenerator" /> method is invoked, it will be invoked within the write lock. Please ensure that no member of the dictionary is called within it.</para>
+        ///     <para>The <paramref name="valueGenerator" /> method is guaranteed to not be invoked if the key exists.</para>
+        ///     <para>When the <paramref name="valueGenerator" /> method is invoked, it will be invoked within the write lock. Please ensure that no member of the dictionary is called within it.</para>
         /// </remarks>
         public TValue GetOrAdd<TParam1, TParam2, TParam3, TParam4>(TKey key, Func<TParam1, TParam2, TParam3, TParam4, TValue> valueGenerator, TParam1 param1, TParam2 param2, TParam3 param3, TParam4 param4)
         {
@@ -730,7 +730,7 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Creates an item or changes its state, if one exists.
+        ///     Creates an item or changes its state, if one exists.
         /// </summary>
         /// <typeparam name="TParam1">The type of parameter to be passed to the invoked method at index 0.</typeparam>
         /// <typeparam name="TParam2">The type of parameter to be passed to the invoked method at index 1.</typeparam>
@@ -807,7 +807,7 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Removes a key from the dictionary, then acts on its resulting value.
+        ///     Removes a key from the dictionary, then acts on its resulting value.
         /// </summary>
         /// <typeparam name="TParam1">The type of parameter to be passed to the invoked method at index 0.</typeparam>
         /// <typeparam name="TParam2">The type of parameter to be passed to the invoked method at index 1.</typeparam>
@@ -877,7 +877,7 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Gets a value from the dictionary, optionally generating one if the key is not found.
+        ///     Gets a value from the dictionary, optionally generating one if the key is not found.
         /// </summary>
         /// <typeparam name="TParam1">The type of parameter to be passed to the invoked method at index 0.</typeparam>
         /// <typeparam name="TParam2">The type of parameter to be passed to the invoked method at index 1.</typeparam>
@@ -893,8 +893,8 @@ namespace IX.Observable
         /// <param name="param5">A parameter of type <typeparamref name="TParam5" /> to pass to the invoked method at index 4.</param>
         /// <returns>The value corresponding to the key, that is guaranteed to exist in the dictionary after this method.</returns>
         /// <remarks>
-        /// <para>The <paramref name="valueGenerator" /> method is guaranteed to not be invoked if the key exists.</para>
-        /// <para>When the <paramref name="valueGenerator" /> method is invoked, it will be invoked within the write lock. Please ensure that no member of the dictionary is called within it.</para>
+        ///     <para>The <paramref name="valueGenerator" /> method is guaranteed to not be invoked if the key exists.</para>
+        ///     <para>When the <paramref name="valueGenerator" /> method is invoked, it will be invoked within the write lock. Please ensure that no member of the dictionary is called within it.</para>
         /// </remarks>
         public TValue GetOrAdd<TParam1, TParam2, TParam3, TParam4, TParam5>(TKey key, Func<TParam1, TParam2, TParam3, TParam4, TParam5, TValue> valueGenerator, TParam1 param1, TParam2 param2, TParam3 param3, TParam4 param4, TParam5 param5)
         {
@@ -957,7 +957,7 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Creates an item or changes its state, if one exists.
+        ///     Creates an item or changes its state, if one exists.
         /// </summary>
         /// <typeparam name="TParam1">The type of parameter to be passed to the invoked method at index 0.</typeparam>
         /// <typeparam name="TParam2">The type of parameter to be passed to the invoked method at index 1.</typeparam>
@@ -1036,7 +1036,7 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Removes a key from the dictionary, then acts on its resulting value.
+        ///     Removes a key from the dictionary, then acts on its resulting value.
         /// </summary>
         /// <typeparam name="TParam1">The type of parameter to be passed to the invoked method at index 0.</typeparam>
         /// <typeparam name="TParam2">The type of parameter to be passed to the invoked method at index 1.</typeparam>
@@ -1108,7 +1108,7 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Gets a value from the dictionary, optionally generating one if the key is not found.
+        ///     Gets a value from the dictionary, optionally generating one if the key is not found.
         /// </summary>
         /// <typeparam name="TParam1">The type of parameter to be passed to the invoked method at index 0.</typeparam>
         /// <typeparam name="TParam2">The type of parameter to be passed to the invoked method at index 1.</typeparam>
@@ -1126,8 +1126,8 @@ namespace IX.Observable
         /// <param name="param6">A parameter of type <typeparamref name="TParam6" /> to pass to the invoked method at index 5.</param>
         /// <returns>The value corresponding to the key, that is guaranteed to exist in the dictionary after this method.</returns>
         /// <remarks>
-        /// <para>The <paramref name="valueGenerator" /> method is guaranteed to not be invoked if the key exists.</para>
-        /// <para>When the <paramref name="valueGenerator" /> method is invoked, it will be invoked within the write lock. Please ensure that no member of the dictionary is called within it.</para>
+        ///     <para>The <paramref name="valueGenerator" /> method is guaranteed to not be invoked if the key exists.</para>
+        ///     <para>When the <paramref name="valueGenerator" /> method is invoked, it will be invoked within the write lock. Please ensure that no member of the dictionary is called within it.</para>
         /// </remarks>
         public TValue GetOrAdd<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>(TKey key, Func<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6, TValue> valueGenerator, TParam1 param1, TParam2 param2, TParam3 param3, TParam4 param4, TParam5 param5, TParam6 param6)
         {
@@ -1190,7 +1190,7 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Creates an item or changes its state, if one exists.
+        ///     Creates an item or changes its state, if one exists.
         /// </summary>
         /// <typeparam name="TParam1">The type of parameter to be passed to the invoked method at index 0.</typeparam>
         /// <typeparam name="TParam2">The type of parameter to be passed to the invoked method at index 1.</typeparam>
@@ -1271,7 +1271,7 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Removes a key from the dictionary, then acts on its resulting value.
+        ///     Removes a key from the dictionary, then acts on its resulting value.
         /// </summary>
         /// <typeparam name="TParam1">The type of parameter to be passed to the invoked method at index 0.</typeparam>
         /// <typeparam name="TParam2">The type of parameter to be passed to the invoked method at index 1.</typeparam>
@@ -1345,7 +1345,7 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Gets a value from the dictionary, optionally generating one if the key is not found.
+        ///     Gets a value from the dictionary, optionally generating one if the key is not found.
         /// </summary>
         /// <typeparam name="TParam1">The type of parameter to be passed to the invoked method at index 0.</typeparam>
         /// <typeparam name="TParam2">The type of parameter to be passed to the invoked method at index 1.</typeparam>
@@ -1365,8 +1365,8 @@ namespace IX.Observable
         /// <param name="param7">A parameter of type <typeparamref name="TParam7" /> to pass to the invoked method at index 6.</param>
         /// <returns>The value corresponding to the key, that is guaranteed to exist in the dictionary after this method.</returns>
         /// <remarks>
-        /// <para>The <paramref name="valueGenerator" /> method is guaranteed to not be invoked if the key exists.</para>
-        /// <para>When the <paramref name="valueGenerator" /> method is invoked, it will be invoked within the write lock. Please ensure that no member of the dictionary is called within it.</para>
+        ///     <para>The <paramref name="valueGenerator" /> method is guaranteed to not be invoked if the key exists.</para>
+        ///     <para>When the <paramref name="valueGenerator" /> method is invoked, it will be invoked within the write lock. Please ensure that no member of the dictionary is called within it.</para>
         /// </remarks>
         public TValue GetOrAdd<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6, TParam7>(TKey key, Func<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6, TParam7, TValue> valueGenerator, TParam1 param1, TParam2 param2, TParam3 param3, TParam4 param4, TParam5 param5, TParam6 param6, TParam7 param7)
         {
@@ -1429,7 +1429,7 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Creates an item or changes its state, if one exists.
+        ///     Creates an item or changes its state, if one exists.
         /// </summary>
         /// <typeparam name="TParam1">The type of parameter to be passed to the invoked method at index 0.</typeparam>
         /// <typeparam name="TParam2">The type of parameter to be passed to the invoked method at index 1.</typeparam>
@@ -1512,7 +1512,7 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Removes a key from the dictionary, then acts on its resulting value.
+        ///     Removes a key from the dictionary, then acts on its resulting value.
         /// </summary>
         /// <typeparam name="TParam1">The type of parameter to be passed to the invoked method at index 0.</typeparam>
         /// <typeparam name="TParam2">The type of parameter to be passed to the invoked method at index 1.</typeparam>
@@ -1588,7 +1588,7 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Gets a value from the dictionary, optionally generating one if the key is not found.
+        ///     Gets a value from the dictionary, optionally generating one if the key is not found.
         /// </summary>
         /// <typeparam name="TParam1">The type of parameter to be passed to the invoked method at index 0.</typeparam>
         /// <typeparam name="TParam2">The type of parameter to be passed to the invoked method at index 1.</typeparam>
@@ -1610,8 +1610,8 @@ namespace IX.Observable
         /// <param name="param8">A parameter of type <typeparamref name="TParam8" /> to pass to the invoked method at index 7.</param>
         /// <returns>The value corresponding to the key, that is guaranteed to exist in the dictionary after this method.</returns>
         /// <remarks>
-        /// <para>The <paramref name="valueGenerator" /> method is guaranteed to not be invoked if the key exists.</para>
-        /// <para>When the <paramref name="valueGenerator" /> method is invoked, it will be invoked within the write lock. Please ensure that no member of the dictionary is called within it.</para>
+        ///     <para>The <paramref name="valueGenerator" /> method is guaranteed to not be invoked if the key exists.</para>
+        ///     <para>When the <paramref name="valueGenerator" /> method is invoked, it will be invoked within the write lock. Please ensure that no member of the dictionary is called within it.</para>
         /// </remarks>
         public TValue GetOrAdd<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6, TParam7, TParam8>(TKey key, Func<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6, TParam7, TParam8, TValue> valueGenerator, TParam1 param1, TParam2 param2, TParam3 param3, TParam4 param4, TParam5 param5, TParam6 param6, TParam7 param7, TParam8 param8)
         {
@@ -1674,7 +1674,7 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Creates an item or changes its state, if one exists.
+        ///     Creates an item or changes its state, if one exists.
         /// </summary>
         /// <typeparam name="TParam1">The type of parameter to be passed to the invoked method at index 0.</typeparam>
         /// <typeparam name="TParam2">The type of parameter to be passed to the invoked method at index 1.</typeparam>
@@ -1759,7 +1759,7 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Removes a key from the dictionary, then acts on its resulting value.
+        ///     Removes a key from the dictionary, then acts on its resulting value.
         /// </summary>
         /// <typeparam name="TParam1">The type of parameter to be passed to the invoked method at index 0.</typeparam>
         /// <typeparam name="TParam2">The type of parameter to be passed to the invoked method at index 1.</typeparam>

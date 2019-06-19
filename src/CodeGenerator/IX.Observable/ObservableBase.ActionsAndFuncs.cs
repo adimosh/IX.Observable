@@ -9,13 +9,13 @@ using IX.StandardExtensions.Threading;
 namespace IX.Observable
 {
     /// <summary>
-    /// A base class for collections that are observable.
+    ///     A base class for collections that are observable.
     /// </summary>
     /// <seealso cref="NotifyCollectionChangedInvokerBase" />
-    public abstract partial class ObservableBase : NotifyCollectionChangedInvokerBase
+    public abstract partial class ObservableBase
     {
         /// <summary>
-        /// Invokes using a reader lock.
+        ///     Invokes using a reader lock.
         /// </summary>
         /// <typeparam name="TParam1">The type of parameter to be passed to the invoked method at index 0.</typeparam>
         /// <param name="action">The action.</param>
@@ -29,7 +29,7 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Gets a result from an invoker using a reader lock.
+        ///     Gets a result from an invoker using a reader lock.
         /// </summary>
         /// <typeparam name="TParam1">The type of parameter to be passed to the invoked method at index 0.</typeparam>
         /// <typeparam name="TReturn">The return type of the invoked method.</typeparam>
@@ -45,7 +45,7 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Invokes using a writer lock.
+        ///     Invokes using a writer lock.
         /// </summary>
         /// <typeparam name="TParam1">The type of parameter to be passed to the invoked method at index 0.</typeparam>
         /// <param name="action">The action.</param>
@@ -59,7 +59,7 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Gets a result from an invoker using a writer lock.
+        ///     Gets a result from an invoker using a writer lock.
         /// </summary>
         /// <typeparam name="TParam1">The type of parameter to be passed to the invoked method at index 0.</typeparam>
         /// <typeparam name="TReturn">The return type of the invoked method.</typeparam>
@@ -75,7 +75,7 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Invokes using a reader lock.
+        ///     Invokes using a reader lock.
         /// </summary>
         /// <typeparam name="TParam1">The type of parameter to be passed to the invoked method at index 0.</typeparam>
         /// <typeparam name="TParam2">The type of parameter to be passed to the invoked method at index 1.</typeparam>
@@ -91,7 +91,7 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Gets a result from an invoker using a reader lock.
+        ///     Gets a result from an invoker using a reader lock.
         /// </summary>
         /// <typeparam name="TParam1">The type of parameter to be passed to the invoked method at index 0.</typeparam>
         /// <typeparam name="TParam2">The type of parameter to be passed to the invoked method at index 1.</typeparam>
@@ -109,7 +109,7 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Invokes using a writer lock.
+        ///     Invokes using a writer lock.
         /// </summary>
         /// <typeparam name="TParam1">The type of parameter to be passed to the invoked method at index 0.</typeparam>
         /// <typeparam name="TParam2">The type of parameter to be passed to the invoked method at index 1.</typeparam>
@@ -125,7 +125,7 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Gets a result from an invoker using a writer lock.
+        ///     Gets a result from an invoker using a writer lock.
         /// </summary>
         /// <typeparam name="TParam1">The type of parameter to be passed to the invoked method at index 0.</typeparam>
         /// <typeparam name="TParam2">The type of parameter to be passed to the invoked method at index 1.</typeparam>
@@ -143,7 +143,7 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Invokes using a reader lock.
+        ///     Invokes using a reader lock.
         /// </summary>
         /// <typeparam name="TParam1">The type of parameter to be passed to the invoked method at index 0.</typeparam>
         /// <typeparam name="TParam2">The type of parameter to be passed to the invoked method at index 1.</typeparam>
@@ -161,7 +161,7 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Gets a result from an invoker using a reader lock.
+        ///     Gets a result from an invoker using a reader lock.
         /// </summary>
         /// <typeparam name="TParam1">The type of parameter to be passed to the invoked method at index 0.</typeparam>
         /// <typeparam name="TParam2">The type of parameter to be passed to the invoked method at index 1.</typeparam>
@@ -181,7 +181,7 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Invokes using a writer lock.
+        ///     Invokes using a writer lock.
         /// </summary>
         /// <typeparam name="TParam1">The type of parameter to be passed to the invoked method at index 0.</typeparam>
         /// <typeparam name="TParam2">The type of parameter to be passed to the invoked method at index 1.</typeparam>
@@ -199,7 +199,7 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Gets a result from an invoker using a writer lock.
+        ///     Gets a result from an invoker using a writer lock.
         /// </summary>
         /// <typeparam name="TParam1">The type of parameter to be passed to the invoked method at index 0.</typeparam>
         /// <typeparam name="TParam2">The type of parameter to be passed to the invoked method at index 1.</typeparam>
@@ -219,7 +219,7 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Invokes using a reader lock.
+        ///     Invokes using a reader lock.
         /// </summary>
         /// <typeparam name="TParam1">The type of parameter to be passed to the invoked method at index 0.</typeparam>
         /// <typeparam name="TParam2">The type of parameter to be passed to the invoked method at index 1.</typeparam>
@@ -239,7 +239,7 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Gets a result from an invoker using a reader lock.
+        ///     Gets a result from an invoker using a reader lock.
         /// </summary>
         /// <typeparam name="TParam1">The type of parameter to be passed to the invoked method at index 0.</typeparam>
         /// <typeparam name="TParam2">The type of parameter to be passed to the invoked method at index 1.</typeparam>
@@ -261,7 +261,7 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Invokes using a writer lock.
+        ///     Invokes using a writer lock.
         /// </summary>
         /// <typeparam name="TParam1">The type of parameter to be passed to the invoked method at index 0.</typeparam>
         /// <typeparam name="TParam2">The type of parameter to be passed to the invoked method at index 1.</typeparam>
@@ -281,7 +281,7 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Gets a result from an invoker using a writer lock.
+        ///     Gets a result from an invoker using a writer lock.
         /// </summary>
         /// <typeparam name="TParam1">The type of parameter to be passed to the invoked method at index 0.</typeparam>
         /// <typeparam name="TParam2">The type of parameter to be passed to the invoked method at index 1.</typeparam>
@@ -303,7 +303,7 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Invokes using a reader lock.
+        ///     Invokes using a reader lock.
         /// </summary>
         /// <typeparam name="TParam1">The type of parameter to be passed to the invoked method at index 0.</typeparam>
         /// <typeparam name="TParam2">The type of parameter to be passed to the invoked method at index 1.</typeparam>
@@ -325,7 +325,7 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Gets a result from an invoker using a reader lock.
+        ///     Gets a result from an invoker using a reader lock.
         /// </summary>
         /// <typeparam name="TParam1">The type of parameter to be passed to the invoked method at index 0.</typeparam>
         /// <typeparam name="TParam2">The type of parameter to be passed to the invoked method at index 1.</typeparam>
@@ -349,7 +349,7 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Invokes using a writer lock.
+        ///     Invokes using a writer lock.
         /// </summary>
         /// <typeparam name="TParam1">The type of parameter to be passed to the invoked method at index 0.</typeparam>
         /// <typeparam name="TParam2">The type of parameter to be passed to the invoked method at index 1.</typeparam>
@@ -371,7 +371,7 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Gets a result from an invoker using a writer lock.
+        ///     Gets a result from an invoker using a writer lock.
         /// </summary>
         /// <typeparam name="TParam1">The type of parameter to be passed to the invoked method at index 0.</typeparam>
         /// <typeparam name="TParam2">The type of parameter to be passed to the invoked method at index 1.</typeparam>
@@ -395,7 +395,7 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Invokes using a reader lock.
+        ///     Invokes using a reader lock.
         /// </summary>
         /// <typeparam name="TParam1">The type of parameter to be passed to the invoked method at index 0.</typeparam>
         /// <typeparam name="TParam2">The type of parameter to be passed to the invoked method at index 1.</typeparam>
@@ -419,7 +419,7 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Gets a result from an invoker using a reader lock.
+        ///     Gets a result from an invoker using a reader lock.
         /// </summary>
         /// <typeparam name="TParam1">The type of parameter to be passed to the invoked method at index 0.</typeparam>
         /// <typeparam name="TParam2">The type of parameter to be passed to the invoked method at index 1.</typeparam>
@@ -445,7 +445,7 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Invokes using a writer lock.
+        ///     Invokes using a writer lock.
         /// </summary>
         /// <typeparam name="TParam1">The type of parameter to be passed to the invoked method at index 0.</typeparam>
         /// <typeparam name="TParam2">The type of parameter to be passed to the invoked method at index 1.</typeparam>
@@ -469,7 +469,7 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Gets a result from an invoker using a writer lock.
+        ///     Gets a result from an invoker using a writer lock.
         /// </summary>
         /// <typeparam name="TParam1">The type of parameter to be passed to the invoked method at index 0.</typeparam>
         /// <typeparam name="TParam2">The type of parameter to be passed to the invoked method at index 1.</typeparam>
@@ -495,7 +495,7 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Invokes using a reader lock.
+        ///     Invokes using a reader lock.
         /// </summary>
         /// <typeparam name="TParam1">The type of parameter to be passed to the invoked method at index 0.</typeparam>
         /// <typeparam name="TParam2">The type of parameter to be passed to the invoked method at index 1.</typeparam>
@@ -521,7 +521,7 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Gets a result from an invoker using a reader lock.
+        ///     Gets a result from an invoker using a reader lock.
         /// </summary>
         /// <typeparam name="TParam1">The type of parameter to be passed to the invoked method at index 0.</typeparam>
         /// <typeparam name="TParam2">The type of parameter to be passed to the invoked method at index 1.</typeparam>
@@ -549,7 +549,7 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Invokes using a writer lock.
+        ///     Invokes using a writer lock.
         /// </summary>
         /// <typeparam name="TParam1">The type of parameter to be passed to the invoked method at index 0.</typeparam>
         /// <typeparam name="TParam2">The type of parameter to be passed to the invoked method at index 1.</typeparam>
@@ -575,7 +575,7 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Gets a result from an invoker using a writer lock.
+        ///     Gets a result from an invoker using a writer lock.
         /// </summary>
         /// <typeparam name="TParam1">The type of parameter to be passed to the invoked method at index 0.</typeparam>
         /// <typeparam name="TParam2">The type of parameter to be passed to the invoked method at index 1.</typeparam>
@@ -603,7 +603,7 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Invokes using a reader lock.
+        ///     Invokes using a reader lock.
         /// </summary>
         /// <typeparam name="TParam1">The type of parameter to be passed to the invoked method at index 0.</typeparam>
         /// <typeparam name="TParam2">The type of parameter to be passed to the invoked method at index 1.</typeparam>
@@ -631,7 +631,7 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Gets a result from an invoker using a reader lock.
+        ///     Gets a result from an invoker using a reader lock.
         /// </summary>
         /// <typeparam name="TParam1">The type of parameter to be passed to the invoked method at index 0.</typeparam>
         /// <typeparam name="TParam2">The type of parameter to be passed to the invoked method at index 1.</typeparam>
@@ -661,7 +661,7 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Invokes using a writer lock.
+        ///     Invokes using a writer lock.
         /// </summary>
         /// <typeparam name="TParam1">The type of parameter to be passed to the invoked method at index 0.</typeparam>
         /// <typeparam name="TParam2">The type of parameter to be passed to the invoked method at index 1.</typeparam>
@@ -689,7 +689,7 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Gets a result from an invoker using a writer lock.
+        ///     Gets a result from an invoker using a writer lock.
         /// </summary>
         /// <typeparam name="TParam1">The type of parameter to be passed to the invoked method at index 0.</typeparam>
         /// <typeparam name="TParam2">The type of parameter to be passed to the invoked method at index 1.</typeparam>

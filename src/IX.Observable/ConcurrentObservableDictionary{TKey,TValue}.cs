@@ -9,282 +9,411 @@ using System.Runtime.Serialization;
 using IX.Observable.DebugAide;
 using IX.StandardExtensions.Threading;
 using IX.System.Threading;
+using JetBrains.Annotations;
 using GlobalThreading = System.Threading;
 
 namespace IX.Observable
 {
     /// <summary>
-    /// A dictionary that broadcasts its changes.
+    ///     A dictionary that broadcasts its changes.
     /// </summary>
     /// <typeparam name="TKey">The data key type.</typeparam>
     /// <typeparam name="TValue">The data value type.</typeparam>
     [DebuggerDisplay("ConcurrentObservableDictionary, Count = {Count}")]
     [DebuggerTypeProxy(typeof(DictionaryDebugView<,>))]
-    [CollectionDataContract(Namespace = Constants.DataContractNamespace, Name = "ConcurrentObservable{1}DictionaryBy{0}", ItemName = "Entry", KeyName = "Key", ValueName = "Value")]
+    [CollectionDataContract(
+        Namespace = Constants.DataContractNamespace,
+        Name = "ConcurrentObservable{1}DictionaryBy{0}",
+        ItemName = "Entry",
+        KeyName = "Key",
+        ValueName = "Value")]
+    [PublicAPI]
     public partial class ConcurrentObservableDictionary<TKey, TValue> : ObservableDictionary<TKey, TValue>
     {
-        private ReaderWriterLockSlim locker;
+        private Lazy<ReaderWriterLockSlim> locker;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ConcurrentObservableDictionary{TKey, TValue}" /> class.
+        ///     Initializes a new instance of the <see cref="ConcurrentObservableDictionary{TKey, TValue}" /> class.
         /// </summary>
         public ConcurrentObservableDictionary()
-            : base()
         {
+            this.locker = EnvironmentSettings.GenerateDefaultLocker();
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ConcurrentObservableDictionary{TKey, TValue}" /> class.
+        ///     Initializes a new instance of the <see cref="ConcurrentObservableDictionary{TKey, TValue}" /> class.
         /// </summary>
         /// <param name="capacity">The initial capacity of the dictionary.</param>
         public ConcurrentObservableDictionary(int capacity)
             : base(capacity)
         {
+            this.locker = EnvironmentSettings.GenerateDefaultLocker();
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ConcurrentObservableDictionary{TKey, TValue}" /> class.
+        ///     Initializes a new instance of the <see cref="ConcurrentObservableDictionary{TKey, TValue}" /> class.
         /// </summary>
         /// <param name="equalityComparer">A comparer object to use for equality comparison.</param>
         public ConcurrentObservableDictionary(IEqualityComparer<TKey> equalityComparer)
             : base(equalityComparer)
         {
+            this.locker = EnvironmentSettings.GenerateDefaultLocker();
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ConcurrentObservableDictionary{TKey, TValue}" /> class.
+        ///     Initializes a new instance of the <see cref="ConcurrentObservableDictionary{TKey, TValue}" /> class.
         /// </summary>
         /// <param name="capacity">The initial capacity of the dictionary.</param>
         /// <param name="equalityComparer">A comparer object to use for equality comparison.</param>
-        public ConcurrentObservableDictionary(int capacity, IEqualityComparer<TKey> equalityComparer)
-            : base(capacity, equalityComparer)
+        public ConcurrentObservableDictionary(
+            int capacity,
+            IEqualityComparer<TKey> equalityComparer)
+            : base(
+                capacity,
+                equalityComparer)
         {
+            this.locker = EnvironmentSettings.GenerateDefaultLocker();
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ConcurrentObservableDictionary{TKey, TValue}" /> class.
+        ///     Initializes a new instance of the <see cref="ConcurrentObservableDictionary{TKey, TValue}" /> class.
         /// </summary>
         /// <param name="dictionary">A dictionary of items to copy from.</param>
         public ConcurrentObservableDictionary(IDictionary<TKey, TValue> dictionary)
             : base(dictionary)
         {
+            this.locker = EnvironmentSettings.GenerateDefaultLocker();
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ConcurrentObservableDictionary{TKey, TValue}" /> class.
+        ///     Initializes a new instance of the <see cref="ConcurrentObservableDictionary{TKey, TValue}" /> class.
         /// </summary>
         /// <param name="dictionary">A dictionary of items to copy from.</param>
         /// <param name="comparer">A comparer object to use for equality comparison.</param>
-        public ConcurrentObservableDictionary(IDictionary<TKey, TValue> dictionary, IEqualityComparer<TKey> comparer)
-            : base(dictionary, comparer)
+        public ConcurrentObservableDictionary(
+            IDictionary<TKey, TValue> dictionary,
+            IEqualityComparer<TKey> comparer)
+            : base(
+                dictionary,
+                comparer)
         {
+            this.locker = EnvironmentSettings.GenerateDefaultLocker();
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ConcurrentObservableDictionary{TKey, TValue}" /> class.
+        ///     Initializes a new instance of the <see cref="ConcurrentObservableDictionary{TKey, TValue}" /> class.
         /// </summary>
         /// <param name="context">The synchronization context top use when posting observable messages.</param>
         public ConcurrentObservableDictionary(GlobalThreading.SynchronizationContext context)
             : base(context)
         {
+            this.locker = EnvironmentSettings.GenerateDefaultLocker();
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ConcurrentObservableDictionary{TKey, TValue}" /> class.
+        ///     Initializes a new instance of the <see cref="ConcurrentObservableDictionary{TKey, TValue}" /> class.
         /// </summary>
         /// <param name="context">The synchronization context top use when posting observable messages.</param>
         /// <param name="capacity">The initial capacity of the dictionary.</param>
-        public ConcurrentObservableDictionary(GlobalThreading.SynchronizationContext context, int capacity)
-            : base(context, capacity)
+        public ConcurrentObservableDictionary(
+            GlobalThreading.SynchronizationContext context,
+            int capacity)
+            : base(
+                context,
+                capacity)
         {
+            this.locker = EnvironmentSettings.GenerateDefaultLocker();
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ConcurrentObservableDictionary{TKey, TValue}" /> class.
+        ///     Initializes a new instance of the <see cref="ConcurrentObservableDictionary{TKey, TValue}" /> class.
         /// </summary>
         /// <param name="context">The synchronization context top use when posting observable messages.</param>
         /// <param name="equalityComparer">A comparer object to use for equality comparison.</param>
-        public ConcurrentObservableDictionary(GlobalThreading.SynchronizationContext context, IEqualityComparer<TKey> equalityComparer)
-            : base(context, equalityComparer)
+        public ConcurrentObservableDictionary(
+            GlobalThreading.SynchronizationContext context,
+            IEqualityComparer<TKey> equalityComparer)
+            : base(
+                context,
+                equalityComparer)
         {
+            this.locker = EnvironmentSettings.GenerateDefaultLocker();
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ConcurrentObservableDictionary{TKey, TValue}" /> class.
+        ///     Initializes a new instance of the <see cref="ConcurrentObservableDictionary{TKey, TValue}" /> class.
         /// </summary>
         /// <param name="context">The synchronization context top use when posting observable messages.</param>
         /// <param name="capacity">The initial capacity of the dictionary.</param>
         /// <param name="equalityComparer">A comparer object to use for equality comparison.</param>
-        public ConcurrentObservableDictionary(GlobalThreading.SynchronizationContext context, int capacity, IEqualityComparer<TKey> equalityComparer)
-            : base(context, capacity, equalityComparer)
+        public ConcurrentObservableDictionary(
+            GlobalThreading.SynchronizationContext context,
+            int capacity,
+            IEqualityComparer<TKey> equalityComparer)
+            : base(
+                context,
+                capacity,
+                equalityComparer)
         {
+            this.locker = EnvironmentSettings.GenerateDefaultLocker();
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ConcurrentObservableDictionary{TKey, TValue}" /> class.
+        ///     Initializes a new instance of the <see cref="ConcurrentObservableDictionary{TKey, TValue}" /> class.
         /// </summary>
         /// <param name="context">The synchronization context top use when posting observable messages.</param>
         /// <param name="dictionary">A dictionary of items to copy from.</param>
-        public ConcurrentObservableDictionary(GlobalThreading.SynchronizationContext context, IDictionary<TKey, TValue> dictionary)
-            : base(context, dictionary)
+        public ConcurrentObservableDictionary(
+            GlobalThreading.SynchronizationContext context,
+            IDictionary<TKey, TValue> dictionary)
+            : base(
+                context,
+                dictionary)
         {
+            this.locker = EnvironmentSettings.GenerateDefaultLocker();
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ConcurrentObservableDictionary{TKey, TValue}" /> class.
+        ///     Initializes a new instance of the <see cref="ConcurrentObservableDictionary{TKey, TValue}" /> class.
         /// </summary>
         /// <param name="context">The synchronization context top use when posting observable messages.</param>
         /// <param name="dictionary">A dictionary of items to copy from.</param>
         /// <param name="comparer">A comparer object to use for equality comparison.</param>
-        public ConcurrentObservableDictionary(GlobalThreading.SynchronizationContext context, IDictionary<TKey, TValue> dictionary, IEqualityComparer<TKey> comparer)
-            : base(context, dictionary, comparer)
+        public ConcurrentObservableDictionary(
+            GlobalThreading.SynchronizationContext context,
+            IDictionary<TKey, TValue> dictionary,
+            IEqualityComparer<TKey> comparer)
+            : base(
+                context,
+                dictionary,
+                comparer)
         {
+            this.locker = EnvironmentSettings.GenerateDefaultLocker();
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ConcurrentObservableDictionary{TKey, TValue}" /> class.
+        ///     Initializes a new instance of the <see cref="ConcurrentObservableDictionary{TKey, TValue}" /> class.
         /// </summary>
-        /// <param name="suppressUndoable">If set to <see langword="true"/>, suppresses undoable capabilities of this collection.</param>
+        /// <param name="suppressUndoable">If set to <see langword="true" />, suppresses undoable capabilities of this collection.</param>
         public ConcurrentObservableDictionary(bool suppressUndoable)
             : base(suppressUndoable)
         {
+            this.locker = EnvironmentSettings.GenerateDefaultLocker();
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ConcurrentObservableDictionary{TKey, TValue}" /> class.
+        ///     Initializes a new instance of the <see cref="ConcurrentObservableDictionary{TKey, TValue}" /> class.
         /// </summary>
         /// <param name="capacity">The initial capacity of the dictionary.</param>
-        /// <param name="suppressUndoable">If set to <see langword="true"/>, suppresses undoable capabilities of this collection.</param>
-        public ConcurrentObservableDictionary(int capacity, bool suppressUndoable)
-            : base(capacity, suppressUndoable)
+        /// <param name="suppressUndoable">If set to <see langword="true" />, suppresses undoable capabilities of this collection.</param>
+        public ConcurrentObservableDictionary(
+            int capacity,
+            bool suppressUndoable)
+            : base(
+                capacity,
+                suppressUndoable)
         {
+            this.locker = EnvironmentSettings.GenerateDefaultLocker();
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ConcurrentObservableDictionary{TKey, TValue}" /> class.
+        ///     Initializes a new instance of the <see cref="ConcurrentObservableDictionary{TKey, TValue}" /> class.
         /// </summary>
         /// <param name="equalityComparer">A comparer object to use for equality comparison.</param>
-        /// <param name="suppressUndoable">If set to <see langword="true"/>, suppresses undoable capabilities of this collection.</param>
-        public ConcurrentObservableDictionary(IEqualityComparer<TKey> equalityComparer, bool suppressUndoable)
-            : base(equalityComparer, suppressUndoable)
+        /// <param name="suppressUndoable">If set to <see langword="true" />, suppresses undoable capabilities of this collection.</param>
+        public ConcurrentObservableDictionary(
+            IEqualityComparer<TKey> equalityComparer,
+            bool suppressUndoable)
+            : base(
+                equalityComparer,
+                suppressUndoable)
         {
+            this.locker = EnvironmentSettings.GenerateDefaultLocker();
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ConcurrentObservableDictionary{TKey, TValue}" /> class.
+        ///     Initializes a new instance of the <see cref="ConcurrentObservableDictionary{TKey, TValue}" /> class.
         /// </summary>
         /// <param name="capacity">The initial capacity of the dictionary.</param>
         /// <param name="equalityComparer">A comparer object to use for equality comparison.</param>
-        /// <param name="suppressUndoable">If set to <see langword="true"/>, suppresses undoable capabilities of this collection.</param>
-        public ConcurrentObservableDictionary(int capacity, IEqualityComparer<TKey> equalityComparer, bool suppressUndoable)
-            : base(capacity, equalityComparer, suppressUndoable)
+        /// <param name="suppressUndoable">If set to <see langword="true" />, suppresses undoable capabilities of this collection.</param>
+        public ConcurrentObservableDictionary(
+            int capacity,
+            IEqualityComparer<TKey> equalityComparer,
+            bool suppressUndoable)
+            : base(
+                capacity,
+                equalityComparer,
+                suppressUndoable)
         {
+            this.locker = EnvironmentSettings.GenerateDefaultLocker();
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ConcurrentObservableDictionary{TKey, TValue}" /> class.
+        ///     Initializes a new instance of the <see cref="ConcurrentObservableDictionary{TKey, TValue}" /> class.
         /// </summary>
         /// <param name="dictionary">A dictionary of items to copy from.</param>
-        /// <param name="suppressUndoable">If set to <see langword="true"/>, suppresses undoable capabilities of this collection.</param>
-        public ConcurrentObservableDictionary(IDictionary<TKey, TValue> dictionary, bool suppressUndoable)
-            : base(dictionary, suppressUndoable)
+        /// <param name="suppressUndoable">If set to <see langword="true" />, suppresses undoable capabilities of this collection.</param>
+        public ConcurrentObservableDictionary(
+            IDictionary<TKey, TValue> dictionary,
+            bool suppressUndoable)
+            : base(
+                dictionary,
+                suppressUndoable)
         {
+            this.locker = EnvironmentSettings.GenerateDefaultLocker();
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ConcurrentObservableDictionary{TKey, TValue}" /> class.
+        ///     Initializes a new instance of the <see cref="ConcurrentObservableDictionary{TKey, TValue}" /> class.
         /// </summary>
-        /// <param name="dictionary">A dictionary of items to copy from.</param>
-        /// <param name="comparer">A comparer object to use for equality comparison.</param>
-        /// <param name="suppressUndoable">If set to <see langword="true"/>, suppresses undoable capabilities of this collection.</param>
-        public ConcurrentObservableDictionary(IDictionary<TKey, TValue> dictionary, IEqualityComparer<TKey> comparer, bool suppressUndoable)
-            : base(dictionary, comparer, suppressUndoable)
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ConcurrentObservableDictionary{TKey, TValue}" /> class.
-        /// </summary>
-        /// <param name="context">The synchronization context top use when posting observable messages.</param>
-        /// <param name="suppressUndoable">If set to <see langword="true"/>, suppresses undoable capabilities of this collection.</param>
-        public ConcurrentObservableDictionary(GlobalThreading.SynchronizationContext context, bool suppressUndoable)
-            : base(context, suppressUndoable)
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ConcurrentObservableDictionary{TKey, TValue}" /> class.
-        /// </summary>
-        /// <param name="context">The synchronization context top use when posting observable messages.</param>
-        /// <param name="capacity">The initial capacity of the dictionary.</param>
-        /// <param name="suppressUndoable">If set to <see langword="true"/>, suppresses undoable capabilities of this collection.</param>
-        public ConcurrentObservableDictionary(GlobalThreading.SynchronizationContext context, int capacity, bool suppressUndoable)
-            : base(context, capacity, suppressUndoable)
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ConcurrentObservableDictionary{TKey, TValue}" /> class.
-        /// </summary>
-        /// <param name="context">The synchronization context top use when posting observable messages.</param>
-        /// <param name="equalityComparer">A comparer object to use for equality comparison.</param>
-        /// <param name="suppressUndoable">If set to <see langword="true"/>, suppresses undoable capabilities of this collection.</param>
-        public ConcurrentObservableDictionary(GlobalThreading.SynchronizationContext context, IEqualityComparer<TKey> equalityComparer, bool suppressUndoable)
-            : base(context, equalityComparer, suppressUndoable)
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ConcurrentObservableDictionary{TKey, TValue}" /> class.
-        /// </summary>
-        /// <param name="context">The synchronization context top use when posting observable messages.</param>
-        /// <param name="capacity">The initial capacity of the dictionary.</param>
-        /// <param name="equalityComparer">A comparer object to use for equality comparison.</param>
-        /// <param name="suppressUndoable">If set to <see langword="true"/>, suppresses undoable capabilities of this collection.</param>
-        public ConcurrentObservableDictionary(GlobalThreading.SynchronizationContext context, int capacity, IEqualityComparer<TKey> equalityComparer, bool suppressUndoable)
-            : base(context, capacity, equalityComparer, suppressUndoable)
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ConcurrentObservableDictionary{TKey, TValue}" /> class.
-        /// </summary>
-        /// <param name="context">The synchronization context top use when posting observable messages.</param>
-        /// <param name="dictionary">A dictionary of items to copy from.</param>
-        /// <param name="suppressUndoable">If set to <see langword="true"/>, suppresses undoable capabilities of this collection.</param>
-        public ConcurrentObservableDictionary(GlobalThreading.SynchronizationContext context, IDictionary<TKey, TValue> dictionary, bool suppressUndoable)
-            : base(context, dictionary, suppressUndoable)
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ConcurrentObservableDictionary{TKey, TValue}" /> class.
-        /// </summary>
-        /// <param name="context">The synchronization context top use when posting observable messages.</param>
         /// <param name="dictionary">A dictionary of items to copy from.</param>
         /// <param name="comparer">A comparer object to use for equality comparison.</param>
-        /// <param name="suppressUndoable">If set to <see langword="true"/>, suppresses undoable capabilities of this collection.</param>
-        public ConcurrentObservableDictionary(GlobalThreading.SynchronizationContext context, IDictionary<TKey, TValue> dictionary, IEqualityComparer<TKey> comparer, bool suppressUndoable)
-            : base(context, dictionary, comparer, suppressUndoable)
+        /// <param name="suppressUndoable">If set to <see langword="true" />, suppresses undoable capabilities of this collection.</param>
+        public ConcurrentObservableDictionary(
+            IDictionary<TKey, TValue> dictionary,
+            IEqualityComparer<TKey> comparer,
+            bool suppressUndoable)
+            : base(
+                dictionary,
+                comparer,
+                suppressUndoable)
         {
+            this.locker = EnvironmentSettings.GenerateDefaultLocker();
         }
 
         /// <summary>
-        /// Gets a synchronization lock item to be used when trying to synchronize read/write operations between threads.
+        ///     Initializes a new instance of the <see cref="ConcurrentObservableDictionary{TKey, TValue}" /> class.
         /// </summary>
-        protected override IReaderWriterLock SynchronizationLock => this.locker;
+        /// <param name="context">The synchronization context top use when posting observable messages.</param>
+        /// <param name="suppressUndoable">If set to <see langword="true" />, suppresses undoable capabilities of this collection.</param>
+        public ConcurrentObservableDictionary(
+            GlobalThreading.SynchronizationContext context,
+            bool suppressUndoable)
+            : base(
+                context,
+                suppressUndoable)
+        {
+            this.locker = EnvironmentSettings.GenerateDefaultLocker();
+        }
 
         /// <summary>
-        /// Gets a value from the dictionary, optionally generating one if the key is not found.
+        ///     Initializes a new instance of the <see cref="ConcurrentObservableDictionary{TKey, TValue}" /> class.
+        /// </summary>
+        /// <param name="context">The synchronization context top use when posting observable messages.</param>
+        /// <param name="capacity">The initial capacity of the dictionary.</param>
+        /// <param name="suppressUndoable">If set to <see langword="true" />, suppresses undoable capabilities of this collection.</param>
+        public ConcurrentObservableDictionary(
+            GlobalThreading.SynchronizationContext context,
+            int capacity,
+            bool suppressUndoable)
+            : base(
+                context,
+                capacity,
+                suppressUndoable)
+        {
+            this.locker = EnvironmentSettings.GenerateDefaultLocker();
+        }
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="ConcurrentObservableDictionary{TKey, TValue}" /> class.
+        /// </summary>
+        /// <param name="context">The synchronization context top use when posting observable messages.</param>
+        /// <param name="equalityComparer">A comparer object to use for equality comparison.</param>
+        /// <param name="suppressUndoable">If set to <see langword="true" />, suppresses undoable capabilities of this collection.</param>
+        public ConcurrentObservableDictionary(
+            GlobalThreading.SynchronizationContext context,
+            IEqualityComparer<TKey> equalityComparer,
+            bool suppressUndoable)
+            : base(
+                context,
+                equalityComparer,
+                suppressUndoable)
+        {
+            this.locker = EnvironmentSettings.GenerateDefaultLocker();
+        }
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="ConcurrentObservableDictionary{TKey, TValue}" /> class.
+        /// </summary>
+        /// <param name="context">The synchronization context top use when posting observable messages.</param>
+        /// <param name="capacity">The initial capacity of the dictionary.</param>
+        /// <param name="equalityComparer">A comparer object to use for equality comparison.</param>
+        /// <param name="suppressUndoable">If set to <see langword="true" />, suppresses undoable capabilities of this collection.</param>
+        public ConcurrentObservableDictionary(
+            GlobalThreading.SynchronizationContext context,
+            int capacity,
+            IEqualityComparer<TKey> equalityComparer,
+            bool suppressUndoable)
+            : base(
+                context,
+                capacity,
+                equalityComparer,
+                suppressUndoable)
+        {
+            this.locker = EnvironmentSettings.GenerateDefaultLocker();
+        }
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="ConcurrentObservableDictionary{TKey, TValue}" /> class.
+        /// </summary>
+        /// <param name="context">The synchronization context top use when posting observable messages.</param>
+        /// <param name="dictionary">A dictionary of items to copy from.</param>
+        /// <param name="suppressUndoable">If set to <see langword="true" />, suppresses undoable capabilities of this collection.</param>
+        public ConcurrentObservableDictionary(
+            GlobalThreading.SynchronizationContext context,
+            IDictionary<TKey, TValue> dictionary,
+            bool suppressUndoable)
+            : base(
+                context,
+                dictionary,
+                suppressUndoable)
+        {
+            this.locker = EnvironmentSettings.GenerateDefaultLocker();
+        }
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="ConcurrentObservableDictionary{TKey, TValue}" /> class.
+        /// </summary>
+        /// <param name="context">The synchronization context top use when posting observable messages.</param>
+        /// <param name="dictionary">A dictionary of items to copy from.</param>
+        /// <param name="comparer">A comparer object to use for equality comparison.</param>
+        /// <param name="suppressUndoable">If set to <see langword="true" />, suppresses undoable capabilities of this collection.</param>
+        public ConcurrentObservableDictionary(
+            GlobalThreading.SynchronizationContext context,
+            IDictionary<TKey, TValue> dictionary,
+            IEqualityComparer<TKey> comparer,
+            bool suppressUndoable)
+            : base(
+                context,
+                dictionary,
+                comparer,
+                suppressUndoable)
+        {
+            this.locker = EnvironmentSettings.GenerateDefaultLocker();
+        }
+
+        /// <summary>
+        ///     Gets a synchronization lock item to be used when trying to synchronize read/write operations between threads.
+        /// </summary>
+        protected override IReaderWriterLock SynchronizationLock => this.locker.Value;
+
+        /// <summary>
+        ///     Gets a value from the dictionary, optionally generating one if the key is not found.
         /// </summary>
         /// <param name="key">The key.</param>
         /// <param name="valueGenerator">The value generator.</param>
         /// <returns>The value corresponding to the key, that is guaranteed to exist in the dictionary after this method.</returns>
         /// <remarks>
-        /// <para>The <paramref name="valueGenerator" /> method is guaranteed to not be invoked if the key exists.</para>
-        /// <para>When the <paramref name="valueGenerator" /> method is invoked, it will be invoked within the write lock. Please ensure that no member of the dictionary is called within it.</para>
+        ///     <para>The <paramref name="valueGenerator" /> method is guaranteed to not be invoked if the key exists.</para>
+        ///     <para>
+        ///         When the <paramref name="valueGenerator" /> method is invoked, it will be invoked within the write lock.
+        ///         Please ensure that no member of the dictionary is called within it.
+        ///     </para>
         /// </remarks>
-        public TValue GetOrAdd(TKey key, Func<TValue> valueGenerator)
+        public TValue GetOrAdd(
+            TKey key,
+            Func<TValue> valueGenerator)
         {
             // PRECONDITIONS
 
@@ -298,27 +427,31 @@ namespace IX.Observable
             // Under read/write lock
             using (ReadWriteSynchronizationLocker rwl = this.ReadWriteLock())
             {
-                if (this.InternalContainer.TryGetValue(key, out value))
+                if (this.InternalContainer.TryGetValue(
+                    key,
+                    out value))
                 {
                     // Within read lock, if the key is found, return the value.
                     return value;
                 }
-                else
+
+                rwl.Upgrade();
+
+                if (this.InternalContainer.TryGetValue(
+                    key,
+                    out value))
                 {
-                    rwl.Upgrade();
-
-                    if (this.InternalContainer.TryGetValue(key, out value))
-                    {
-                        // Re-check within a write lock, to ensure that something else hasn't already added it.
-                        return value;
-                    }
-
-                    // Generate the value
-                    value = valueGenerator();
-
-                    // Add the item
-                    newIndex = this.InternalContainer.Add(key, value);
+                    // Re-check within a write lock, to ensure that something else hasn't already added it.
+                    return value;
                 }
+
+                // Generate the value
+                value = valueGenerator();
+
+                // Add the item
+                newIndex = this.InternalContainer.Add(
+                    key,
+                    value);
             }
 
             // NOTIFICATIONS
@@ -332,7 +465,10 @@ namespace IX.Observable
             else
             {
                 // If index was added at a specific index
-                this.RaiseCollectionChangedAdd(new KeyValuePair<TKey, TValue>(key, value), newIndex);
+                this.RaiseCollectionChangedAdd(
+                    new KeyValuePair<TKey, TValue>(
+                        key,
+                        value), newIndex);
             }
 
             // Property changed
@@ -345,13 +481,16 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Creates an item or changes its state, if one exists.
+        ///     Creates an item or changes its state, if one exists.
         /// </summary>
         /// <param name="key">The key.</param>
         /// <param name="valueGenerator">The value generator.</param>
         /// <param name="valueAction">The value action.</param>
         /// <returns>The created or state-changed item.</returns>
-        public TValue CreateOrChangeState(TKey key, Func<TValue> valueGenerator, Action<TValue> valueAction)
+        public TValue CreateOrChangeState(
+            TKey key,
+            Func<TValue> valueGenerator,
+            Action<TValue> valueAction)
         {
             // PRECONDITIONS
 
@@ -365,29 +504,33 @@ namespace IX.Observable
             // Under read/write lock
             using (ReadWriteSynchronizationLocker rwl = this.ReadWriteLock())
             {
-                if (this.InternalContainer.TryGetValue(key, out value))
+                if (this.InternalContainer.TryGetValue(
+                    key,
+                    out value))
                 {
                     // Within read lock, if the key is found, return the value.
                     valueAction(value);
                     return value;
                 }
-                else
+
+                rwl.Upgrade();
+
+                if (this.InternalContainer.TryGetValue(
+                    key,
+                    out value))
                 {
-                    rwl.Upgrade();
-
-                    if (this.InternalContainer.TryGetValue(key, out value))
-                    {
-                        // Re-check within a write lock, to ensure that something else hasn't already added it.
-                        valueAction(value);
-                        return value;
-                    }
-
-                    // Generate the value
-                    value = valueGenerator();
-
-                    // Add the item
-                    newIndex = this.InternalContainer.Add(key, value);
+                    // Re-check within a write lock, to ensure that something else hasn't already added it.
+                    valueAction(value);
+                    return value;
                 }
+
+                // Generate the value
+                value = valueGenerator();
+
+                // Add the item
+                newIndex = this.InternalContainer.Add(
+                    key,
+                    value);
             }
 
             // NOTIFICATIONS
@@ -401,7 +544,10 @@ namespace IX.Observable
             else
             {
                 // If index was added at a specific index
-                this.RaiseCollectionChangedAdd(new KeyValuePair<TKey, TValue>(key, value), newIndex);
+                this.RaiseCollectionChangedAdd(
+                    new KeyValuePair<TKey, TValue>(
+                        key,
+                        value), newIndex);
             }
 
             // Property changed
@@ -414,12 +560,14 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Removes a key from the dictionary, then acts on its resulting value.
+        ///     Removes a key from the dictionary, then acts on its resulting value.
         /// </summary>
         /// <param name="key">The key.</param>
         /// <param name="action">The action.</param>
-        /// <returns><see langword="true"/> if the variable was successfully removed, <see langword="false"/> otherwise.</returns>
-        public bool RemoveThenAct(TKey key, Action<TValue> action)
+        /// <returns><see langword="true" /> if the variable was successfully removed, <see langword="false" /> otherwise.</returns>
+        public bool RemoveThenAct(
+            TKey key,
+            Action<TValue> action)
         {
             // PRECONDITIONS
 
@@ -433,14 +581,21 @@ namespace IX.Observable
             // Under read/write lock
             using (ReadWriteSynchronizationLocker rwl = this.ReadWriteLock())
             {
-                if (this.InternalContainer.TryGetValue(key, out value))
+                if (this.InternalContainer.TryGetValue(
+                    key,
+                    out value))
                 {
                     rwl.Upgrade();
 
-                    if (this.InternalContainer.TryGetValue(key, out value))
+                    if (this.InternalContainer.TryGetValue(
+                        key,
+                        out value))
                     {
                         // Re-check within a write lock, to ensure that something else hasn't already removed it.
-                        oldIndex = this.InternalContainer.Remove(new KeyValuePair<TKey, TValue>(key, value));
+                        oldIndex = this.InternalContainer.Remove(
+                            new KeyValuePair<TKey, TValue>(
+                                key,
+                                value));
 
                         action(value);
                     }
@@ -466,7 +621,10 @@ namespace IX.Observable
             else
             {
                 // If index was added at a specific index
-                this.RaiseCollectionChangedRemove(new KeyValuePair<TKey, TValue>(key, value), oldIndex);
+                this.RaiseCollectionChangedRemove(
+                    new KeyValuePair<TKey, TValue>(
+                        key,
+                        value), oldIndex);
             }
 
             // Property changed
@@ -479,29 +637,38 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Called when the object is being deserialized, in order to set the locker to a new value.
+        ///     Called when the object is being deserialized, in order to set the locker to a new value.
         /// </summary>
         /// <param name="context">The streaming context.</param>
         [OnDeserializing]
-        internal void OnDeserializingMethod(StreamingContext context)
-            => GlobalThreading.Interlocked.Exchange(ref this.locker, new ReaderWriterLockSlim(GlobalThreading.LockRecursionPolicy.NoRecursion));
+        internal void OnDeserializingMethod(StreamingContext context) => GlobalThreading.Interlocked.Exchange(
+            ref this.locker,
+            EnvironmentSettings.GenerateDefaultLocker());
 
         /// <summary>
-        /// Disposes the managed context.
+        ///     Disposes the managed context.
         /// </summary>
         protected override void DisposeManagedContext()
         {
-            GlobalThreading.Interlocked.Exchange(ref this.locker, null)?.Dispose();
+            Lazy<ReaderWriterLockSlim> l = GlobalThreading.Interlocked.Exchange(
+                ref this.locker,
+                null);
+            if (l?.IsValueCreated ?? false)
+            {
+                l.Value.Dispose();
+            }
 
             base.DisposeManagedContext();
         }
 
         /// <summary>
-        /// Disposes the general context.
+        ///     Disposes the general context.
         /// </summary>
         protected override void DisposeGeneralContext()
         {
-            GlobalThreading.Interlocked.Exchange(ref this.locker, null);
+            GlobalThreading.Interlocked.Exchange(
+                ref this.locker,
+                null);
 
             base.DisposeGeneralContext();
         }

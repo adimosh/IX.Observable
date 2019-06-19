@@ -8,28 +8,31 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading;
-
 using IX.Observable.Adapters;
 using IX.Observable.DebugAide;
 using IX.Observable.UndoLevels;
+using IX.StandardExtensions.Threading;
 using IX.System.Collections.Generic;
 using IX.Undoable;
-
 using JetBrains.Annotations;
 
 namespace IX.Observable
 {
     /// <summary>
-    /// A queue that broadcasts its changes.
+    ///     A queue that broadcasts its changes.
     /// </summary>
     /// <typeparam name="T">The type of items in the queue.</typeparam>
     [DebuggerDisplay("ObservableQueue, Count = {Count}")]
     [DebuggerTypeProxy(typeof(QueueDebugView<>))]
-    [CollectionDataContract(Namespace = Constants.DataContractNamespace, Name = "Observable{0}Queue", ItemName = "Item")]
+    [CollectionDataContract(
+        Namespace = Constants.DataContractNamespace,
+        Name = "Observable{0}Queue",
+        ItemName = "Item")]
+    [PublicAPI]
     public class ObservableQueue<T> : ObservableCollectionBase<T>, IQueue<T>
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="ObservableQueue{T}"/> class.
+        ///     Initializes a new instance of the <see cref="ObservableQueue{T}" /> class.
         /// </summary>
         public ObservableQueue()
             : base(new QueueCollectionAdapter<T>(new System.Collections.Generic.Queue<T>()))
@@ -37,7 +40,7 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ObservableQueue{T}"/> class.
+        ///     Initializes a new instance of the <see cref="ObservableQueue{T}" /> class.
         /// </summary>
         /// <param name="collection">A collection of items to copy from.</param>
         public ObservableQueue(IEnumerable<T> collection)
@@ -46,7 +49,7 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ObservableQueue{T}"/> class.
+        ///     Initializes a new instance of the <see cref="ObservableQueue{T}" /> class.
         /// </summary>
         /// <param name="capacity">The initial capacity of the queue.</param>
         public ObservableQueue(int capacity)
@@ -55,97 +58,134 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ObservableQueue{T}"/> class.
+        ///     Initializes a new instance of the <see cref="ObservableQueue{T}" /> class.
         /// </summary>
         /// <param name="context">The synchronization context top use when posting observable messages.</param>
         public ObservableQueue(SynchronizationContext context)
-            : base(new QueueCollectionAdapter<T>(new System.Collections.Generic.Queue<T>()), context)
+            : base(
+                new QueueCollectionAdapter<T>(new System.Collections.Generic.Queue<T>()),
+                context)
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ObservableQueue{T}"/> class.
+        ///     Initializes a new instance of the <see cref="ObservableQueue{T}" /> class.
         /// </summary>
         /// <param name="context">The synchronization context top use when posting observable messages.</param>
         /// <param name="collection">A collection of items to copy from.</param>
-        public ObservableQueue(SynchronizationContext context, IEnumerable<T> collection)
-            : base(new QueueCollectionAdapter<T>(new System.Collections.Generic.Queue<T>(collection)), context)
+        public ObservableQueue(
+            SynchronizationContext context,
+            IEnumerable<T> collection)
+            : base(
+                new QueueCollectionAdapter<T>(new System.Collections.Generic.Queue<T>(collection)),
+                context)
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ObservableQueue{T}"/> class.
+        ///     Initializes a new instance of the <see cref="ObservableQueue{T}" /> class.
         /// </summary>
         /// <param name="context">The synchronization context top use when posting observable messages.</param>
         /// <param name="capacity">The initial capacity of the queue.</param>
-        public ObservableQueue(SynchronizationContext context, int capacity)
-            : base(new QueueCollectionAdapter<T>(new System.Collections.Generic.Queue<T>(capacity)), context)
+        public ObservableQueue(
+            SynchronizationContext context,
+            int capacity)
+            : base(
+                new QueueCollectionAdapter<T>(new System.Collections.Generic.Queue<T>(capacity)),
+                context)
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ObservableQueue{T}"/> class.
+        ///     Initializes a new instance of the <see cref="ObservableQueue{T}" /> class.
         /// </summary>
-        /// <param name="suppressUndoable">If set to <see langword="true"/>, suppresses undoable capabilities of this collection.</param>
+        /// <param name="suppressUndoable">If set to <see langword="true" />, suppresses undoable capabilities of this collection.</param>
         public ObservableQueue(bool suppressUndoable)
-            : base(new QueueCollectionAdapter<T>(new System.Collections.Generic.Queue<T>()), suppressUndoable)
+            : base(
+                new QueueCollectionAdapter<T>(new System.Collections.Generic.Queue<T>()),
+                suppressUndoable)
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ObservableQueue{T}"/> class.
+        ///     Initializes a new instance of the <see cref="ObservableQueue{T}" /> class.
         /// </summary>
         /// <param name="collection">A collection of items to copy from.</param>
-        /// <param name="suppressUndoable">If set to <see langword="true"/>, suppresses undoable capabilities of this collection.</param>
-        public ObservableQueue(IEnumerable<T> collection, bool suppressUndoable)
-            : base(new QueueCollectionAdapter<T>(new System.Collections.Generic.Queue<T>(collection)), suppressUndoable)
+        /// <param name="suppressUndoable">If set to <see langword="true" />, suppresses undoable capabilities of this collection.</param>
+        public ObservableQueue(
+            IEnumerable<T> collection,
+            bool suppressUndoable)
+            : base(
+                new QueueCollectionAdapter<T>(new System.Collections.Generic.Queue<T>(collection)),
+                suppressUndoable)
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ObservableQueue{T}"/> class.
+        ///     Initializes a new instance of the <see cref="ObservableQueue{T}" /> class.
         /// </summary>
         /// <param name="capacity">The initial capacity of the queue.</param>
-        /// <param name="suppressUndoable">If set to <see langword="true"/>, suppresses undoable capabilities of this collection.</param>
-        public ObservableQueue(int capacity, bool suppressUndoable)
-            : base(new QueueCollectionAdapter<T>(new System.Collections.Generic.Queue<T>(capacity)), suppressUndoable)
+        /// <param name="suppressUndoable">If set to <see langword="true" />, suppresses undoable capabilities of this collection.</param>
+        public ObservableQueue(
+            int capacity,
+            bool suppressUndoable)
+            : base(
+                new QueueCollectionAdapter<T>(new System.Collections.Generic.Queue<T>(capacity)),
+                suppressUndoable)
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ObservableQueue{T}"/> class.
+        ///     Initializes a new instance of the <see cref="ObservableQueue{T}" /> class.
         /// </summary>
         /// <param name="context">The synchronization context top use when posting observable messages.</param>
-        /// <param name="suppressUndoable">If set to <see langword="true"/>, suppresses undoable capabilities of this collection.</param>
-        public ObservableQueue(SynchronizationContext context, bool suppressUndoable)
-            : base(new QueueCollectionAdapter<T>(new System.Collections.Generic.Queue<T>()), context, suppressUndoable)
+        /// <param name="suppressUndoable">If set to <see langword="true" />, suppresses undoable capabilities of this collection.</param>
+        public ObservableQueue(
+            SynchronizationContext context,
+            bool suppressUndoable)
+            : base(
+                new QueueCollectionAdapter<T>(new System.Collections.Generic.Queue<T>()),
+                context,
+                suppressUndoable)
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ObservableQueue{T}"/> class.
+        ///     Initializes a new instance of the <see cref="ObservableQueue{T}" /> class.
         /// </summary>
         /// <param name="context">The synchronization context top use when posting observable messages.</param>
         /// <param name="collection">A collection of items to copy from.</param>
-        /// <param name="suppressUndoable">If set to <see langword="true"/>, suppresses undoable capabilities of this collection.</param>
-        public ObservableQueue(SynchronizationContext context, IEnumerable<T> collection, bool suppressUndoable)
-            : base(new QueueCollectionAdapter<T>(new System.Collections.Generic.Queue<T>(collection)), context, suppressUndoable)
+        /// <param name="suppressUndoable">If set to <see langword="true" />, suppresses undoable capabilities of this collection.</param>
+        public ObservableQueue(
+            SynchronizationContext context,
+            IEnumerable<T> collection,
+            bool suppressUndoable)
+            : base(
+                new QueueCollectionAdapter<T>(new System.Collections.Generic.Queue<T>(collection)),
+                context,
+                suppressUndoable)
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ObservableQueue{T}"/> class.
+        ///     Initializes a new instance of the <see cref="ObservableQueue{T}" /> class.
         /// </summary>
         /// <param name="context">The synchronization context top use when posting observable messages.</param>
         /// <param name="capacity">The initial capacity of the queue.</param>
-        /// <param name="suppressUndoable">If set to <see langword="true"/>, suppresses undoable capabilities of this collection.</param>
-        public ObservableQueue(SynchronizationContext context, int capacity, bool suppressUndoable)
-            : base(new QueueCollectionAdapter<T>(new System.Collections.Generic.Queue<T>(capacity)), context, suppressUndoable)
+        /// <param name="suppressUndoable">If set to <see langword="true" />, suppresses undoable capabilities of this collection.</param>
+        public ObservableQueue(
+            SynchronizationContext context,
+            int capacity,
+            bool suppressUndoable)
+            : base(
+                new QueueCollectionAdapter<T>(new System.Collections.Generic.Queue<T>(capacity)),
+                context,
+                suppressUndoable)
         {
         }
 
         /// <summary>
-        /// De-queues and removes an item from the queue.
+        ///     De-queues and removes an item from the queue.
         /// </summary>
         /// <returns>The de-queued item.</returns>
         public T Dequeue()
@@ -162,21 +202,26 @@ namespace IX.Observable
 
             this.RaisePropertyChanged(nameof(this.Count));
             this.RaisePropertyChanged(Constants.ItemsName);
-            this.RaiseCollectionChangedRemove(item, 0);
+            this.RaiseCollectionChangedRemove(
+                item,
+                0);
 
             return item;
         }
 
         /// <summary>
-        /// Attempts to de-queue an item and to remove it from queue.
+        ///     Attempts to de-queue an item and to remove it from queue.
         /// </summary>
         /// <param name="item">The item that has been de-queued, default if unsuccessful.</param>
-        /// <returns><see langword="true" /> if an item is de-queued successfully, <see langword="false"/> otherwise, or if the queue is empty.</returns>
-        public bool TryDequeue([CanBeNull] out T item)
+        /// <returns>
+        ///     <see langword="true" /> if an item is de-queued successfully, <see langword="false" /> otherwise, or if the
+        ///     queue is empty.
+        /// </returns>
+        public bool TryDequeue(out T item)
         {
             this.ThrowIfCurrentObjectDisposed();
 
-            using (var locker = this.ReadWriteLock())
+            using (ReadWriteSynchronizationLocker locker = this.ReadWriteLock())
             {
                 var adapter = (QueueCollectionAdapter<T>)this.InternalContainer;
 
@@ -194,13 +239,15 @@ namespace IX.Observable
 
             this.RaisePropertyChanged(nameof(this.Count));
             this.RaisePropertyChanged(Constants.ItemsName);
-            this.RaiseCollectionChangedRemove(item, 0);
+            this.RaiseCollectionChangedRemove(
+                item,
+                0);
 
             return true;
         }
 
         /// <summary>
-        /// Queues an item into the queue.
+        ///     Queues an item into the queue.
         /// </summary>
         /// <param name="item">The item to queue.</param>
         public void Enqueue(T item)
@@ -219,11 +266,13 @@ namespace IX.Observable
 
             this.RaisePropertyChanged(nameof(this.Count));
             this.RaisePropertyChanged(Constants.ItemsName);
-            this.RaiseCollectionChangedAdd(item, newIndex);
+            this.RaiseCollectionChangedAdd(
+                item,
+                newIndex);
         }
 
         /// <summary>
-        /// Peeks at the topmost item in the queue without de-queuing it.
+        ///     Peeks at the topmost item in the queue without de-queuing it.
         /// </summary>
         /// <returns>The topmost item in the queue.</returns>
         public T Peek()
@@ -237,7 +286,7 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Copies the items of the queue into a new array.
+        ///     Copies the items of the queue into a new array.
         /// </summary>
         /// <returns>An array of items that are contained in the queue.</returns>
         public T[] ToArray()
@@ -251,7 +300,8 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Sets the capacity to the actual number of elements in the <see cref="ObservableQueue{T}"/>, if that number is less than 90 percent of current capacity.
+        ///     Sets the capacity to the actual number of elements in the <see cref="ObservableQueue{T}" />, if that number is less
+        ///     than 90 percent of current capacity.
         /// </summary>
         public void TrimExcess()
         {
@@ -264,15 +314,21 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Has the last operation undone.
+        ///     Has the last operation undone.
         /// </summary>
         /// <param name="undoRedoLevel">A level of undo, with contents.</param>
         /// <param name="toInvokeOutsideLock">An action to invoke outside of the lock.</param>
         /// <param name="state">The state object to pass to the invocation.</param>
-        /// <returns><see langword="true"/> if the undo was successful, <see langword="false"/> otherwise.</returns>
-        protected override bool UndoInternally(StateChange undoRedoLevel, [CanBeNull] out Action<object> toInvokeOutsideLock, [CanBeNull] out object state)
+        /// <returns><see langword="true" /> if the undo was successful, <see langword="false" /> otherwise.</returns>
+        protected override bool UndoInternally(
+            StateChange undoRedoLevel,
+            out Action<object> toInvokeOutsideLock,
+            out object state)
         {
-            if (base.UndoInternally(undoRedoLevel, out toInvokeOutsideLock, out state))
+            if (base.UndoInternally(
+                undoRedoLevel,
+                out toInvokeOutsideLock,
+                out state))
             {
                 return true;
             }
@@ -280,133 +336,158 @@ namespace IX.Observable
             switch (undoRedoLevel)
             {
                 case AddUndoLevel<T> _:
+                {
+                    var container = (QueueCollectionAdapter<T>)this.InternalContainer;
+                    var array = new T[container.Count];
+                    container.CopyTo(
+                        array,
+                        0);
+                    container.Clear();
+
+                    for (var i = 0; i < array.Length - 1; i++)
                     {
-                        var container = (QueueCollectionAdapter<T>)this.InternalContainer;
-                        var array = new T[container.Count];
-                        container.CopyTo(array, 0);
-                        container.Clear();
-
-                        for (var i = 0; i < array.Length - 1; i++)
-                        {
-                            container.Enqueue(array[i]);
-                        }
-
-                        var index = container.Count;
-                        T item = array.Last();
-                        toInvokeOutsideLock = (innerState) =>
-                        {
-                            var convertedState = innerState as Tuple<ObservableQueue<T>, T, int>;
-
-                            convertedState.Item1.RaisePropertyChanged(nameof(convertedState.Item1.Count));
-                            convertedState.Item1.RaisePropertyChanged(Constants.ItemsName);
-                            convertedState.Item1.RaiseCollectionChangedRemove(convertedState.Item2, convertedState.Item3);
-                        };
-
-                        state = new Tuple<ObservableQueue<T>, T, int>(this, item, index);
-
-                        break;
+                        container.Enqueue(array[i]);
                     }
+
+                    var index = container.Count;
+                    T item = array.Last();
+                    toInvokeOutsideLock = innerState =>
+                    {
+                        var convertedState = (Tuple<ObservableQueue<T>, T, int>)innerState;
+
+                        convertedState.Item1.RaisePropertyChanged(nameof(convertedState.Item1.Count));
+                        convertedState.Item1.RaisePropertyChanged(Constants.ItemsName);
+                        convertedState.Item1.RaiseCollectionChangedRemove(
+                            convertedState.Item2,
+                            convertedState.Item3);
+                    };
+
+                    state = new Tuple<ObservableQueue<T>, T, int>(
+                        this,
+                        item,
+                        index);
+
+                    break;
+                }
 
                 case EnqueueUndoLevel<T> _:
+                {
+                    var container = (QueueCollectionAdapter<T>)this.InternalContainer;
+                    var array = new T[container.Count];
+                    container.CopyTo(
+                        array,
+                        0);
+                    container.Clear();
+
+                    for (var i = 0; i < array.Length - 1; i++)
                     {
-                        var container = (QueueCollectionAdapter<T>)this.InternalContainer;
-                        var array = new T[container.Count];
-                        container.CopyTo(array, 0);
-                        container.Clear();
-
-                        for (var i = 0; i < array.Length - 1; i++)
-                        {
-                            container.Enqueue(array[i]);
-                        }
-
-                        var index = container.Count;
-                        T item = array.Last();
-                        toInvokeOutsideLock = (innerState) =>
-                        {
-                            var convertedState = innerState as Tuple<ObservableQueue<T>, T, int>;
-
-                            convertedState.Item1.RaisePropertyChanged(nameof(convertedState.Item1.Count));
-                            convertedState.Item1.RaisePropertyChanged(Constants.ItemsName);
-                            convertedState.Item1.RaiseCollectionChangedRemove(convertedState.Item2, convertedState.Item3);
-                        };
-
-                        state = new Tuple<ObservableQueue<T>, T, int>(this, item, index);
-
-                        break;
+                        container.Enqueue(array[i]);
                     }
+
+                    var index = container.Count;
+                    T item = array.Last();
+                    toInvokeOutsideLock = innerState =>
+                    {
+                        var convertedState = (Tuple<ObservableQueue<T>, T, int>)innerState;
+
+                        convertedState.Item1.RaisePropertyChanged(nameof(convertedState.Item1.Count));
+                        convertedState.Item1.RaisePropertyChanged(Constants.ItemsName);
+                        convertedState.Item1.RaiseCollectionChangedRemove(
+                            convertedState.Item2,
+                            convertedState.Item3);
+                    };
+
+                    state = new Tuple<ObservableQueue<T>, T, int>(
+                        this,
+                        item,
+                        index);
+
+                    break;
+                }
 
                 case DequeueUndoLevel<T> dul:
+                {
+                    var container = (QueueCollectionAdapter<T>)this.InternalContainer;
+                    container.Enqueue(dul.DequeuedItem);
+
+                    var index = container.Count - 1;
+                    T item = dul.DequeuedItem;
+                    toInvokeOutsideLock = innerState =>
                     {
-                        var container = (QueueCollectionAdapter<T>)this.InternalContainer;
-                        container.Enqueue(dul.DequeuedItem);
+                        var convertedState = (Tuple<ObservableQueue<T>, T, int>)innerState;
 
-                        var index = container.Count - 1;
-                        T item = dul.DequeuedItem;
-                        toInvokeOutsideLock = (innerState) =>
-                        {
-                            var convertedState = innerState as Tuple<ObservableQueue<T>, T, int>;
+                        convertedState.Item1.RaisePropertyChanged(nameof(convertedState.Item1.Count));
+                        convertedState.Item1.RaisePropertyChanged(Constants.ItemsName);
+                        convertedState.Item1.RaiseCollectionChangedAdd(
+                            convertedState.Item2,
+                            convertedState.Item3);
+                    };
 
-                            convertedState.Item1.RaisePropertyChanged(nameof(convertedState.Item1.Count));
-                            convertedState.Item1.RaisePropertyChanged(Constants.ItemsName);
-                            convertedState.Item1.RaiseCollectionChangedAdd(convertedState.Item2, convertedState.Item3);
-                        };
+                    state = new Tuple<ObservableQueue<T>, T, int>(
+                        this,
+                        item,
+                        index);
 
-                        state = new Tuple<ObservableQueue<T>, T, int>(this, item, index);
-
-                        break;
-                    }
+                    break;
+                }
 
                 case RemoveUndoLevel<T> _:
-                    {
-                        toInvokeOutsideLock = null;
-                        state = null;
-                        break;
-                    }
+                {
+                    toInvokeOutsideLock = null;
+                    state = null;
+                    break;
+                }
 
                 case ClearUndoLevel<T> cul:
+                {
+                    var container = (QueueCollectionAdapter<T>)this.InternalContainer;
+                    for (var i = 0; i < cul.OriginalItems.Length - 1; i++)
                     {
-                        var container = (QueueCollectionAdapter<T>)this.InternalContainer;
-                        for (var i = 0; i < cul.OriginalItems.Length - 1; i++)
-                        {
-                            container.Enqueue(cul.OriginalItems[i]);
-                        }
-
-                        toInvokeOutsideLock = (innerState) =>
-                        {
-                            var convertedState = innerState as ObservableQueue<T>;
-
-                            convertedState.RaisePropertyChanged(nameof(convertedState.Count));
-                            convertedState.RaisePropertyChanged(Constants.ItemsName);
-                            convertedState.RaiseCollectionReset();
-                        };
-
-                        state = this;
-
-                        break;
+                        container.Enqueue(cul.OriginalItems[i]);
                     }
+
+                    toInvokeOutsideLock = innerState =>
+                    {
+                        var convertedState = (ObservableQueue<T>)innerState;
+
+                        convertedState.RaisePropertyChanged(nameof(convertedState.Count));
+                        convertedState.RaisePropertyChanged(Constants.ItemsName);
+                        convertedState.RaiseCollectionReset();
+                    };
+
+                    state = this;
+
+                    break;
+                }
 
                 default:
-                    {
-                        toInvokeOutsideLock = null;
-                        state = null;
+                {
+                    toInvokeOutsideLock = null;
+                    state = null;
 
-                        return false;
-                    }
+                    return false;
+                }
             }
 
             return true;
         }
 
         /// <summary>
-        /// Has the last undone operation redone.
+        ///     Has the last undone operation redone.
         /// </summary>
         /// <param name="undoRedoLevel">A level of undo, with contents.</param>
         /// <param name="toInvokeOutsideLock">An action to invoke outside of the lock.</param>
         /// <param name="state">The state object to pass to the invocation.</param>
-        /// <returns><see langword="true"/> if the redo was successful, <see langword="false"/> otherwise.</returns>
-        protected override bool RedoInternally([NotNull] StateChange undoRedoLevel, [CanBeNull] out Action<object> toInvokeOutsideLock, [CanBeNull] out object state)
+        /// <returns><see langword="true" /> if the redo was successful, <see langword="false" /> otherwise.</returns>
+        protected override bool RedoInternally(
+            StateChange undoRedoLevel,
+            out Action<object> toInvokeOutsideLock,
+            out object state)
         {
-            if (base.RedoInternally(undoRedoLevel, out toInvokeOutsideLock, out state))
+            if (base.RedoInternally(
+                undoRedoLevel,
+                out toInvokeOutsideLock,
+                out state))
             {
                 return true;
             }
@@ -414,114 +495,131 @@ namespace IX.Observable
             switch (undoRedoLevel)
             {
                 case AddUndoLevel<T> aul:
+                {
+                    var container = (QueueCollectionAdapter<T>)this.InternalContainer;
+
+                    container.Enqueue(aul.AddedItem);
+
+                    var index = container.Count - 1;
+                    T item = aul.AddedItem;
+                    toInvokeOutsideLock = innerState =>
                     {
-                        var container = (QueueCollectionAdapter<T>)this.InternalContainer;
+                        var convertedState = (Tuple<ObservableQueue<T>, T, int>)innerState;
 
-                        container.Enqueue(aul.AddedItem);
+                        convertedState.Item1.RaisePropertyChanged(nameof(convertedState.Item1.Count));
+                        convertedState.Item1.RaisePropertyChanged(Constants.ItemsName);
+                        convertedState.Item1.RaiseCollectionChangedAdd(
+                            convertedState.Item2,
+                            convertedState.Item3);
+                    };
 
-                        var index = container.Count - 1;
-                        T item = aul.AddedItem;
-                        toInvokeOutsideLock = (innerState) =>
-                        {
-                            var convertedState = innerState as Tuple<ObservableQueue<T>, T, int>;
+                    state = new Tuple<ObservableQueue<T>, T, int>(
+                        this,
+                        item,
+                        index);
 
-                            convertedState.Item1.RaisePropertyChanged(nameof(convertedState.Item1.Count));
-                            convertedState.Item1.RaisePropertyChanged(Constants.ItemsName);
-                            convertedState.Item1.RaiseCollectionChangedAdd(convertedState.Item2, convertedState.Item3);
-                        };
-
-                        state = new Tuple<ObservableQueue<T>, T, int>(this, item, index);
-
-                        break;
-                    }
+                    break;
+                }
 
                 case EnqueueUndoLevel<T> eul:
+                {
+                    var container = (QueueCollectionAdapter<T>)this.InternalContainer;
+
+                    container.Enqueue(eul.EnqueuedItem);
+
+                    var index = container.Count - 1;
+                    T item = eul.EnqueuedItem;
+                    toInvokeOutsideLock = innerState =>
                     {
-                        var container = (QueueCollectionAdapter<T>)this.InternalContainer;
+                        var convertedState = (Tuple<ObservableQueue<T>, T, int>)innerState;
 
-                        container.Enqueue(eul.EnqueuedItem);
+                        convertedState.Item1.RaisePropertyChanged(nameof(convertedState.Item1.Count));
+                        convertedState.Item1.RaisePropertyChanged(Constants.ItemsName);
+                        convertedState.Item1.RaiseCollectionChangedAdd(
+                            convertedState.Item2,
+                            convertedState.Item3);
+                    };
 
-                        var index = container.Count - 1;
-                        T item = eul.EnqueuedItem;
-                        toInvokeOutsideLock = (innerState) =>
-                        {
-                            var convertedState = innerState as Tuple<ObservableQueue<T>, T, int>;
+                    state = new Tuple<ObservableQueue<T>, T, int>(
+                        this,
+                        item,
+                        index);
 
-                            convertedState.Item1.RaisePropertyChanged(nameof(convertedState.Item1.Count));
-                            convertedState.Item1.RaisePropertyChanged(Constants.ItemsName);
-                            convertedState.Item1.RaiseCollectionChangedAdd(convertedState.Item2, convertedState.Item3);
-                        };
-
-                        state = new Tuple<ObservableQueue<T>, T, int>(this, item, index);
-
-                        break;
-                    }
+                    break;
+                }
 
                 case DequeueUndoLevel<T> dul:
+                {
+                    var container = (QueueCollectionAdapter<T>)this.InternalContainer;
+
+                    container.Dequeue();
+
+                    var index = 0;
+                    T item = dul.DequeuedItem;
+                    toInvokeOutsideLock = innerState =>
                     {
-                        var container = (QueueCollectionAdapter<T>)this.InternalContainer;
+                        var convertedState = (Tuple<ObservableQueue<T>, T, int>)innerState;
 
-                        container.Dequeue();
+                        convertedState.Item1.RaisePropertyChanged(nameof(convertedState.Item1.Count));
+                        convertedState.Item1.RaisePropertyChanged(Constants.ItemsName);
+                        convertedState.Item1.RaiseCollectionChangedRemove(
+                            convertedState.Item2,
+                            convertedState.Item3);
+                    };
 
-                        var index = 0;
-                        T item = dul.DequeuedItem;
-                        toInvokeOutsideLock = (innerState) =>
-                        {
-                            var convertedState = innerState as Tuple<ObservableQueue<T>, T, int>;
+                    state = new Tuple<ObservableQueue<T>, T, int>(
+                        this,
+                        item,
+                        index);
 
-                            convertedState.Item1.RaisePropertyChanged(nameof(convertedState.Item1.Count));
-                            convertedState.Item1.RaisePropertyChanged(Constants.ItemsName);
-                            convertedState.Item1.RaiseCollectionChangedRemove(convertedState.Item2, convertedState.Item3);
-                        };
-
-                        state = new Tuple<ObservableQueue<T>, T, int>(this, item, index);
-
-                        break;
-                    }
+                    break;
+                }
 
                 case RemoveUndoLevel<T> _:
-                    {
-                        toInvokeOutsideLock = null;
-                        state = null;
-                        break;
-                    }
+                {
+                    toInvokeOutsideLock = null;
+                    state = null;
+                    break;
+                }
 
                 case ClearUndoLevel<T> _:
+                {
+                    this.InternalContainer.Clear();
+
+                    toInvokeOutsideLock = innerState =>
                     {
-                        this.InternalContainer.Clear();
+                        var convertedState = (ObservableQueue<T>)innerState;
 
-                        toInvokeOutsideLock = (innerState) =>
-                        {
-                            var convertedState = innerState as ObservableQueue<T>;
+                        convertedState.RaisePropertyChanged(nameof(convertedState.Count));
+                        convertedState.RaisePropertyChanged(Constants.ItemsName);
+                        convertedState.RaiseCollectionReset();
+                    };
 
-                            convertedState.RaisePropertyChanged(nameof(convertedState.Count));
-                            convertedState.RaisePropertyChanged(Constants.ItemsName);
-                            convertedState.RaiseCollectionReset();
-                        };
+                    state = this;
 
-                        state = this;
-
-                        break;
-                    }
+                    break;
+                }
 
                 default:
-                    {
-                        toInvokeOutsideLock = null;
-                        state = null;
+                {
+                    toInvokeOutsideLock = null;
+                    state = null;
 
-                        return false;
-                    }
+                    return false;
+                }
             }
 
             return true;
         }
 
         /// <summary>
-        /// Interprets the block state changes outside the write lock.
+        ///     Interprets the block state changes outside the write lock.
         /// </summary>
         /// <param name="actions">The actions to employ.</param>
         /// <param name="states">The state objects to send to the corresponding actions.</param>
-        protected override void InterpretBlockStateChangesOutsideLock(Action<object>[] actions, object[] states)
+        protected override void InterpretBlockStateChangesOutsideLock(
+            Action<object>[] actions,
+            object[] states)
         {
             this.RaisePropertyChanged(nameof(this.Count));
             this.RaisePropertyChanged(Constants.ItemsName);

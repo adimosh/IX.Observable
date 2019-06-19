@@ -98,9 +98,39 @@ namespace IX.Undoable
             }
             else
             {
-                // Both stacks are null at this point
-                this.undoStack = new Lazy<PushDownStack<StateChange[]>>(this.GenerateStack);
-                this.redoStack = new Lazy<PushDownStack<StateChange[]>>(this.GenerateStack);
+                if (this.undoStack != null && this.redoStack != null)
+                {
+                    // Both stacks are not null at this point
+                    // If any of them is initialized, we should change its size limit
+                    if (this.undoStack.IsValueCreated)
+                    {
+                        this.undoStack.Value.Limit = this.historyLevels;
+                    }
+
+                    if (this.redoStack.IsValueCreated)
+                    {
+                        this.redoStack.Value.Limit = this.historyLevels;
+                    }
+                }
+                else
+                {
+                    // Both stacks are null at this point, or need to be otherwise reinitialized
+
+                    // Let's check for whether or not stacks need to be disposed
+                    if (this.undoStack?.IsValueCreated ?? false)
+                    {
+                        this.undoStack.Value.Dispose();
+                    }
+
+                    if (this.redoStack?.IsValueCreated ?? false)
+                    {
+                        this.redoStack.Value.Dispose();
+                    }
+
+                    // Do proper stack initialization
+                    this.undoStack = new Lazy<PushDownStack<StateChange[]>>(this.GenerateStack);
+                    this.redoStack = new Lazy<PushDownStack<StateChange[]>>(this.GenerateStack);
+                }
             }
         }
 

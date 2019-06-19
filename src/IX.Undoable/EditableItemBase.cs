@@ -234,6 +234,7 @@ namespace IX.Undoable
                 throw new ItemIsInEditModeException();
             }
 
+            // Set the parent undo context
             this.ParentUndoContext = parent;
             if (this.undoContext.IsValueCreated)
             {
@@ -256,7 +257,15 @@ namespace IX.Undoable
                 return;
             }
 
+            // Set parent undo context as null
             this.ParentUndoContext = null;
+
+            if (this.undoContext.IsValueCreated)
+            {
+                // We already have an undo inner context, let's set it back.
+                // If we don't have an undo inner context, no sense in setting anything.
+                this.undoContext.Value.HistoryLevels = this.historyLevels;
+            }
 
             this.RaisePropertyChanged(nameof(this.IsCapturedIntoUndoContext));
         }
