@@ -15,10 +15,10 @@ using IX.StandardExtensions.Threading;
 namespace IX.Observable
 {
     /// <summary>
-    /// A base class for collections that are observable.
+    ///     A base class for collections that are observable.
     /// </summary>
     /// <seealso cref="NotifyCollectionChangedInvokerBase" />
-    public abstract partial class ObservableBase : NotifyCollectionChangedInvokerBase
+    public abstract partial class ObservableBase
     {<#
 for (int i = 1; i <= 8; i++)
 {
@@ -40,7 +40,7 @@ for (int i = 1; i <= 8; i++)
 #>
 
         /// <summary>
-        /// Invokes using a reader lock.
+        ///     Invokes using a reader lock.
         /// </summary>
 <#
     for (int j = 1; j <= i; j++)
@@ -68,7 +68,7 @@ for (int i = 1; i <= 8; i++)
         }
 
         /// <summary>
-        /// Gets a result from an invoker using a reader lock.
+        ///     Gets a result from an invoker using a reader lock.
         /// </summary>
 <#
     for (int j = 1; j <= i; j++)
@@ -98,7 +98,7 @@ for (int i = 1; i <= 8; i++)
         }
 
         /// <summary>
-        /// Invokes using a writer lock.
+        ///     Invokes using a writer lock.
         /// </summary>
 <#
     for (int j = 1; j <= i; j++)
@@ -126,7 +126,7 @@ for (int i = 1; i <= 8; i++)
         }
 
         /// <summary>
-        /// Gets a result from an invoker using a writer lock.
+        ///     Gets a result from an invoker using a writer lock.
         /// </summary>
 <#
     for (int j = 1; j <= i; j++)

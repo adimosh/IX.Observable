@@ -11,26 +11,29 @@ using IX.Observable.Adapters;
 using IX.Observable.DebugAide;
 using IX.Observable.UndoLevels;
 using IX.StandardExtensions.Threading;
+using JetBrains.Annotations;
 
 namespace IX.Observable
 {
     /// <summary>
-    /// An observable collection created from a master collection (to which updates go) and many slave, read-only collections.
+    ///     An observable collection created from a master collection (to which updates go) and many slave, read-only
+    ///     collections.
     /// </summary>
     /// <typeparam name="T">The type of the item.</typeparam>
     /// <seealso cref="IX.Observable.ObservableListBase{T}" />
-    /// <seealso cref="global::System.Collections.Generic.IList{T}" />
-    /// <seealso cref="global::System.Collections.Generic.IReadOnlyCollection{T}" />
-    /// <seealso cref="global::System.Collections.Generic.ICollection{T}" />
+    /// <seealso cref="IList{T}" />
+    /// <seealso cref="IReadOnlyCollection{T}" />
+    /// <seealso cref="ICollection{T}" />
     /// <seealso cref="ICollection" />
     /// <seealso cref="IList" />
     /// <seealso cref="Observable.ObservableCollectionBase{TItem}" />
     [DebuggerDisplay("ObservableMasterSlaveCollection, Count = {Count}")]
     [DebuggerTypeProxy(typeof(CollectionDebugView<>))]
-    public class ObservableMasterSlaveCollection<T> : ObservableListBase<T>, IList<T>, IReadOnlyCollection<T>, ICollection<T>, ICollection, IList
+    [PublicAPI]
+    public class ObservableMasterSlaveCollection<T> : ObservableListBase<T>
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="ObservableMasterSlaveCollection{T}"/> class.
+        ///     Initializes a new instance of the <see cref="ObservableMasterSlaveCollection{T}" /> class.
         /// </summary>
         public ObservableMasterSlaveCollection()
             : base(new MultiListMasterSlaveListAdapter<T>())
@@ -38,48 +41,58 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ObservableMasterSlaveCollection{T}"/> class.
+        ///     Initializes a new instance of the <see cref="ObservableMasterSlaveCollection{T}" /> class.
         /// </summary>
         /// <param name="context">The synchronization context to use, if any.</param>
         public ObservableMasterSlaveCollection(SynchronizationContext context)
-            : base(new MultiListMasterSlaveListAdapter<T>(), context)
+            : base(
+                new MultiListMasterSlaveListAdapter<T>(),
+                context)
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ObservableMasterSlaveCollection{T}"/> class.
+        ///     Initializes a new instance of the <see cref="ObservableMasterSlaveCollection{T}" /> class.
         /// </summary>
-        /// <param name="suppressUndoable">If set to <see langword="true"/>, suppresses undoable capabilities of this collection.</param>
+        /// <param name="suppressUndoable">If set to <see langword="true" />, suppresses undoable capabilities of this collection.</param>
         public ObservableMasterSlaveCollection(bool suppressUndoable)
-            : base(new MultiListMasterSlaveListAdapter<T>(), suppressUndoable)
+            : base(
+                new MultiListMasterSlaveListAdapter<T>(),
+                suppressUndoable)
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ObservableMasterSlaveCollection{T}"/> class.
+        ///     Initializes a new instance of the <see cref="ObservableMasterSlaveCollection{T}" /> class.
         /// </summary>
         /// <param name="context">The synchronization context to use, if any.</param>
-        /// <param name="suppressUndoable">If set to <see langword="true"/>, suppresses undoable capabilities of this collection.</param>
-        public ObservableMasterSlaveCollection(SynchronizationContext context, bool suppressUndoable)
-            : base(new MultiListMasterSlaveListAdapter<T>(), context, suppressUndoable)
+        /// <param name="suppressUndoable">If set to <see langword="true" />, suppresses undoable capabilities of this collection.</param>
+        public ObservableMasterSlaveCollection(
+            SynchronizationContext context,
+            bool suppressUndoable)
+            : base(
+                new MultiListMasterSlaveListAdapter<T>(),
+                context,
+                suppressUndoable)
         {
         }
 
         /// <summary>
-        /// Gets the count after an add operation. Used internally.
+        ///     Gets the count after an add operation. Used internally.
         /// </summary>
         /// <value>
-        /// The count after add.
+        ///     The count after add.
         /// </value>
-        protected override int CountAfterAdd => ((MultiListMasterSlaveListAdapter<T>)this.InternalContainer).MasterCount;
+        protected override int CountAfterAdd =>
+            ((MultiListMasterSlaveListAdapter<T>)this.InternalContainer).MasterCount;
 
         /// <summary>
-        /// Sets the master list.
+        ///     Sets the master list.
         /// </summary>
         /// <typeparam name="TList">The type of the list.</typeparam>
         /// <param name="list">The list.</param>
         public void SetMasterList<TList>(TList list)
-                    where TList : class, IList<T>, INotifyCollectionChanged
+            where TList : class, IList<T>, INotifyCollectionChanged
         {
             this.ThrowIfCurrentObjectDisposed();
 
@@ -94,12 +107,12 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Sets a slave list.
+        ///     Sets a slave list.
         /// </summary>
         /// <typeparam name="TList">The type of the list.</typeparam>
         /// <param name="list">The list.</param>
         public void SetSlaveList<TList>(TList list)
-                    where TList : class, IEnumerable<T>, INotifyCollectionChanged
+            where TList : class, IEnumerable<T>, INotifyCollectionChanged
         {
             this.ThrowIfCurrentObjectDisposed();
 
@@ -114,12 +127,12 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Removes a slave list.
+        ///     Removes a slave list.
         /// </summary>
         /// <typeparam name="TList">The type of the list.</typeparam>
         /// <param name="list">The list.</param>
         public void RemoveSlaveList<TList>(TList list)
-                    where TList : class, IEnumerable<T>, INotifyCollectionChanged
+            where TList : class, IEnumerable<T>, INotifyCollectionChanged
         {
             this.ThrowIfCurrentObjectDisposed();
 
@@ -134,7 +147,7 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Adds an item to the <see cref="T:IX.Observable.ObservableCollectionBase`1" />.
+        ///     Adds an item to the <see cref="T:IX.Observable.ObservableCollectionBase`1" />.
         /// </summary>
         /// <param name="item">The object to add to the <see cref="T:IX.Observable.ObservableCollectionBase`1" />.</param>
         /// <remarks>On concurrent collections, this method is write-synchronized.</remarks>
@@ -145,22 +158,31 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Inserts an item at the specified index.
+        ///     Inserts an item at the specified index.
         /// </summary>
         /// <param name="index">The index at which to insert.</param>
         /// <param name="item">The item.</param>
-        public override void Insert(int index, T item)
+        public override void Insert(
+            int index,
+            T item)
         {
             this.IncreaseIgnoreMustResetCounter();
-            base.Insert(index, item);
+            base.Insert(
+                index,
+                item);
         }
 
         /// <summary>
-        /// Removes the first occurrence of a specific object from the <see cref="T:IX.Observable.ObservableCollectionBase`1" />.
+        ///     Removes the first occurrence of a specific object from the
+        ///     <see cref="T:IX.Observable.ObservableCollectionBase`1" />.
         /// </summary>
         /// <param name="item">The object to remove from the <see cref="T:IX.Observable.ObservableCollectionBase`1" />.</param>
-        /// <returns><see langword="true"/> if <paramref name="item" /> was successfully removed from the <see cref="T:IX.Observable.ObservableCollectionBase`1" />; otherwise, <see langword="false"/>.
-        /// This method also returns false if <paramref name="item" /> is not found in the original <see cref="T:IX.Observable.ObservableCollectionBase`1" />.</returns>
+        /// <returns>
+        ///     <see langword="true" /> if <paramref name="item" /> was successfully removed from the
+        ///     <see cref="T:IX.Observable.ObservableCollectionBase`1" />; otherwise, <see langword="false" />.
+        ///     This method also returns false if <paramref name="item" /> is not found in the original
+        ///     <see cref="T:IX.Observable.ObservableCollectionBase`1" />.
+        /// </returns>
         /// <remarks>On concurrent collections, this method is write-synchronized.</remarks>
         public override bool Remove(T item)
         {
@@ -175,7 +197,7 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Removes an item at the specified index.
+        ///     Removes an item at the specified index.
         /// </summary>
         /// <param name="index">The index at which to remove an item from.</param>
         public override void RemoveAt(int index)
@@ -200,13 +222,15 @@ namespace IX.Observable
                 this.PushUndoLevel(new RemoveUndoLevel<T> { Index = index, RemovedItem = item });
             }
 
-            this.RaiseCollectionChangedRemove(item, index);
+            this.RaiseCollectionChangedRemove(
+                item,
+                index);
             this.RaisePropertyChanged(nameof(this.Count));
             this.ContentsMayHaveChanged();
         }
 
         /// <summary>
-        /// Removes all items from the <see cref="ObservableMasterSlaveCollection{T}" />.
+        ///     Removes all items from the <see cref="ObservableMasterSlaveCollection{T}" />.
         /// </summary>
         /// <returns>An array containing the original collection items.</returns>
         /// <remarks>On concurrent collections, this method is write-synchronized.</remarks>
@@ -223,7 +247,9 @@ namespace IX.Observable
                 this.IncreaseIgnoreMustResetCounter(container.SlavesCount + 1);
 
                 originalArray = new T[container.MasterCount];
-                container.MasterCopyTo(originalArray, 0);
+                container.MasterCopyTo(
+                    originalArray,
+                    0);
 
                 this.InternalContainer.Clear();
 
@@ -238,7 +264,7 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Called when the contents may have changed so that proper notifications can happen.
+        ///     Called when the contents may have changed so that proper notifications can happen.
         /// </summary>
         protected override void ContentsMayHaveChanged() => this.RaisePropertyChanged(Constants.ItemsName);
     }

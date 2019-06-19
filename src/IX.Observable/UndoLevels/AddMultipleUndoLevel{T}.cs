@@ -3,6 +3,7 @@
 // </copyright>
 
 using IX.Undoable;
+using JetBrains.Annotations;
 
 namespace IX.Observable.UndoLevels
 {
@@ -11,6 +12,7 @@ namespace IX.Observable.UndoLevels
     /// </summary>
     /// <typeparam name="T">The type of items.</typeparam>
     /// <seealso cref="IX.Undoable.StateChange" />
+    [PublicAPI]
     public class AddMultipleUndoLevel<T> : StateChange
     {
         /// <summary>

@@ -48,7 +48,7 @@ for (int i = 1; i <= 8; i++)
 #>
 
         /// <summary>
-        /// Gets a value from the dictionary, optionally generating one if the key is not found.
+        ///     Gets a value from the dictionary, optionally generating one if the key is not found.
         /// </summary>
 <#
     for (int j = 1; j <= i; j++)
@@ -70,8 +70,8 @@ for (int i = 1; i <= 8; i++)
 #>
         /// <returns>The value corresponding to the key, that is guaranteed to exist in the dictionary after this method.</returns>
         /// <remarks>
-        /// <para>The <paramref name="valueGenerator" /> method is guaranteed to not be invoked if the key exists.</para>
-        /// <para>When the <paramref name="valueGenerator" /> method is invoked, it will be invoked within the write lock. Please ensure that no member of the dictionary is called within it.</para>
+        ///     <para>The <paramref name="valueGenerator" /> method is guaranteed to not be invoked if the key exists.</para>
+        ///     <para>When the <paramref name="valueGenerator" /> method is invoked, it will be invoked within the write lock. Please ensure that no member of the dictionary is called within it.</para>
         /// </remarks>
         public TValue GetOrAdd<<#= paramTypes #>>(TKey key, Func<<#= paramTypes #>, TValue> valueGenerator, <#= paramNameTypes #>)
         {
@@ -134,7 +134,7 @@ for (int i = 1; i <= 8; i++)
         }
 
         /// <summary>
-        /// Creates an item or changes its state, if one exists.
+        ///     Creates an item or changes its state, if one exists.
         /// </summary>
 <#
     for (int j = 1; j <= i; j++)
@@ -219,7 +219,7 @@ for (int i = 1; i <= 8; i++)
         }
 
         /// <summary>
-        /// Removes a key from the dictionary, then acts on its resulting value.
+        ///     Removes a key from the dictionary, then acts on its resulting value.
         /// </summary>
 <#
     for (int j = 1; j <= i; j++)

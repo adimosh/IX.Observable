@@ -13,36 +13,44 @@ using IX.Undoable;
 namespace IX.Observable
 {
     /// <summary>
-    /// An auto-capture-releasing class that captures in a transaction.
+    ///     An auto-capture-releasing class that captures in a transaction.
     /// </summary>
     public class AutoReleaseTransactionContext : OperationTransaction
     {
+        private readonly EventHandler<EditCommittedEventArgs> editableHandler;
         private readonly IUndoableItem item;
         private readonly IUndoableItem[] items;
-        private readonly EventHandler<EditCommittedEventArgs> editableHandler;
         private readonly IUndoableItem parentContext;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="AutoReleaseTransactionContext"/> class.
+        ///     Initializes a new instance of the <see cref="AutoReleaseTransactionContext" /> class.
         /// </summary>
         public AutoReleaseTransactionContext()
         {
             this.Success();
         }
 
-#pragma warning disable IDE0016 // Use 'throw' expression
         /// <summary>
-        /// Initializes a new instance of the <see cref="AutoReleaseTransactionContext" /> class.
+        ///     Initializes a new instance of the <see cref="AutoReleaseTransactionContext" /> class.
         /// </summary>
         /// <param name="item">The item.</param>
         /// <param name="parentContext">The parent context.</param>
         /// <param name="editableHandler">The editable handler.</param>
-        public AutoReleaseTransactionContext(IUndoableItem item, IUndoableItem parentContext, EventHandler<EditCommittedEventArgs> editableHandler)
+        public AutoReleaseTransactionContext(
+            IUndoableItem item,
+            IUndoableItem parentContext,
+            EventHandler<EditCommittedEventArgs> editableHandler)
         {
             // Contract validation
-            Contract.RequiresNotNullPrivate(in item, nameof(item));
-            Contract.RequiresNotNullPrivate(in parentContext, nameof(parentContext));
-            Contract.RequiresNotNullPrivate(in editableHandler, nameof(editableHandler));
+            Contract.RequiresNotNullPrivate(
+                in item,
+                nameof(item));
+            Contract.RequiresNotNullPrivate(
+                in parentContext,
+                nameof(parentContext));
+            Contract.RequiresNotNullPrivate(
+                in editableHandler,
+                nameof(editableHandler));
 
             // Data validation
             if (!item.IsCapturedIntoUndoContext || item.ParentUndoContext != parentContext)
@@ -67,22 +75,34 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="AutoReleaseTransactionContext" /> class.
+        ///     Initializes a new instance of the <see cref="AutoReleaseTransactionContext" /> class.
         /// </summary>
         /// <param name="items">The items.</param>
         /// <param name="parentContext">The parent context.</param>
         /// <param name="editableHandler">The editable handler.</param>
-        public AutoReleaseTransactionContext(IEnumerable<IUndoableItem> items, IUndoableItem parentContext, EventHandler<EditCommittedEventArgs> editableHandler)
+        public AutoReleaseTransactionContext(
+            IEnumerable<IUndoableItem> items,
+            IUndoableItem parentContext,
+            EventHandler<EditCommittedEventArgs> editableHandler)
         {
             // Contract validation
-            Contract.RequiresNotNullPrivate(in items, nameof(items));
-            Contract.RequiresNotNullPrivate(in parentContext, nameof(parentContext));
-            Contract.RequiresNotNullPrivate(in editableHandler, nameof(editableHandler));
+            Contract.RequiresNotNullPrivate(
+                in items,
+                nameof(items));
+            Contract.RequiresNotNullPrivate(
+                in parentContext,
+                nameof(parentContext));
+            Contract.RequiresNotNullPrivate(
+                in editableHandler,
+                nameof(editableHandler));
 
             // Data validation
             // Multiple enumeration warning: this has to be done, as there is no efficient way to do a transactional capturing otherwise
-            var itemsArray = items.ToArray();
-            if (itemsArray.Any((item, pc) => !item.IsCapturedIntoUndoContext || item.ParentUndoContext != pc, parentContext))
+            IUndoableItem[] itemsArray = items.ToArray();
+            if (itemsArray.Any(
+                (
+                        item,
+                        pc) => !item.IsCapturedIntoUndoContext || item.ParentUndoContext != pc, parentContext))
             {
                 throw new ItemNotCapturedIntoUndoContextException();
             }
@@ -92,11 +112,11 @@ namespace IX.Observable
             this.item = null;
             this.editableHandler = editableHandler;
 
-            foreach (IUndoableItem item in itemsArray)
+            foreach (IUndoableItem undoableItem in itemsArray)
             {
-                item.ReleaseFromUndoContext();
+                undoableItem.ReleaseFromUndoContext();
 
-                if (item is IEditCommittableItem tei)
+                if (undoableItem is IEditCommittableItem tei)
                 {
                     tei.EditCommitted -= editableHandler;
                 }
@@ -105,44 +125,42 @@ namespace IX.Observable
             this.AddFailure();
         }
 
-#pragma warning restore IDE0016 // Use 'throw' expression
-
         /// <summary>
-        /// Gets invoked when the transaction commits and is successful.
+        ///     Gets invoked when the transaction commits and is successful.
         /// </summary>
         protected override void WhenSuccessful()
         {
         }
 
         private void AddFailure() => this.AddRevertStep(
-                state =>
+            state =>
+            {
+                var thisL1 = (AutoReleaseTransactionContext)state;
+
+                if (thisL1.item != null)
                 {
-                    var thisL1 = (AutoReleaseTransactionContext)state;
+                    thisL1.item.CaptureIntoUndoContext(thisL1.parentContext);
 
-                    if (thisL1.item != null)
+                    if (thisL1.item is IEditCommittableItem tei)
                     {
-                        thisL1.item.CaptureIntoUndoContext(thisL1.parentContext);
-
-                        if (thisL1.item is IEditCommittableItem tei)
-                        {
-                            tei.EditCommitted += thisL1.editableHandler;
-                        }
+                        tei.EditCommitted += thisL1.editableHandler;
                     }
+                }
 
-                    if (thisL1.items == null)
+                if (thisL1.items == null)
+                {
+                    return;
+                }
+
+                foreach (IUndoableItem undoableItem in thisL1.items)
+                {
+                    undoableItem.CaptureIntoUndoContext(thisL1.parentContext);
+
+                    if (thisL1.item is IEditCommittableItem tei)
                     {
-                        return;
+                        tei.EditCommitted += thisL1.editableHandler;
                     }
-
-                    foreach (IUndoableItem item in thisL1.items)
-                    {
-                        item.CaptureIntoUndoContext(thisL1.parentContext);
-
-                        if (thisL1.item is IEditCommittableItem tei)
-                        {
-                            tei.EditCommitted += thisL1.editableHandler;
-                        }
-                    }
-                }, this);
+                }
+            }, this);
     }
 }

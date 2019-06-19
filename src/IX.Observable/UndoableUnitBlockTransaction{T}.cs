@@ -2,9 +2,9 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
-using System;
 using System.Collections.Generic;
 using IX.Guaranteed;
+using IX.StandardExtensions.Contracts;
 using IX.Undoable;
 
 namespace IX.Observable
@@ -15,11 +15,9 @@ namespace IX.Observable
 
         internal UndoableUnitBlockTransaction(ObservableCollectionBase<T> collectionBase)
         {
-            this.collectionBase = collectionBase
-#if DEBUG
-                ?? throw new ArgumentNullException(nameof(collectionBase))
-#endif
-                ;
+            Contract.RequiresNotNullPrivate(in collectionBase, nameof(collectionBase));
+
+            this.collectionBase = collectionBase;
 
             this.AddRevertStep(
                 (state) =>
