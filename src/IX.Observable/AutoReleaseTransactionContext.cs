@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using IX.Guaranteed;
 using IX.StandardExtensions;
+using IX.StandardExtensions.Contracts;
 using IX.Undoable;
 
 namespace IX.Observable
@@ -17,7 +18,7 @@ namespace IX.Observable
     public class AutoReleaseTransactionContext : OperationTransaction
     {
         private readonly IUndoableItem item;
-        private readonly IEnumerable<IUndoableItem> items;
+        private readonly IUndoableItem[] items;
         private readonly EventHandler<EditCommittedEventArgs> editableHandler;
         private readonly IUndoableItem parentContext;
 
@@ -38,28 +39,18 @@ namespace IX.Observable
         /// <param name="editableHandler">The editable handler.</param>
         public AutoReleaseTransactionContext(IUndoableItem item, IUndoableItem parentContext, EventHandler<EditCommittedEventArgs> editableHandler)
         {
-#if DEBUG
-            if (item == null)
-            {
-                throw new ArgumentNullException(nameof(item));
-            }
+            // Contract validation
+            Contract.RequiresNotNullPrivate(in item, nameof(item));
+            Contract.RequiresNotNullPrivate(in parentContext, nameof(parentContext));
+            Contract.RequiresNotNullPrivate(in editableHandler, nameof(editableHandler));
 
-            if (parentContext == null)
-            {
-                throw new ArgumentNullException(nameof(parentContext));
-            }
-
-            if (editableHandler == null)
-            {
-                throw new ArgumentNullException(nameof(editableHandler));
-            }
-#endif
-
+            // Data validation
             if (!item.IsCapturedIntoUndoContext || item.ParentUndoContext != parentContext)
             {
                 throw new ItemNotCapturedIntoUndoContextException();
             }
 
+            // State
             this.items = null;
             this.item = item;
             this.editableHandler = editableHandler;
@@ -83,34 +74,25 @@ namespace IX.Observable
         /// <param name="editableHandler">The editable handler.</param>
         public AutoReleaseTransactionContext(IEnumerable<IUndoableItem> items, IUndoableItem parentContext, EventHandler<EditCommittedEventArgs> editableHandler)
         {
-#if DEBUG
-            if (items == null)
-            {
-                throw new ArgumentNullException(nameof(items));
-            }
+            // Contract validation
+            Contract.RequiresNotNullPrivate(in items, nameof(items));
+            Contract.RequiresNotNullPrivate(in parentContext, nameof(parentContext));
+            Contract.RequiresNotNullPrivate(in editableHandler, nameof(editableHandler));
 
-            if (parentContext == null)
-            {
-                throw new ArgumentNullException(nameof(parentContext));
-            }
-
-            if (editableHandler == null)
-            {
-                throw new ArgumentNullException(nameof(editableHandler));
-            }
-#endif
-
-            if (items.Any((item, pc) => !item.IsCapturedIntoUndoContext || item.ParentUndoContext != pc, parentContext))
+            // Data validation
+            // Multiple enumeration warning: this has to be done, as there is no efficient way to do a transactional capturing otherwise
+            var itemsArray = items.ToArray();
+            if (itemsArray.Any((item, pc) => !item.IsCapturedIntoUndoContext || item.ParentUndoContext != pc, parentContext))
             {
                 throw new ItemNotCapturedIntoUndoContextException();
             }
 
-            this.items = items;
+            // State
+            this.items = itemsArray;
             this.item = null;
             this.editableHandler = editableHandler;
 
-#pragma warning disable HAA0401 // Possible allocation of reference type enumerator
-            foreach (IUndoableItem item in items)
+            foreach (IUndoableItem item in itemsArray)
             {
                 item.ReleaseFromUndoContext();
 
@@ -119,7 +101,6 @@ namespace IX.Observable
                     tei.EditCommitted -= editableHandler;
                 }
             }
-#pragma warning restore HAA0401 // Possible allocation of reference type enumerator
 
             this.AddFailure();
         }
@@ -134,9 +115,9 @@ namespace IX.Observable
         }
 
         private void AddFailure() => this.AddRevertStep(
-                (state) =>
+                state =>
                 {
-                    var thisL1 = state as AutoReleaseTransactionContext;
+                    var thisL1 = (AutoReleaseTransactionContext)state;
 
                     if (thisL1.item != null)
                     {
@@ -148,19 +129,19 @@ namespace IX.Observable
                         }
                     }
 
-                    if (thisL1.items != null)
+                    if (thisL1.items == null)
                     {
-#pragma warning disable HAA0401 // Possible allocation of reference type enumerator
-                        foreach (IUndoableItem item in thisL1.items)
-                        {
-                            item.CaptureIntoUndoContext(thisL1.parentContext);
+                        return;
+                    }
 
-                            if (thisL1.item is IEditCommittableItem tei)
-                            {
-                                tei.EditCommitted += thisL1.editableHandler;
-                            }
+                    foreach (IUndoableItem item in thisL1.items)
+                    {
+                        item.CaptureIntoUndoContext(thisL1.parentContext);
+
+                        if (thisL1.item is IEditCommittableItem tei)
+                        {
+                            tei.EditCommitted += thisL1.editableHandler;
                         }
-#pragma warning restore HAA0401 // Possible allocation of reference type enumerator
                     }
                 }, this);
     }

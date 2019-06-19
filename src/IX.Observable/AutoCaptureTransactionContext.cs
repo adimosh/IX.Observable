@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using IX.Guaranteed;
 using IX.StandardExtensions;
+using IX.StandardExtensions.Contracts;
 using IX.Undoable;
 
 namespace IX.Observable
@@ -18,7 +19,7 @@ namespace IX.Observable
     internal class AutoCaptureTransactionContext : OperationTransaction
     {
         private readonly IUndoableItem item;
-        private readonly IEnumerable<IUndoableItem> items;
+        private readonly IUndoableItem[] items;
         private readonly EventHandler<EditCommittedEventArgs> editableHandler;
 
         /// <summary>
@@ -29,7 +30,6 @@ namespace IX.Observable
             this.Success();
         }
 
-#pragma warning disable IDE0016 // Use 'throw' expression
         /// <summary>
         /// Initializes a new instance of the <see cref="AutoCaptureTransactionContext" /> class.
         /// </summary>
@@ -38,28 +38,18 @@ namespace IX.Observable
         /// <param name="editableHandler">The editable handler.</param>
         public AutoCaptureTransactionContext(IUndoableItem item, IUndoableItem parentContext, EventHandler<EditCommittedEventArgs> editableHandler)
         {
-#if DEBUG
-            if (item == null)
-            {
-                throw new ArgumentNullException(nameof(item));
-            }
+            // Contract validation
+            Contract.RequiresNotNullPrivate(in item, nameof(item));
+            Contract.RequiresNotNullPrivate(in parentContext, nameof(parentContext));
+            Contract.RequiresNotNullPrivate(in editableHandler, nameof(editableHandler));
 
-            if (parentContext == null)
-            {
-                throw new ArgumentNullException(nameof(parentContext));
-            }
-
-            if (editableHandler == null)
-            {
-                throw new ArgumentNullException(nameof(editableHandler));
-            }
-#endif
-
+            // Data validation
             if (item.IsCapturedIntoUndoContext && item.ParentUndoContext != parentContext)
             {
                 throw new ItemAlreadyCapturedIntoUndoContextException();
             }
 
+            // State
             this.items = null;
             this.item = item;
             this.editableHandler = editableHandler;
@@ -82,48 +72,36 @@ namespace IX.Observable
         /// <param name="editableHandler">The editable handler.</param>
         public AutoCaptureTransactionContext(IEnumerable<IUndoableItem> items, IUndoableItem parentContext, EventHandler<EditCommittedEventArgs> editableHandler)
         {
-#if DEBUG
-            if (items == null)
-            {
-                throw new ArgumentNullException(nameof(items));
-            }
+            // Contract validation
+            Contract.RequiresNotNullPrivate(in items, nameof(items));
+            Contract.RequiresNotNullPrivate(in parentContext, nameof(parentContext));
+            Contract.RequiresNotNullPrivate(in editableHandler, nameof(editableHandler));
 
-            if (parentContext == null)
-            {
-                throw new ArgumentNullException(nameof(parentContext));
-            }
-
-            if (editableHandler == null)
-            {
-                throw new ArgumentNullException(nameof(editableHandler));
-            }
-#endif
-
-            if (items.Any((item, pc) => item.IsCapturedIntoUndoContext && item.ParentUndoContext != pc, parentContext))
+            // Data validation
+            // Multiple enumeration warning: this has to be done, as there is no efficient way to do a transactional capturing otherwise
+            var itemsArray = items.ToArray();
+            if (itemsArray.Any((item, pc) => item.IsCapturedIntoUndoContext && item.ParentUndoContext != pc, parentContext))
             {
                 throw new ItemAlreadyCapturedIntoUndoContextException();
             }
 
-            this.items = items;
+            // State
+            this.items = itemsArray;
             this.item = null;
             this.editableHandler = editableHandler;
 
-#pragma warning disable HAA0401 // Possible allocation of reference type enumerator
-            foreach (IUndoableItem item in items)
+            foreach (IUndoableItem undoableItem in itemsArray)
             {
-                item.CaptureIntoUndoContext(parentContext);
+                undoableItem.CaptureIntoUndoContext(parentContext);
 
-                if (item is IEditCommittableItem tei)
+                if (undoableItem is IEditCommittableItem tei)
                 {
                     tei.EditCommitted += editableHandler;
                 }
             }
-#pragma warning restore HAA0401 // Possible allocation of reference type enumerator
 
             this.AddFailure();
         }
-
-#pragma warning restore IDE0016 // Use 'throw' expression
 
         /// <summary>
         /// Gets invoked when the transaction commits and is successful.
@@ -135,7 +113,7 @@ namespace IX.Observable
         private void AddFailure() => this.AddRevertStep(
                 (state) =>
                 {
-                    var thisL1 = state as AutoCaptureTransactionContext;
+                    var thisL1 = (AutoCaptureTransactionContext)state;
                     if (thisL1.item != null)
                     {
                         thisL1.item.ReleaseFromUndoContext();
@@ -146,19 +124,19 @@ namespace IX.Observable
                         }
                     }
 
-                    if (thisL1.items != null)
+                    if (thisL1.items == null)
                     {
-#pragma warning disable HAA0401 // Possible allocation of reference type enumerator
-                        foreach (IUndoableItem item in thisL1.items)
-                        {
-                            item.ReleaseFromUndoContext();
+                        return;
+                    }
 
-                            if (thisL1.item is IEditCommittableItem tei)
-                            {
-                                tei.EditCommitted -= thisL1.editableHandler;
-                            }
+                    foreach (IUndoableItem undoableItem in thisL1.items)
+                    {
+                        undoableItem.ReleaseFromUndoContext();
+
+                        if (thisL1.item is IEditCommittableItem tei)
+                        {
+                            tei.EditCommitted -= thisL1.editableHandler;
                         }
-#pragma warning restore HAA0401 // Possible allocation of reference type enumerator
                     }
                 }, this);
     }
