@@ -177,7 +177,6 @@ namespace IX.Observable
         public bool ItemsAreUndoable { get; } =
             typeof(IUndoableItem).GetTypeInfo().IsAssignableFrom(typeof(T).GetTypeInfo());
 
-#pragma warning disable HAA0401 // Possible allocation of reference type enumerator
         /// <summary>
         ///     Gets or sets a value indicating whether to automatically capture sub items in the current undo/redo context.
         /// </summary>
@@ -193,54 +192,10 @@ namespace IX.Observable
         {
             get => this.automaticallyCaptureSubItems;
 
-            set
-            {
-                this.automaticallyCaptureSubItems = value;
-
-                if (!this.ItemsAreUndoable)
-                {
-                    return;
-                }
-
-                if (value)
-                {
-                    // At this point we start capturing
-                    using (ReadWriteSynchronizationLocker locker = this.ReadWriteLock())
-                    {
-                        if (((ICollection<T>)this.InternalContainer).Count <= 0)
-                        {
-                            return;
-                        }
-
-                        locker.Upgrade();
-
-                        foreach (IUndoableItem item in this.InternalContainer.Cast<IUndoableItem>())
-                        {
-                            item.CaptureIntoUndoContext(this);
-                        }
-                    }
-                }
-                else
-                {
-                    // At this point we release the captures
-                    using (ReadWriteSynchronizationLocker locker = this.ReadWriteLock())
-                    {
-                        if (((ICollection<T>)this.InternalContainer).Count <= 0)
-                        {
-                            return;
-                        }
-
-                        locker.Upgrade();
-
-                        foreach (IUndoableItem item in this.InternalContainer.Cast<IUndoableItem>())
-                        {
-                            item.ReleaseFromUndoContext();
-                        }
-                    }
-                }
-            }
+            set => this.SetAutomaticallyCaptureSubItems(
+                value,
+                false);
         }
-#pragma warning restore HAA0401 // Possible allocation of reference type enumerator
 
         /// <summary>
         ///     Gets or sets the number of levels to keep undo or redo information.
@@ -454,7 +409,9 @@ namespace IX.Observable
 
             using (this.WriteLock())
             {
-                this.AutomaticallyCaptureSubItems = false;
+                this.SetAutomaticallyCaptureSubItems(
+                    false,
+                    true);
                 this.ParentUndoContext = null;
             }
         }
@@ -802,7 +759,9 @@ namespace IX.Observable
 
             using (this.WriteLock())
             {
-                this.AutomaticallyCaptureSubItems = captureSubItems;
+                this.SetAutomaticallyCaptureSubItems(
+                    captureSubItems,
+                    true);
                 this.ParentUndoContext = parent;
             }
         }
@@ -1282,5 +1241,76 @@ namespace IX.Observable
         {
             HistoryLevels = this.historyLevels
         };
+
+#pragma warning disable HAA0401 // Possible allocation of reference type enumerator
+        private void SetAutomaticallyCaptureSubItems(bool value, bool lockAcquired)
+        {
+            this.automaticallyCaptureSubItems = value;
+
+            if (!this.ItemsAreUndoable)
+            {
+                return;
+            }
+
+            ReadWriteSynchronizationLocker locker = lockAcquired ? null : this.ReadWriteLock();
+
+            if (value)
+            {
+                // At this point we start capturing
+                try
+                {
+                    if (((ICollection<T>)this.InternalContainer).Count <= 0)
+                    {
+                        return;
+                    }
+
+                    if (!lockAcquired)
+                    {
+                        locker.Upgrade();
+                    }
+
+                    foreach (IUndoableItem item in this.InternalContainer.Cast<IUndoableItem>())
+                    {
+                        item.CaptureIntoUndoContext(this);
+                    }
+                }
+                finally
+                {
+                    if (!lockAcquired)
+                    {
+                        locker.Dispose();
+                    }
+                }
+            }
+            else
+            {
+                // At this point we release the captures
+                try
+                {
+                    if (((ICollection<T>)this.InternalContainer).Count <= 0)
+                    {
+                        return;
+                    }
+
+                    if (!lockAcquired)
+                    {
+                        locker.Upgrade();
+                    }
+
+                    foreach (IUndoableItem item in this.InternalContainer.Cast<IUndoableItem>())
+                    {
+                        item.ReleaseFromUndoContext();
+                    }
+                }
+                finally
+                {
+                    if (!lockAcquired)
+                    {
+                        locker.Dispose();
+                    }
+                }
+            }
+        }
+#pragma warning restore HAA0401 // Possible allocation of reference type enumerator
     }
 }
