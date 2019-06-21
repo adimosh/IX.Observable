@@ -1,3 +1,5 @@
+<!--EXTERNAL_PROPERTIES: TargetFrameworkIsFramework-->
+<!--EXTERNAL_PROPERTIES: TargetFrameworkIsStandard-->
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
@@ -44,11 +46,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="IX.Abstractions" Version="0.5.0.86" />
-    <PackageReference Include="IX.Abstractions.Collections" Version="0.5.0.86" />
-    <PackageReference Include="IX.Abstractions.Threading" Version="0.5.0.86" />
-    <PackageReference Include="IX.StandardExtensions.ComponentModel" Version="0.5.0.86" />
-    <PackageReference Include="IX.StandardExtensions.Threading" Version="0.5.0.86" />
+    <PackageReference Include="IX.Abstractions" Version="0.5.0.88" />
+    <PackageReference Include="IX.Abstractions.Collections" Version="0.5.0.88" />
+    <PackageReference Include="IX.Abstractions.Threading" Version="0.5.0.88" />
+    <PackageReference Include="IX.StandardExtensions.ComponentModel" Version="0.5.0.88" />
+    <PackageReference Include="IX.StandardExtensions.Threading" Version="0.5.0.88" />
     <ProjectReference Include="..\IX.Undoable\IX.Undoable.csproj" />
   </ItemGroup>
 
