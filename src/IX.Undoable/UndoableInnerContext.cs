@@ -10,24 +10,44 @@ using JetBrains.Annotations;
 namespace IX.Undoable
 {
     /// <summary>
-    /// The inner context of an undoable object. This class should not normally be used, instead, use <see cref="EditableItemBase"/>.
+    ///     The inner context of an undoable object. This class should not normally be used, instead, use
+    ///     <see cref="EditableItemBase" />.
     /// </summary>
     [PublicAPI]
     public class UndoableInnerContext : NotifyPropertyChangedBase
     {
-        private Lazy<PushDownStack<StateChange[]>> undoStack;
-        private Lazy<PushDownStack<StateChange[]>> redoStack;
-
         private int historyLevels;
+        private Lazy<PushDownStack<StateChange[]>> redoStack;
+        private Lazy<PushDownStack<StateChange[]>> undoStack;
 
         /// <summary>
-        /// Gets or sets the number of levels to keep undo or redo information.
+        ///     Gets the redo stack.
+        /// </summary>
+        /// <value>The redo stack.</value>
+        public PushDownStack<StateChange[]> RedoStack => this.redoStack.Value;
+
+        /// <summary>
+        ///     Gets the undo stack.
+        /// </summary>
+        /// <value>The undo stack.</value>
+        public PushDownStack<StateChange[]> UndoStack => this.undoStack.Value;
+
+        /// <summary>
+        ///     Gets or sets the number of levels to keep undo or redo information.
         /// </summary>
         /// <value>The history levels.</value>
-        /// <remarks><para>If this value is set, for example, to 7, then the implementing object should allow undo methods
-        /// to be called 7 times to change the state of the object. Upon calling it an 8th time, there should be no change in the
-        /// state of the object.</para>
-        /// <para>Any call beyond the limit imposed here should not fail, but it should also not change the state of the object.</para></remarks>
+        /// <remarks>
+        ///     <para>
+        ///         If this value is set, for example, to 7, then the implementing object should allow undo methods
+        ///         to be called 7 times to change the state of the object. Upon calling it an 8th time, there should be no change
+        ///         in the
+        ///         state of the object.
+        ///     </para>
+        ///     <para>
+        ///         Any call beyond the limit imposed here should not fail, but it should also not change the state of the
+        ///         object.
+        ///     </para>
+        /// </remarks>
         public int HistoryLevels
         {
             get => this.historyLevels;
@@ -56,18 +76,6 @@ namespace IX.Undoable
             }
         }
 
-        /// <summary>
-        /// Gets the undo stack.
-        /// </summary>
-        /// <value>The undo stack.</value>
-        public PushDownStack<StateChange[]> UndoStack => this.undoStack.Value;
-
-        /// <summary>
-        /// Gets the redo stack.
-        /// </summary>
-        /// <value>The redo stack.</value>
-        public PushDownStack<StateChange[]> RedoStack => this.redoStack.Value;
-
         /// <summary>Disposes in the managed context.</summary>
         protected override void DisposeManagedContext()
         {
@@ -83,16 +91,24 @@ namespace IX.Undoable
             if (this.historyLevels == 0)
             {
                 // Undo stack
-                var stack = this.undoStack;
+                Lazy<PushDownStack<StateChange[]>> stack = this.undoStack;
                 this.undoStack = null;
-                stack.Value.Clear();
-                stack.Value.Dispose();
+
+                if (stack.IsValueCreated)
+                {
+                    stack.Value.Clear();
+                    stack.Value.Dispose();
+                }
 
                 // Redo stack
                 stack = this.redoStack;
                 this.redoStack = null;
-                stack.Value.Clear();
-                stack.Value.Dispose();
+
+                if (stack.IsValueCreated)
+                {
+                    stack.Value.Clear();
+                    stack.Value.Dispose();
+                }
 
                 // We do no null-checks as the stacks cannot be null at this point
             }

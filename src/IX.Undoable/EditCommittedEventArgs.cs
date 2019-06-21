@@ -3,26 +3,28 @@
 // </copyright>
 
 using System;
+using JetBrains.Annotations;
 
 namespace IX.Undoable
 {
     /// <summary>
-    /// Event arguments for edit committed.
+    ///     Event arguments for edit committed.
     /// </summary>
+    [PublicAPI]
     public class EditCommittedEventArgs : EventArgs
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="EditCommittedEventArgs"/> class.
+        ///     Initializes a new instance of the <see cref="EditCommittedEventArgs" /> class.
         /// </summary>
         /// <param name="stateChanges">The state changes that have been committed.</param>
-        public EditCommittedEventArgs(params StateChange[] stateChanges)
+        public EditCommittedEventArgs([NotNull] params StateChange[] stateChanges)
         {
             this.StateChanges = stateChanges;
         }
 
         /// <summary>
-        /// Gets the state changes that have been committed.
+        ///     Gets the state changes that have been committed.
         /// </summary>
-        public StateChange[] StateChanges { get; private set; }
+        public StateChange[] StateChanges { get; }
     }
 }
