@@ -25,7 +25,7 @@ namespace IX.Observable
     ///         and serialize the result.
     ///     </para>
     /// </remarks>
-    [DebuggerDisplay("ObservableStack, Count = {Count}")]
+    [DebuggerDisplay("ObservableStack, Count = {" + nameof(Count) + "}")]
     [DebuggerTypeProxy(typeof(StackDebugView<>))]
     [PublicAPI]
     public class ObservableStack<T> : ObservableCollectionBase<T>, IStack<T>

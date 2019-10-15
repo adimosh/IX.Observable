@@ -17,7 +17,7 @@ namespace IX.Observable
     /// </summary>
     /// <typeparam name="T">The type of the item.</typeparam>
     /// <seealso cref="IX.Observable.ObservableCollectionBase{TItem}" />
-    [DebuggerDisplay("Count = {Count}")]
+    [DebuggerDisplay("Count = {" + nameof(Count) + "}")]
     [DebuggerTypeProxy(typeof(CollectionDebugView<>))]
     [PublicAPI]
     public class ConcurrentObservableMasterSlaveCollection<T> : ObservableMasterSlaveCollection<T>

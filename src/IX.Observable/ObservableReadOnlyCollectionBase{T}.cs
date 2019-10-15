@@ -86,13 +86,13 @@ namespace IX.Observable
         /// <remarks>
         ///     <para>
         ///         This property is inexplicably still used to &quot;synchronize&quot; access to the collections, even though MSDN
-        ///         members themselves
-        ///         admit that it was a mistake that would not be repeated with generic collections.
+        ///         members themselves admit that it was a mistake that would not be repeated with generic collections.
         ///     </para>
         ///     <para>It is ill-advised to use it yourself, as it does not synchronize anything.</para>
         ///     <para>This property will always return an object, since UI frameworks (such as the XCeed Avalon) depend on it.</para>
         /// </remarks>
-        [Obsolete]
+        [Obsolete(
+            "Please do not explicitly use these properties. The newest .NET Framework guidelines do not recommend doing collection synchronization using them.")]
         public object SyncRoot { get; } = new object();
 
         /// <summary>

@@ -6,8 +6,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using IX.Guaranteed;
-using IX.StandardExtensions;
 using IX.StandardExtensions.Contracts;
+using IX.StandardExtensions.Extensions;
 using IX.Undoable;
 
 namespace IX.Observable
@@ -15,7 +15,7 @@ namespace IX.Observable
     /// <summary>
     ///     An auto-capture-releasing class that captures in a transaction.
     /// </summary>
-    public class AutoReleaseTransactionContext : OperationTransaction
+    internal class AutoReleaseTransactionContext : OperationTransaction
     {
         private readonly EventHandler<EditCommittedEventArgs> editableHandler;
         private readonly IUndoableItem item;

@@ -8,7 +8,7 @@ using JetBrains.Annotations;
 namespace IX.Observable.UndoLevels
 {
     /// <summary>
-    /// An undo step for when a collection was cleared.
+    ///     An undo step for when a collection was cleared.
     /// </summary>
     /// <typeparam name="T">The type of item.</typeparam>
     /// <seealso cref="StateChange" />
@@ -16,7 +16,7 @@ namespace IX.Observable.UndoLevels
     public class ClearUndoLevel<T> : StateChange
     {
         /// <summary>
-        /// Gets or sets the original items.
+        ///     Gets or sets the original items.
         /// </summary>
         /// <value>The original items.</value>
         public T[] OriginalItems { get; set; }

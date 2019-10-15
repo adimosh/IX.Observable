@@ -18,7 +18,7 @@ namespace IX.Observable
     /// </summary>
     /// <typeparam name="T">The type of the items in the list.</typeparam>
     /// <seealso cref="IX.Observable.ObservableList{T}" />
-    [DebuggerDisplay("ObservableList, Count = {Count}")]
+    [DebuggerDisplay("ObservableList, Count = {" + nameof(Count) + "}")]
     [DebuggerTypeProxy(typeof(CollectionDebugView<>))]
     [CollectionDataContract(
         Namespace = Constants.DataContractNamespace,

@@ -15,20 +15,19 @@ namespace IX.Observable
 
         internal UndoableUnitBlockTransaction(ObservableCollectionBase<T> collectionBase)
         {
-            Contract.RequiresNotNullPrivate(in collectionBase, nameof(collectionBase));
+            Contract.RequiresNotNullPrivate(
+                in collectionBase,
+                nameof(collectionBase));
 
             this.collectionBase = collectionBase;
 
             this.AddRevertStep(
-                (state) =>
-                {
-                    ((ObservableCollectionBase<T>)state).FailExplicitUndoBlockTransaction();
-                },
+                state => { ((ObservableCollectionBase<T>)state).FailExplicitUndoBlockTransaction(); },
                 collectionBase);
 
             this.StateChanges = new BlockStateChange
             {
-                StateChanges = new List<StateChange>(),
+                StateChanges = new List<StateChange>()
             };
         }
 

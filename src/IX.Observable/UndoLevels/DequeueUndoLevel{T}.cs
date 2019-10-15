@@ -8,7 +8,7 @@ using JetBrains.Annotations;
 namespace IX.Observable.UndoLevels
 {
     /// <summary>
-    /// An undo step for when an item was dequeued.
+    ///     An undo step for when an item was dequeued.
     /// </summary>
     /// <typeparam name="T">The type of item.</typeparam>
     /// <seealso cref="IX.Undoable.StateChange" />
@@ -16,7 +16,7 @@ namespace IX.Observable.UndoLevels
     public class DequeueUndoLevel<T> : StateChange
     {
         /// <summary>
-        /// Gets or sets the dequeued item.
+        ///     Gets or sets the dequeued item.
         /// </summary>
         /// <value>The dequeued item.</value>
         public T DequeuedItem { get; set; }

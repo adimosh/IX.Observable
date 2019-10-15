@@ -12,12 +12,13 @@ using JetBrains.Annotations;
 namespace IX.Observable
 {
     /// <summary>
-    /// An observable collection created from a master collection (to which updates go) and many slave, read-only collections, whose items can also be filtered.
+    ///     An observable collection created from a master collection (to which updates go) and many slave, read-only
+    ///     collections, whose items can also be filtered.
     /// </summary>
     /// <typeparam name="TItem">The type of the item.</typeparam>
     /// <typeparam name="TFilter">The type of the filter.</typeparam>
     /// <seealso cref="IX.Observable.ObservableMasterSlaveCollection{T}" />
-    [DebuggerDisplay("Count = {Count}")]
+    [DebuggerDisplay("Count = {" + nameof(Count) + "}")]
     [DebuggerTypeProxy(typeof(CollectionDebugView<>))]
     [PublicAPI]
     public class FilterableObservableMasterSlaveCollection<TItem, TFilter> : ObservableMasterSlaveCollection<TItem>
@@ -26,41 +27,72 @@ namespace IX.Observable
         private IList<TItem> filteredElements;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="FilterableObservableMasterSlaveCollection{TItem, TFilter}" /> class.
+        ///     Initializes a new instance of the <see cref="FilterableObservableMasterSlaveCollection{TItem, TFilter}" /> class.
         /// </summary>
         /// <param name="filteringPredicate">The filtering predicate.</param>
-        /// <exception cref="ArgumentNullException"><paramref name="filteringPredicate"/> is <see langword="null"/> (<see langword="Nothing"/>) in Visual Basic.</exception>
+        /// <exception cref="ArgumentNullException">
+        ///     <paramref name="filteringPredicate" /> is <see langword="null" /> (
+        ///     <see langword="Nothing" />) in Visual Basic.
+        /// </exception>
         public FilterableObservableMasterSlaveCollection(Func<TItem, TFilter, bool> filteringPredicate)
-            : base()
         {
             this.FilteringPredicate = filteringPredicate ?? throw new ArgumentNullException(nameof(filteringPredicate));
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="FilterableObservableMasterSlaveCollection{TItem, TFilter}"/> class.
+        ///     Initializes a new instance of the <see cref="FilterableObservableMasterSlaveCollection{TItem, TFilter}" /> class.
         /// </summary>
         /// <param name="filteringPredicate">The filtering predicate.</param>
         /// <param name="context">The synchronization context to use, if any.</param>
-        /// <exception cref="ArgumentNullException"><paramref name="filteringPredicate"/> is <see langword="null"/> (<see langword="Nothing"/>) in Visual Basic.</exception>
-        public FilterableObservableMasterSlaveCollection(Func<TItem, TFilter, bool> filteringPredicate, SynchronizationContext context)
+        /// <exception cref="ArgumentNullException">
+        ///     <paramref name="filteringPredicate" /> is <see langword="null" /> (
+        ///     <see langword="Nothing" />) in Visual Basic.
+        /// </exception>
+        public FilterableObservableMasterSlaveCollection(
+            Func<TItem, TFilter, bool> filteringPredicate,
+            SynchronizationContext context)
             : base(context)
         {
             this.FilteringPredicate = filteringPredicate ?? throw new ArgumentNullException(nameof(filteringPredicate));
         }
 
         /// <summary>
-        /// Gets the filtering predicate.
+        ///     Gets the number of items in the collection.
         /// </summary>
         /// <value>
-        /// The filtering predicate.
+        ///     The item count.
+        /// </value>
+        public override int Count
+        {
+            get
+            {
+                if (!this.IsFilter())
+                {
+                    return base.Count;
+                }
+
+                if (this.filteredElements == null)
+                {
+                    this.FillCachedList();
+                }
+
+                return this.filteredElements.Count;
+            }
+        }
+
+        /// <summary>
+        ///     Gets the filtering predicate.
+        /// </summary>
+        /// <value>
+        ///     The filtering predicate.
         /// </value>
         public Func<TItem, TFilter, bool> FilteringPredicate { get; }
 
         /// <summary>
-        /// Gets or sets the filter value.
+        ///     Gets or sets the filter value.
         /// </summary>
         /// <value>
-        /// The filter value.
+        ///     The filter value.
         /// </value>
         public TFilter Filter
         {
@@ -78,64 +110,35 @@ namespace IX.Observable
         }
 
         /// <summary>
-        /// Gets the number of items in the collection.
-        /// </summary>
-        /// <value>
-        /// The item count.
-        /// </value>
-        public override int Count
-        {
-            get
-            {
-                if (this.IsFilter())
-                {
-                    if (this.filteredElements == null)
-                    {
-                        this.FillCachedList();
-                    }
-
-                    return this.filteredElements.Count;
-                }
-                else
-                {
-                    return base.Count;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Returns an enumerator that iterates through the collection.
+        ///     Returns an enumerator that iterates through the collection.
         /// </summary>
         /// <returns>
-        /// An enumerator that can be used to iterate through the collection.
+        ///     An enumerator that can be used to iterate through the collection.
         /// </returns>
         public override IEnumerator<TItem> GetEnumerator()
         {
-            if (this.IsFilter())
+            if (!this.IsFilter())
             {
-                if (this.filteredElements == null)
-                {
-                    this.FillCachedList();
-                }
-                else
-                {
-#pragma warning disable HAA0401 // Possible allocation of reference type enumerator - Unavoidable at this point
-                    return this.filteredElements.GetEnumerator();
-#pragma warning restore HAA0401 // Possible allocation of reference type enumerator
-                }
+                return base.GetEnumerator();
             }
 
-#pragma warning disable HAA0401 // Possible allocation of reference type enumerator - Unavoidable
+            if (this.filteredElements != null)
+            {
+                return this.filteredElements.GetEnumerator();
+            }
+
+            this.FillCachedList();
             return base.GetEnumerator();
-#pragma warning restore HAA0401 // Possible allocation of reference type enumerator
         }
 
         /// <summary>
-        /// Called when an item is added to a collection.
+        ///     Called when an item is added to a collection.
         /// </summary>
         /// <param name="addedItem">The added item.</param>
         /// <param name="index">The index.</param>
-        protected override void RaiseCollectionChangedAdd(TItem addedItem, int index)
+        protected override void RaiseCollectionChangedAdd(
+            TItem addedItem,
+            int index)
         {
             if (this.IsFilter())
             {
@@ -143,17 +146,22 @@ namespace IX.Observable
             }
             else
             {
-                base.RaiseCollectionChangedAdd(addedItem, index);
+                base.RaiseCollectionChangedAdd(
+                    addedItem,
+                    index);
             }
         }
 
         /// <summary>
-        /// Called when an item in a collection is changed.
+        ///     Called when an item in a collection is changed.
         /// </summary>
         /// <param name="oldItem">The old item.</param>
         /// <param name="newItem">The new item.</param>
         /// <param name="index">The index.</param>
-        protected override void RaiseCollectionChangedChanged(TItem oldItem, TItem newItem, int index)
+        protected override void RaiseCollectionChangedChanged(
+            TItem oldItem,
+            TItem newItem,
+            int index)
         {
             if (this.IsFilter())
             {
@@ -161,16 +169,21 @@ namespace IX.Observable
             }
             else
             {
-                base.RaiseCollectionChangedChanged(oldItem, newItem, index);
+                base.RaiseCollectionChangedChanged(
+                    oldItem,
+                    newItem,
+                    index);
             }
         }
 
         /// <summary>
-        /// Called when an item is removed from a collection.
+        ///     Called when an item is removed from a collection.
         /// </summary>
         /// <param name="removedItem">The removed item.</param>
         /// <param name="index">The index.</param>
-        protected override void RaiseCollectionChangedRemove(TItem removedItem, int index)
+        protected override void RaiseCollectionChangedRemove(
+            TItem removedItem,
+            int index)
         {
             if (this.IsFilter())
             {
@@ -178,7 +191,9 @@ namespace IX.Observable
             }
             else
             {
-                base.RaiseCollectionChangedRemove(removedItem, index);
+                base.RaiseCollectionChangedRemove(
+                    removedItem,
+                    index);
             }
         }
 
@@ -186,30 +201,26 @@ namespace IX.Observable
         {
             TFilter filter = this.Filter;
 
-#pragma warning disable HAA0401 // Possible allocation of reference type enumerator - Unavoidable
             using (IEnumerator<TItem> enumerator = base.GetEnumerator())
-#pragma warning restore HAA0401 // Possible allocation of reference type enumerator
             {
                 while (enumerator.MoveNext())
                 {
                     TItem current = enumerator.Current;
-                    if (this.FilteringPredicate(current, filter))
+                    if (this.FilteringPredicate(
+                        current,
+                        filter))
                     {
                         yield return current;
                     }
                 }
             }
-
-            yield break;
         }
 
         private void FillCachedList()
         {
             this.filteredElements = new List<TItem>(base.Count);
 
-#pragma warning disable HAA0401 // Possible allocation of reference type enumerator - Unavoidable
             using (IEnumerator<TItem> enumerator = this.EnumerateFiltered())
-#pragma warning restore HAA0401 // Possible allocation of reference type enumerator
             {
                 while (enumerator.MoveNext())
                 {
@@ -221,14 +232,18 @@ namespace IX.Observable
 
         private void ClearCachedContents()
         {
-            if (this.filteredElements != null)
+            if (this.filteredElements == null)
             {
-                IList<TItem> coll = this.filteredElements;
-                this.filteredElements = null;
-                coll.Clear();
+                return;
             }
+
+            IList<TItem> coll = this.filteredElements;
+            this.filteredElements = null;
+            coll.Clear();
         }
 
-        private bool IsFilter() => !EqualityComparer<TFilter>.Default.Equals(this.Filter, default);
+        private bool IsFilter() => !EqualityComparer<TFilter>.Default.Equals(
+            this.Filter,
+            default);
     }
 }

@@ -8,19 +8,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IX.Observable", "IX.Observa
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IX.Undoable", "IX.Undoable\IX.Undoable.csproj", "{B1B35F4A-031F-477E-8061-290C5C6F55D2}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IX.Undoable.WPF", "IX.Undoable.WPF\IX.Undoable.WPF.csproj", "{34562286-322A-4F6D-9502-9807D32E63FD}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{5E05B9C5-6765-44FC-8A6E-BEE018BDEA9B}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 		stylecop.json = stylecop.json
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Props", "Props", "{6AE6F3F7-FE0A-4CC0-AD3A-948D6764E9C1}"
-	ProjectSection(SolutionItems) = preProject
-		Branding.props = Branding.props
-		IXTargets.targets = IXTargets.targets
-		StyleCop.targets = StyleCop.targets
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GitHub Documentation", "GitHub Documentation", "{CF1DED9F-4975-4D48-91D3-0FA13BBC9EBD}"
@@ -48,10 +39,6 @@ Global
 		{B1B35F4A-031F-477E-8061-290C5C6F55D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B1B35F4A-031F-477E-8061-290C5C6F55D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B1B35F4A-031F-477E-8061-290C5C6F55D2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{34562286-322A-4F6D-9502-9807D32E63FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{34562286-322A-4F6D-9502-9807D32E63FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{34562286-322A-4F6D-9502-9807D32E63FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{34562286-322A-4F6D-9502-9807D32E63FD}.Release|Any CPU.Build.0 = Release|Any CPU
 		{EE8BE730-7219-4FE1-B975-248FB6255DB1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{EE8BE730-7219-4FE1-B975-248FB6255DB1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EE8BE730-7219-4FE1-B975-248FB6255DB1}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -61,7 +48,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{6AE6F3F7-FE0A-4CC0-AD3A-948D6764E9C1} = {5E05B9C5-6765-44FC-8A6E-BEE018BDEA9B}
 		{EE8BE730-7219-4FE1-B975-248FB6255DB1} = {B5529E7C-26C5-4A91-BA0E-EDEA9D367DA3}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution

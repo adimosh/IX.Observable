@@ -14,6 +14,8 @@ using IX.StandardExtensions;
 using IX.StandardExtensions.Threading;
 using IX.Undoable;
 using JetBrains.Annotations;
+using IEnumerableExtensions = IX.StandardExtensions.Extensions.IEnumerableExtensions;
+using LinqExtensions = IX.StandardExtensions.Extensions.LinqExtensions;
 
 namespace IX.Observable
 {
@@ -472,21 +474,23 @@ namespace IX.Observable
             // Inside a write lock
             using (this.WriteLock())
             {
-                if (items.Any(
+                if (LinqExtensions.Any(
+                    items,
                     (
                         p,
-                        coll) => !coll.Contains(p), this.InternalContainer))
+                        coll) => !coll.Contains(p),
+                    this.InternalContainer))
                 {
                     throw new ArgumentException(
                         Resources.TheGivenCollectionToRemoveIsNotContainedInTheInitialCollection,
                         nameof(items));
                 }
 
-                var itemsToDelete = this.InternalContainer.Select(
-                    (
-                        p,
-                        index) => new { Index = index, Item = p }).Where(
-                    (
+                var itemsToDelete = LinqExtensions.Where(
+                    this.InternalContainer.Select(
+                        (
+                            p,
+                            index) => new { Index = index, Item = p }), (
                         p,
                         coll) => coll.Contains(p.Item), items).OrderByDescending(p => p.Index).ToArray();
 
@@ -723,14 +727,14 @@ namespace IX.Observable
         /// <returns>The index at which the item was added.</returns>
         int IList.Add(object value)
         {
-            if (value is T v)
+            if (!(value is T v))
             {
-                this.Add(v);
-
-                return this.CountAfterAdd - 1;
+                throw new ArgumentInvalidTypeException(nameof(value));
             }
 
-            throw new ArgumentInvalidTypeException(nameof(value));
+            this.Add(v);
+
+            return this.CountAfterAdd - 1;
         }
 
         /// <summary>
@@ -774,16 +778,14 @@ namespace IX.Observable
             int index,
             object value)
         {
-            if (value is T v)
+            if (!(value is T v))
             {
-                this.Insert(
-                    index,
-                    v);
-
-                return;
+                throw new ArgumentInvalidTypeException(nameof(value));
             }
 
-            throw new ArgumentInvalidTypeException(nameof(value));
+            this.Insert(
+                index,
+                v);
         }
 
         /// <summary>
@@ -889,10 +891,10 @@ namespace IX.Observable
 
                     if (this.ItemsAreUndoable && this.AutomaticallyCaptureSubItems)
                     {
-                        foreach (IUndoableItem ul in items.Cast<IUndoableItem>().Where(
-                            (
-                                    p,
-                                    thisL1) => p.IsCapturedIntoUndoContext && p.ParentUndoContext == thisL1, this))
+                        foreach (IUndoableItem ul in LinqExtensions.Where(
+                            items.Cast<IUndoableItem>(),
+                            (p, thisL1) => p.IsCapturedIntoUndoContext && p.ParentUndoContext == thisL1,
+                            this))
                         {
                             ul.ReleaseFromUndoContext();
                         }
@@ -1096,13 +1098,14 @@ namespace IX.Observable
                     var index = amul.Index;
                     IEnumerable<T> items = amul.AddedItems;
 
-                    items.Reverse().ForEach(
-                        (
+                    IEnumerableExtensions.ForEach(
+                        items.Reverse(), (
                             p,
                             thisL1,
                             indexL1) => thisL1.InternalContainer.Insert(
                             indexL1,
-                            p), this,
+                            p),
+                        this,
                         index);
 
                     if (this.ItemsAreUndoable && this.AutomaticallyCaptureSubItems)
@@ -1171,10 +1174,11 @@ namespace IX.Observable
 
                     if (this.ItemsAreUndoable && this.AutomaticallyCaptureSubItems)
                     {
-                        foreach (IUndoableItem ul in cul.OriginalItems.Cast<IUndoableItem>().Where(
-                            (
+                        foreach (IUndoableItem ul in LinqExtensions.Where(
+                            cul.OriginalItems.Cast<IUndoableItem>(), (
                                     p,
-                                    thisL1) => p.IsCapturedIntoUndoContext && p.ParentUndoContext == thisL1, this))
+                                    thisL1) => p.IsCapturedIntoUndoContext && p.ParentUndoContext == thisL1,
+                            this))
                         {
                             ul.ReleaseFromUndoContext();
                         }

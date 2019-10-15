@@ -1,20 +1,29 @@
-﻿// <copyright file="ItemNotInEditModeException.cs" company="Adrian Mos">
+// <copyright file="ItemNotInEditModeException.cs" company="Adrian Mos">
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
 using System;
+using JetBrains.Annotations;
+#if !STANDARD
+using System.Runtime.Serialization;
+
+#endif
 
 namespace IX.Undoable
 {
     /// <summary>
-    /// An exception thrown when the item is not in edit mode and it should be.
+    ///     An exception thrown when the item is not in edit mode and it should be.
     /// </summary>
-    /// <seealso cref="InvalidOperationException"/>
-    /// <seealso cref="ITransactionEditableItem"/>
+    /// <seealso cref="InvalidOperationException" />
+    /// <seealso cref="ITransactionEditableItem" />
+#if !STANDARD
+    [Serializable]
+#endif
+    [PublicAPI]
     public class ItemNotInEditModeException : InvalidOperationException
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="ItemNotInEditModeException"/> class.
+        ///     Initializes a new instance of the <see cref="ItemNotInEditModeException" /> class.
         /// </summary>
         public ItemNotInEditModeException()
             : base(Resources.ItemNotInEditModeExceptionDefaultMessage)
@@ -22,7 +31,7 @@ namespace IX.Undoable
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ItemNotInEditModeException"/> class.
+        ///     Initializes a new instance of the <see cref="ItemNotInEditModeException" /> class.
         /// </summary>
         /// <param name="message">The custom message to display.</param>
         public ItemNotInEditModeException(string message)
@@ -31,22 +40,50 @@ namespace IX.Undoable
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ItemNotInEditModeException"/> class.
+        ///     Initializes a new instance of the <see cref="ItemNotInEditModeException" /> class.
         /// </summary>
         /// <param name="innerException">The inner exception that caused this exception.</param>
         public ItemNotInEditModeException(Exception innerException)
-            : base(Resources.ItemNotInEditModeExceptionDefaultMessage, innerException)
+            : base(
+                Resources.ItemNotInEditModeExceptionDefaultMessage,
+                innerException)
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ItemNotInEditModeException"/> class.
+        ///     Initializes a new instance of the <see cref="ItemNotInEditModeException" /> class.
         /// </summary>
         /// <param name="message">The custom message to display.</param>
         /// <param name="innerException">The inner exception that caused this exception.</param>
-        public ItemNotInEditModeException(string message, Exception innerException)
-            : base(message, innerException)
+        public ItemNotInEditModeException(
+            string message,
+            Exception innerException)
+            : base(
+                message,
+                innerException)
         {
         }
+
+#if !STANDARD
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="ItemNotInEditModeException" /> class.
+        /// </summary>
+        /// <param name="info">
+        ///     The <see cref="T:System.Runtime.Serialization.SerializationInfo" /> that holds the serialized object
+        ///     data about the exception being thrown.
+        /// </param>
+        /// <param name="context">
+        ///     The <see cref="T:System.Runtime.Serialization.StreamingContext" /> that contains contextual
+        ///     information about the source or destination.
+        /// </param>
+        protected ItemNotInEditModeException(
+            SerializationInfo info,
+            StreamingContext context)
+            : base(
+                info,
+                context)
+        {
+        }
+#endif
     }
 }

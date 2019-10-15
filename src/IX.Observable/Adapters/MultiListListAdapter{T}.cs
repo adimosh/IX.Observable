@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
-using IX.StandardExtensions;
+using IX.StandardExtensions.Extensions;
 
 namespace IX.Observable.Adapters
 {
@@ -34,13 +34,13 @@ namespace IX.Observable.Adapters
 
                 foreach (IEnumerable<T> list in this.lists)
                 {
-                    if (list.Count() <= idx)
+                    var count = list.Count();
+                    if (count > idx)
                     {
-                        idx -= list.Count();
-                        continue;
+                        return list.ElementAt(idx);
                     }
 
-                    return list.ElementAt(idx);
+                    idx -= count;
                 }
 
                 return default;
@@ -60,16 +60,17 @@ namespace IX.Observable.Adapters
         public override void CopyTo(T[] array, int arrayIndex)
         {
             var totalCount = this.Count + arrayIndex;
-            IEnumerator<T> enumerator = this.GetEnumerator();
-
-            for (var i = arrayIndex; i < totalCount; i++)
+            using (IEnumerator<T> enumerator = this.GetEnumerator())
             {
-                if (!enumerator.MoveNext())
+                for (var i = arrayIndex; i < totalCount; i++)
                 {
-                    break;
-                }
+                    if (!enumerator.MoveNext())
+                    {
+                        break;
+                    }
 
-                array[i] = enumerator.Current;
+                    array[i] = enumerator.Current;
+                }
             }
         }
 
@@ -94,17 +95,15 @@ namespace IX.Observable.Adapters
         {
             var offset = 0;
 
-            int foundIndex;
             foreach (List<T> list in this.lists.Select(p => p.ToList()))
             {
+                int foundIndex;
                 if ((foundIndex = list.IndexOf(item)) != -1)
                 {
                     return foundIndex + offset;
                 }
-                else
-                {
-                    offset += list.Count();
-                }
+
+                offset += list.Count;
             }
 
             return -1;

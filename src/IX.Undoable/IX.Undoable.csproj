@@ -1,27 +1,26 @@
-<!--EXTERNAL_PROPERTIES: TargetFrameworkIsFramework-->
+﻿<!--EXTERNAL_PROPERTIES: TargetFrameworkIsFramework-->
 <!--EXTERNAL_PROPERTIES: TargetFrameworkIsStandard-->
 <Project Sdk="Microsoft.NET.Sdk">
 
+  <!-- Build configuration -->
+  <PropertyGroup Condition="'$(OS)' == 'Windows_NT'">
+    <TargetFrameworks>net452;net461;net471;netstandard1.3;netstandard2.0;netstandard2.1</TargetFrameworks>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(OS)' != 'Windows_NT'">
+    <TargetFrameworks>netstandard1.3;netstandard2.0;netstandard2.1</TargetFrameworks>
+  </PropertyGroup>
+
   <PropertyGroup>
-    <TargetFrameworks>net45;net461;netstandard1.2;netstandard2.0</TargetFrameworks>
     <FailObsoleteTargetFrameworks>true</FailObsoleteTargetFrameworks>
   </PropertyGroup>
 
-  <PropertyGroup>
-    
-  </PropertyGroup>
-
+  <!-- Package metadata -->
   <PropertyGroup>
     <Title>IX Undoable</Title>
     <Description>A library for a standard undo/redo implementation.</Description>
   </PropertyGroup>
 
-  <Import Project="..\IXTargets.targets" />
-
-  <Import Project="..\Branding.props" />
-
-  <Import Project="..\StyleCop.targets" />
-
+  <!-- References -->
   <ItemGroup Condition="'$(TargetFrameworkIsFramework)'=='true'">
     <Reference Include="System" />
   </ItemGroup>
@@ -36,6 +35,7 @@
     <PackageReference Include="System.Collections" Version="4.3.0" />
   </ItemGroup>
 
+  <!-- Resources -->
   <ItemGroup>
     <Compile Update="Resources.Designer.cs">
       <DesignTime>True</DesignTime>
@@ -76,6 +76,14 @@
     <EmbeddedResource Update="Resources.se.resx">
       <DependentUpon>Resources.resx</DependentUpon>
     </EmbeddedResource>
+  </ItemGroup>
+
+  <!-- Project system and dependencies -->
+  <ItemGroup>
+    <PackageReference Include="IX.Framework.ProjectSystem" Version="1.0.0.10">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 
 </Project>

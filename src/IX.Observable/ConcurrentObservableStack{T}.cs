@@ -23,7 +23,7 @@ namespace IX.Observable
     ///         and serialize the result.
     ///     </para>
     /// </remarks>
-    [DebuggerDisplay("ConcurrentObservableStack, Count = {Count}")]
+    [DebuggerDisplay("ConcurrentObservableStack, Count = {" + nameof(Count) + "}")]
     [DebuggerTypeProxy(typeof(StackDebugView<>))]
     [CollectionDataContract(
         Namespace = Constants.DataContractNamespace,
