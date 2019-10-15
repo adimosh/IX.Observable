@@ -42,7 +42,7 @@ jobs:
   steps:
   - template: ../opt/job-master-build.yml
     parameters:
-      solutionName: 'IX.Framework'
+      solutionName: 'IX.Observable'
 - job:
   timeoutInMinutes: 10
   pool:
@@ -51,7 +51,7 @@ jobs:
   steps:
   - template: ../opt/job-master-build.yml
     parameters:
-      solutionName: 'IX.Framework'
+      solutionName: 'IX.Observable'
 - job:
   timeoutInMinutes: 10
   pool:
@@ -60,4 +60,4 @@ jobs:
   steps:
   - template: ../opt/job-master-build.yml
     parameters:
-      solutionName: 'IX.Framework'
+      solutionName: 'IX.Observable'

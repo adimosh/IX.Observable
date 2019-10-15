@@ -19,4 +19,4 @@ jobs:
   steps:
   - template: ../opt/job-release-build.yml
     parameters:
-      solutionName: 'IX.Framework'
+      solutionName: 'IX.Observable'

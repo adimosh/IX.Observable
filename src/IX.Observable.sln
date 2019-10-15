@@ -23,6 +23,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{B5529E7C
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IX.UnitTests", "IX.UnitTests\IX.UnitTests.csproj", "{EE8BE730-7219-4FE1-B975-248FB6255DB1}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build configurations", "Build configurations", "{E0A72A2F-CE5F-4675-B6E4-A3DDAB0F3184}"
+	ProjectSection(SolutionItems) = preProject
+		azure.devops.devci.yaml = azure.devops.devci.yaml
+		azure.devops.masterci.yaml = azure.devops.masterci.yaml
+		azure.devops.releasebuild.yaml = azure.devops.releasebuild.yaml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -49,6 +56,7 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{EE8BE730-7219-4FE1-B975-248FB6255DB1} = {B5529E7C-26C5-4A91-BA0E-EDEA9D367DA3}
+		{E0A72A2F-CE5F-4675-B6E4-A3DDAB0F3184} = {5E05B9C5-6765-44FC-8A6E-BEE018BDEA9B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E982D088-16DA-46BF-A043-B1326577DB77}
