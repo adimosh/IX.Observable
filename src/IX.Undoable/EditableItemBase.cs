@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Threading;
 using IX.StandardExtensions.ComponentModel;
 using IX.StandardExtensions.Contracts;
+using JetBrains.Annotations;
 
 namespace IX.Undoable
 {
@@ -15,6 +16,7 @@ namespace IX.Undoable
     /// </summary>
     /// <seealso cref="IX.Undoable.ITransactionEditableItem" />
     /// <seealso cref="IX.Undoable.IUndoableItem" />
+    [PublicAPI]
     public abstract class EditableItemBase : ViewModelBase, ITransactionEditableItem, IUndoableItem
     {
         private readonly List<StateChange> stateChanges;

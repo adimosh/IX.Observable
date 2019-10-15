@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
-using IX.StandardExtensions;
+using IX.StandardExtensions.Extensions;
 
 namespace IX.Observable.Adapters
 {
@@ -74,13 +74,13 @@ namespace IX.Observable.Adapters
 
                 foreach (IEnumerable<T> slave in this.slaves)
                 {
-                    if (slave.Count() <= idx)
+                    int count = slave.Count();
+                    if (count > idx)
                     {
-                        idx -= slave.Count();
-                        continue;
+                        return slave.ElementAt(idx);
                     }
 
-                    return slave.ElementAt(idx);
+                    idx -= count;
                 }
 
                 return default;
@@ -138,16 +138,17 @@ namespace IX.Observable.Adapters
             this.InitializeMissingMaster();
 
             var totalCount = this.Count + arrayIndex;
-            IEnumerator<T> enumerator = this.GetEnumerator();
-
-            for (var i = arrayIndex; i < totalCount; i++)
+            using (IEnumerator<T> enumerator = this.GetEnumerator())
             {
-                if (!enumerator.MoveNext())
+                for (var i = arrayIndex; i < totalCount; i++)
                 {
-                    break;
-                }
+                    if (!enumerator.MoveNext())
+                    {
+                        break;
+                    }
 
-                array[i] = enumerator.Current;
+                    array[i] = enumerator.Current;
+                }
             }
         }
 
@@ -167,8 +168,6 @@ namespace IX.Observable.Adapters
                     yield return var;
                 }
             }
-
-            yield break;
         }
 
         public override int Remove(T item)
@@ -200,24 +199,20 @@ namespace IX.Observable.Adapters
             {
                 return foundIndex;
             }
-            else
-            {
-                offset += this.master.Count;
 
-                foreach (List<T> slave in this.slaves.Select(p => p.ToList()))
+            offset += this.master.Count;
+
+            foreach (List<T> slave in this.slaves.Select(p => p.ToList()))
+            {
+                if ((foundIndex = slave.IndexOf(item)) != -1)
                 {
-                    if ((foundIndex = slave.IndexOf(item)) != -1)
-                    {
-                        return foundIndex + offset;
-                    }
-                    else
-                    {
-                        offset += slave.Count();
-                    }
+                    return foundIndex + offset;
                 }
 
-                return -1;
+                offset += slave.Count;
             }
+
+            return -1;
         }
 
         /// <summary>

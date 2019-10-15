@@ -1,27 +1,32 @@
-<!--EXTERNAL_PROPERTIES: TargetFrameworkIsFramework-->
+﻿<!--EXTERNAL_PROPERTIES: TargetFrameworkIsFramework-->
 <!--EXTERNAL_PROPERTIES: TargetFrameworkIsStandard-->
 <Project Sdk="Microsoft.NET.Sdk">
 
+  <!-- Build configuration -->
+  <PropertyGroup Condition="'$(OS)' == 'Windows_NT'">
+    <TargetFrameworks>net452;net461;net471;netstandard1.3;netstandard2.0;netstandard2.1</TargetFrameworks>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(OS)' != 'Windows_NT'">
+    <TargetFrameworks>netstandard1.3;netstandard2.0;netstandard2.1</TargetFrameworks>
+  </PropertyGroup>
+
   <PropertyGroup>
-    <TargetFrameworks>net45;net461;netstandard1.2;netstandard2.0</TargetFrameworks>
     <FailObsoleteTargetFrameworks>true</FailObsoleteTargetFrameworks>
   </PropertyGroup>
 
-  <PropertyGroup>
-    
-  </PropertyGroup>
-
+  <!-- Package metadata -->
   <PropertyGroup>
     <Title>IX Observable</Title>
     <Description>A library with several collection types (dictionary, stack, etc.) that have been made observable.</Description>
   </PropertyGroup>
 
-  <Import Project="..\IXTargets.targets" />
+  <!-- Code imports -->
+  <ItemGroup>
+    <Compile Include="..\CodeGenerator\IX.Observable\ConcurrentObservableDictionary{TKey,TValue}.ActionsAndFuncs.cs" Link="ConcurrentObservableDictionary{TKey,TValue}.ActionsAndFuncs.cs" />
+    <Compile Include="..\CodeGenerator\IX.Observable\ObservableBase.ActionsAndFuncs.cs" Link="ObservableBase.ActionsAndFuncs.cs" />
+  </ItemGroup>
 
-  <Import Project="..\Branding.props" />
-
-  <Import Project="..\StyleCop.targets" />
-
+  <!-- References -->
   <ItemGroup Condition="'$(TargetFrameworkIsFramework)'=='true'">
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -41,19 +46,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="..\CodeGenerator\IX.Observable\ConcurrentObservableDictionary{TKey,TValue}.ActionsAndFuncs.cs" Link="ConcurrentObservableDictionary{TKey,TValue}.ActionsAndFuncs.cs" />
-    <Compile Include="..\CodeGenerator\IX.Observable\ObservableBase.ActionsAndFuncs.cs" Link="ObservableBase.ActionsAndFuncs.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="IX.Abstractions" Version="0.5.0.88" />
-    <PackageReference Include="IX.Abstractions.Collections" Version="0.5.0.88" />
-    <PackageReference Include="IX.Abstractions.Threading" Version="0.5.0.88" />
-    <PackageReference Include="IX.StandardExtensions.ComponentModel" Version="0.5.0.88" />
-    <PackageReference Include="IX.StandardExtensions.Threading" Version="0.5.0.88" />
+    <PackageReference Include="IX.Abstractions" Version="0.5.1.1" />
+    <PackageReference Include="IX.Abstractions.Collections" Version="0.5.1.1" />
+    <PackageReference Include="IX.Abstractions.Threading" Version="0.5.1.1" />
+    <PackageReference Include="IX.StandardExtensions.ComponentModel" Version="0.5.1.1" />
+    <PackageReference Include="IX.StandardExtensions.Threading" Version="0.5.1.1" />
     <ProjectReference Include="..\IX.Undoable\IX.Undoable.csproj" />
   </ItemGroup>
 
+  <!-- Resources -->
   <ItemGroup>
     <Compile Update="Resources.Designer.cs">
       <DesignTime>True</DesignTime>
@@ -93,6 +94,14 @@
     <EmbeddedResource Update="Resources.se.resx">
       <DependentUpon>Resources.resx</DependentUpon>
     </EmbeddedResource>
+  </ItemGroup>
+
+  <!-- Project system and dependencies -->
+  <ItemGroup>
+    <PackageReference Include="IX.Framework.ProjectSystem" Version="1.0.0.10">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 
 </Project>

@@ -21,7 +21,7 @@ namespace IX.Observable
     /// </summary>
     /// <typeparam name="TKey">The data key type.</typeparam>
     /// <typeparam name="TValue">The data value type.</typeparam>
-    [DebuggerDisplay("ObservableDictionary, Count = {Count}")]
+    [DebuggerDisplay("ObservableDictionary, Count = {" + nameof(Count) + "}")]
     [DebuggerTypeProxy(typeof(DictionaryDebugView<,>))]
     [CollectionDataContract(
         Namespace = Constants.DataContractNamespace,

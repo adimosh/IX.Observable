@@ -1,0 +1,22 @@
+pool:
+  name: Hosted Windows 2019 with VS2019
+  vmImage: windows-latest
+
+trigger: none
+
+pr: none
+
+variables:
+  IxDevOpsBuild: true
+  system.debug: false
+
+jobs:
+- job:
+  timeoutInMinutes: 10
+  pool:
+    name: Azure Pipelines
+    vmImage: windows-latest
+  steps:
+  - template: ../opt/job-release-build.yml
+    parameters:
+      solutionName: 'IX.Observable'

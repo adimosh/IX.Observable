@@ -1,0 +1,63 @@
+trigger:
+  branches:
+    include:
+    - dev
+  paths:
+    exclude:
+    - doc/*
+    - src/*.yaml
+    - README.md
+    - LICENSE.md
+    - .gitignore
+    - src/.editorconfig
+
+pr:
+  autoCancel: true
+  branches:
+    include:
+    - dev
+  paths:
+    exclude:
+    - doc/*
+    - src/*.yaml
+    - README.md
+    - LICENSE.md
+    - .gitignore
+    - src/.editorconfig
+
+variables:
+  IxDevOpsBuild: true
+  IxVersionPrefix: 0.5.0
+  IxVersionSuffix:
+  system.debug: false
+
+# Jobs should run in parallel
+
+jobs:
+- job:
+  timeoutInMinutes: 10
+  pool:
+    name: Azure Pipelines
+    vmImage: windows-latest
+  steps:
+  - template: ../opt/job-dev-build.yml
+    parameters:
+      solutionName: 'IX.Observable'
+- job:
+  timeoutInMinutes: 10
+  pool:
+    name: Azure Pipelines
+    vmImage: ubuntu-latest
+  steps:
+  - template: ../opt/job-dev-build.yml
+    parameters:
+      solutionName: 'IX.Observable'
+- job:
+  timeoutInMinutes: 10
+  pool:
+    name: Azure Pipelines
+    vmImage: macOS-latest
+  steps:
+  - template: ../opt/job-dev-build.yml
+    parameters:
+      solutionName: 'IX.Observable'

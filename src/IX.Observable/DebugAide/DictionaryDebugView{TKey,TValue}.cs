@@ -40,7 +40,8 @@ namespace IX.Observable.DebugAide
             get
             {
                 var items =
-                    new KeyValuePair<TKey, TValue>[((ICollection<KeyValuePair<TKey, TValue>>)this.dict.InternalContainer).Count];
+                    new KeyValuePair<TKey, TValue>
+                        [((ICollection<KeyValuePair<TKey, TValue>>)this.dict.InternalContainer).Count];
                 this.dict.InternalContainer.CopyTo(
                     items,
                     0);

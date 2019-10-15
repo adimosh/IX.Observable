@@ -8,20 +8,23 @@ using System.Runtime.Serialization;
 namespace IX.Observable.Adapters
 {
     /// <summary>
-    /// A collection adapter for a stack.
+    ///     A collection adapter for a stack.
     /// </summary>
     /// <typeparam name="T">The type of item in the stack.</typeparam>
     /// <seealso cref="IX.Observable.Adapters.CollectionAdapter{T}" />
-    [CollectionDataContract(Namespace = Constants.DataContractNamespace, Name = "StackAdapterOf{0}", ItemName = "Item")]
+    [CollectionDataContract(
+        Namespace = Constants.DataContractNamespace,
+        Name = "StackAdapterOf{0}",
+        ItemName = "Item")]
     internal class StackCollectionAdapter<T> : CollectionAdapter<T>
     {
         /// <summary>
-        /// The base stack.
+        ///     The base stack.
         /// </summary>
         private readonly Stack<T> stack;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="StackCollectionAdapter{T}"/> class.
+        ///     Initializes a new instance of the <see cref="StackCollectionAdapter{T}" /> class.
         /// </summary>
         internal StackCollectionAdapter()
         {
@@ -29,7 +32,7 @@ namespace IX.Observable.Adapters
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="StackCollectionAdapter{T}"/> class.
+        ///     Initializes a new instance of the <see cref="StackCollectionAdapter{T}" /> class.
         /// </summary>
         /// <param name="stack">The stack.</param>
         internal StackCollectionAdapter(Stack<T> stack)
@@ -38,19 +41,19 @@ namespace IX.Observable.Adapters
         }
 
         /// <summary>
-        /// Gets the number of items.
+        ///     Gets the number of items.
         /// </summary>
         /// <value>The number of items.</value>
         public override int Count => this.stack.Count;
 
         /// <summary>
-        /// Gets a value indicating whether this instance is read only.
+        ///     Gets a value indicating whether this instance is read only.
         /// </summary>
-        /// <value><see langword="true"/> if this instance is read only; otherwise, <see langword="false"/>.</value>
+        /// <value><see langword="true" /> if this instance is read only; otherwise, <see langword="false" />.</value>
         public override bool IsReadOnly => false;
 
         /// <summary>
-        /// Adds the specified item.
+        ///     Adds the specified item.
         /// </summary>
         /// <param name="item">The item.</param>
         /// <returns>The index of the freshly-added item.</returns>
@@ -61,26 +64,33 @@ namespace IX.Observable.Adapters
         }
 
         /// <summary>
-        /// Clears this instance.
+        ///     Clears this instance.
         /// </summary>
         public override void Clear() => this.stack.Clear();
 
         /// <summary>
-        /// Determines whether the container list contains the specified item.
+        ///     Determines whether the container list contains the specified item.
         /// </summary>
         /// <param name="item">The item.</param>
-        /// <returns><see langword="true"/> if the container list contains the specified item; otherwise, <see langword="false"/>.</returns>
+        /// <returns>
+        ///     <see langword="true" /> if the container list contains the specified item; otherwise, <see langword="false" />
+        ///     .
+        /// </returns>
         public override bool Contains(T item) => this.stack.Contains(item);
 
         /// <summary>
-        /// Copies the contents of the container to an array.
+        ///     Copies the contents of the container to an array.
         /// </summary>
         /// <param name="array">The array.</param>
         /// <param name="arrayIndex">Index of the array.</param>
-        public override void CopyTo(T[] array, int arrayIndex) => this.stack.CopyTo(array, arrayIndex);
+        public override void CopyTo(
+            T[] array,
+            int arrayIndex) => this.stack.CopyTo(
+            array,
+            arrayIndex);
 
         /// <summary>
-        /// Removes the specified item.
+        ///     Removes the specified item.
         /// </summary>
         /// <param name="item">The item.</param>
         /// <returns>The index of the removed item, or <c>-1</c> if removal was not successful.</returns>
@@ -88,38 +98,38 @@ namespace IX.Observable.Adapters
 
 #pragma warning disable HAA0601 // Value type to reference type conversion causing boxing allocation - Unavoidable here
         /// <summary>
-        /// Returns an enumerator that iterates through the collection.
+        ///     Returns an enumerator that iterates through the collection.
         /// </summary>
         /// <returns>An enumerator that can be used to iterate through the collection.</returns>
         public override IEnumerator<T> GetEnumerator() => this.stack.GetEnumerator();
 #pragma warning restore HAA0601 // Value type to reference type conversion causing boxing allocation
 
         /// <summary>
-        /// Pops an item in the stack.
+        ///     Pops an item in the stack.
         /// </summary>
         /// <returns>T.</returns>
         public T Pop() => this.stack.Pop();
 
         /// <summary>
-        /// Peeks at the top item in the stack.
+        ///     Peeks at the top item in the stack.
         /// </summary>
         /// <returns>T.</returns>
         public T Peek() => this.stack.Peek();
 
         /// <summary>
-        /// Pushes the specified item in the stack.
+        ///     Pushes the specified item in the stack.
         /// </summary>
         /// <param name="item">The item.</param>
         public void Push(T item) => this.stack.Push(item);
 
         /// <summary>
-        /// Converts all items in the stack to an array.
+        ///     Converts all items in the stack to an array.
         /// </summary>
         /// <returns>The array of items.</returns>
         public T[] ToArray() => this.stack.ToArray();
 
         /// <summary>
-        /// Trims the excess space in the stack.
+        ///     Trims the excess space in the stack.
         /// </summary>
         public void TrimExcess() => this.stack.TrimExcess();
     }

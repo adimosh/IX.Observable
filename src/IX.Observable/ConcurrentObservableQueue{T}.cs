@@ -17,7 +17,7 @@ namespace IX.Observable
     ///     A queue that broadcasts its changes.
     /// </summary>
     /// <typeparam name="T">The type of items in the queue.</typeparam>
-    [DebuggerDisplay("ConcurrentObservableQueue, Count = {Count}")]
+    [DebuggerDisplay("ConcurrentObservableQueue, Count = {" + nameof(Count) + "}")]
     [DebuggerTypeProxy(typeof(QueueDebugView<>))]
     [CollectionDataContract(
         Namespace = Constants.DataContractNamespace,

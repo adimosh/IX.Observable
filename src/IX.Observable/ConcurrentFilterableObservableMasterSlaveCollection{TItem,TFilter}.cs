@@ -8,6 +8,7 @@ using System.Diagnostics;
 using IX.Observable.DebugAide;
 using IX.StandardExtensions.Threading;
 using IX.System.Threading;
+using JetBrains.Annotations;
 using GlobalThreading = System.Threading;
 
 namespace IX.Observable
@@ -18,8 +19,9 @@ namespace IX.Observable
     /// <typeparam name="TItem">The type of the item.</typeparam>
     /// <typeparam name="TFilter">The type of the filter.</typeparam>
     /// <seealso cref="IX.Observable.ObservableMasterSlaveCollection{T}" />
-    [DebuggerDisplay("Count = {Count}")]
+    [DebuggerDisplay("Count = {" + nameof(Count) + "}")]
     [DebuggerTypeProxy(typeof(CollectionDebugView<>))]
+    [PublicAPI]
     public class ConcurrentFilterableObservableMasterSlaveCollection<TItem, TFilter> : ConcurrentObservableMasterSlaveCollection<TItem>
     {
 #pragma warning disable IDISP002 // Dispose member.

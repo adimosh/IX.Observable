@@ -27,7 +27,7 @@ namespace IX.Observable
     /// <seealso cref="ICollection" />
     /// <seealso cref="IList" />
     /// <seealso cref="Observable.ObservableCollectionBase{TItem}" />
-    [DebuggerDisplay("ObservableMasterSlaveCollection, Count = {Count}")]
+    [DebuggerDisplay("ObservableMasterSlaveCollection, Count = {" + nameof(Count) + "}")]
     [DebuggerTypeProxy(typeof(CollectionDebugView<>))]
     [PublicAPI]
     public class ObservableMasterSlaveCollection<T> : ObservableListBase<T>
@@ -187,13 +187,13 @@ namespace IX.Observable
         public override bool Remove(T item)
         {
             this.IncreaseIgnoreMustResetCounter();
-            if (!base.Remove(item))
+            if (base.Remove(item))
             {
-                this.IncreaseIgnoreMustResetCounter(-1);
-                return false;
+                return true;
             }
 
-            return true;
+            this.IncreaseIgnoreMustResetCounter(-1);
+            return false;
         }
 
         /// <summary>
