@@ -11,6 +11,7 @@ using IX.Guaranteed;
 using IX.Observable.Adapters;
 using IX.Observable.UndoLevels;
 using IX.StandardExtensions;
+using IX.StandardExtensions.Contracts;
 using IX.StandardExtensions.Threading;
 using IX.Undoable;
 using JetBrains.Annotations;
@@ -310,6 +311,7 @@ namespace IX.Observable
 
             // ACTION
             T[] itemsList;
+            int[] indexesList;
 
             // Inside a write lock
             using (this.WriteLock())
@@ -320,26 +322,25 @@ namespace IX.Observable
                 }
 
                 itemsList = this.InternalContainer.Skip(startIndex).ToArray();
+                indexesList = new int[itemsList.Length];
+                for (int i = 0; i < indexesList.Length; i++)
+                {
+                    indexesList[i] = this.InternalContainer.Count - 1 - i;
+                }
 
                 // Use an undo/redo transaction
                 using (OperationTransaction tc = this.CheckItemAutoRelease(itemsList))
                 {
-                    using (OperationTransaction ts = this.StartExplicitUndoBlockTransaction())
+                    // Actually remove
+                    for (var index = this.InternalContainer.Count - 1; index >= startIndex; index--)
                     {
-                        // Actually remove
-                        for (var index = this.InternalContainer.Count - 1; index >= startIndex; index--)
-                        {
-                            // Remove item (in reverse order)
-                            T item = this.InternalContainer[index];
-                            this.InternalContainer.RemoveAt(index);
-
-                            // Push an undo level for it
-                            this.PushUndoLevel(new RemoveUndoLevel<T> { RemovedItem = item, Index = index });
-                        }
-
-                        // Mark undo transaction as successful
-                        ts.Success();
+                        // Remove item (in reverse order)
+                        T item = this.InternalContainer[index];
+                        this.InternalContainer.RemoveAt(index);
                     }
+
+                    // Push an undo level
+                    this.PushUndoLevel(new RemoveMultipleUndoLevel<T> { RemovedItems = itemsList, Indexes = indexesList });
 
                     // Mark the transaction as successful
                     tc.Success();
@@ -396,6 +397,7 @@ namespace IX.Observable
 
             // ACTION
             T[] itemsList;
+            int[] indexesList;
 
             // Inside a write lock
             using (this.WriteLock())
@@ -411,26 +413,25 @@ namespace IX.Observable
                 }
 
                 itemsList = this.InternalContainer.Skip(startIndex).Take(length).ToArray();
+                indexesList = new int[itemsList.Length];
+                for (int i = 0; i < indexesList.Length; i++)
+                {
+                    indexesList[i] = startIndex + length - 1 - i;
+                }
 
                 // Use an undo/redo transaction
                 using (OperationTransaction tc = this.CheckItemAutoRelease(itemsList))
                 {
-                    using (OperationTransaction ts = this.StartExplicitUndoBlockTransaction())
+                    // Actually remove
+                    for (var index = startIndex + length - 1; index >= startIndex; index--)
                     {
-                        // Actually remove
-                        for (var index = startIndex + length - 1; index >= startIndex; index--)
-                        {
-                            // Remove item (in reverse order)
-                            T item = this.InternalContainer[index];
-                            this.InternalContainer.RemoveAt(index);
-
-                            // Push an undo level for it
-                            this.PushUndoLevel(new RemoveUndoLevel<T> { RemovedItem = item, Index = index });
-                        }
-
-                        // Mark undo transaction as successful
-                        ts.Success();
+                        // Remove item (in reverse order)
+                        T item = this.InternalContainer[index];
+                        this.InternalContainer.RemoveAt(index);
                     }
+
+                    // Push an undo level
+                    this.PushUndoLevel(new RemoveMultipleUndoLevel<T> { RemovedItems = itemsList, Indexes = indexesList });
 
                     // Mark the transaction as successful
                     tc.Success();
@@ -497,21 +498,25 @@ namespace IX.Observable
                 // Use an undo/redo transaction
                 using (OperationTransaction tc = this.CheckItemAutoRelease(items))
                 {
-                    using (OperationTransaction ts = this.StartExplicitUndoBlockTransaction())
+                    // Actually remove
+                    foreach (var item in itemsToDelete)
                     {
-                        // Actually remove
-                        foreach (var item in itemsToDelete)
-                        {
-                            // Remove an item
-                            this.InternalContainer.RemoveAt(item.Index);
+                        // Remove an item
+                        this.InternalContainer.RemoveAt(item.Index);
 
-                            // Push an undo level for it
-                            this.PushUndoLevel(new RemoveUndoLevel<T> { RemovedItem = item.Item, Index = item.Index });
-                        }
-
-                        // Mark undo transaction as successful
-                        ts.Success();
+                        // Push an undo level for it
+                        this.PushUndoLevel(new RemoveUndoLevel<T> { RemovedItem = item.Item, Index = item.Index });
                     }
+
+                    // Push undo transaction
+                    this.PushUndoLevel(
+                        new RemoveMultipleUndoLevel<T>
+                        {
+                            RemovedItems = itemsToDelete.Select(p => p.Item)
+                                .ToArray(),
+                            Indexes = itemsToDelete.Select(p => p.Index)
+                                .ToArray()
+                        });
 
                     // Mark the transaction as successful
                     tc.Success();
@@ -812,6 +817,33 @@ namespace IX.Observable
             addedItems);
 
         /// <summary>
+        ///     Called when items are added to a collection.
+        /// </summary>
+        /// <param name="addedItems">The added items.</param>
+        /// <param name="indexes">The indexes.</param>
+        protected virtual void RaiseCollectionChangedAddMultiple(
+            IEnumerable<T> addedItems,
+            IEnumerable<int> indexes)
+        {
+            var ixs = indexes.ToArray();
+
+            if (ixs.Length > 5)
+            {
+                this.RaiseCollectionReset();
+            }
+            else
+            {
+                var ims = addedItems.ToArray();
+                for (int i = 0; i < ixs.Length; i++)
+                {
+                    this.RaiseCollectionAdd(
+                        ixs[i],
+                        ims[i]);
+                }
+            }
+        }
+
+        /// <summary>
         ///     Called when items are removed from a collection.
         /// </summary>
         /// <param name="removedItems">The removed items.</param>
@@ -821,6 +853,33 @@ namespace IX.Observable
             int index) => this.RaiseCollectionRemove(
             index,
             removedItems);
+
+        /// <summary>
+        ///     Called when items are removed from a collection.
+        /// </summary>
+        /// <param name="removedItems">The removed items.</param>
+        /// <param name="indexes">The indexes.</param>
+        protected virtual void RaiseCollectionChangedRemoveMultiple(
+            IEnumerable<T> removedItems,
+            IEnumerable<int> indexes)
+        {
+            var ixs = indexes.ToArray();
+
+            if (ixs.Length > 5)
+            {
+                this.RaiseCollectionReset();
+            }
+            else
+            {
+                var ims = removedItems.ToArray();
+                for (int i = 0; i < ixs.Length; i++)
+                {
+                    this.RaiseCollectionRemove(
+                        ixs[i],
+                        ims[i]);
+                }
+            }
+        }
 
 #pragma warning disable HAA0401 // Possible allocation of reference type enumerator - currently unavoidable
         /// <summary>
@@ -846,192 +905,230 @@ namespace IX.Observable
             switch (undoRedoLevel)
             {
                 case AddUndoLevel<T> aul:
-                {
-                    var index = aul.Index;
-
-                    this.InternalContainer.RemoveAt(index);
-
-                    T item = aul.AddedItem;
-
-                    if (this.ItemsAreUndoable && this.AutomaticallyCaptureSubItems && item is IUndoableItem ul &&
-                        ul.IsCapturedIntoUndoContext && ul.ParentUndoContext == this)
                     {
-                        ul.ReleaseFromUndoContext();
-                    }
+                        var index = aul.Index;
 
-                    toInvokeOutsideLock = innerState =>
-                    {
-                        var convertedState = (Tuple<ObservableListBase<T>, T, int>)innerState;
-
-                        convertedState.Item1.RaiseCollectionChangedRemove(
-                            convertedState.Item2,
-                            convertedState.Item3);
-                        convertedState.Item1.RaisePropertyChanged(nameof(convertedState.Item1.Count));
-                        convertedState.Item1.ContentsMayHaveChanged();
-                    };
-
-                    state = new Tuple<ObservableListBase<T>, T, int>(
-                        this,
-                        item,
-                        index);
-
-                    break;
-                }
-
-                case AddMultipleUndoLevel<T> amul:
-                {
-                    var index = amul.Index;
-
-                    for (var i = 0; i < amul.AddedItems.Length; i++)
-                    {
                         this.InternalContainer.RemoveAt(index);
-                    }
 
-                    IEnumerable<T> items = amul.AddedItems;
+                        T item = aul.AddedItem;
 
-                    if (this.ItemsAreUndoable && this.AutomaticallyCaptureSubItems)
-                    {
-                        foreach (IUndoableItem ul in LinqExtensions.Where(
-                            items.Cast<IUndoableItem>(),
-                            (p, thisL1) => p.IsCapturedIntoUndoContext && p.ParentUndoContext == thisL1,
-                            this))
+                        if (this.ItemsAreUndoable && this.AutomaticallyCaptureSubItems && item is IUndoableItem ul &&
+                            ul.IsCapturedIntoUndoContext && ul.ParentUndoContext == this)
                         {
                             ul.ReleaseFromUndoContext();
                         }
+
+                        toInvokeOutsideLock = innerState =>
+                        {
+                            var convertedState = (Tuple<ObservableListBase<T>, T, int>)innerState;
+
+                            convertedState.Item1.RaiseCollectionChangedRemove(
+                                convertedState.Item2,
+                                convertedState.Item3);
+                            convertedState.Item1.RaisePropertyChanged(nameof(convertedState.Item1.Count));
+                            convertedState.Item1.ContentsMayHaveChanged();
+                        };
+
+                        state = new Tuple<ObservableListBase<T>, T, int>(
+                            this,
+                            item,
+                            index);
+
+                        break;
                     }
 
-                    toInvokeOutsideLock = innerState =>
+                case AddMultipleUndoLevel<T> amul:
                     {
-                        var convertedState = (Tuple<ObservableListBase<T>, IEnumerable<T>, int>)innerState;
+                        var index = amul.Index;
 
-                        convertedState.Item1.RaiseCollectionChangedRemoveMultiple(
-                            convertedState.Item2,
-                            convertedState.Item3);
-                        convertedState.Item1.RaisePropertyChanged(nameof(convertedState.Item1.Count));
-                        convertedState.Item1.ContentsMayHaveChanged();
-                    };
+                        for (var i = 0; i < amul.AddedItems.Length; i++)
+                        {
+                            this.InternalContainer.RemoveAt(index);
+                        }
 
-                    state = new Tuple<ObservableListBase<T>, IEnumerable<T>, int>(
-                        this,
-                        items,
-                        index);
+                        IEnumerable<T> items = amul.AddedItems;
 
-                    break;
-                }
+                        if (this.ItemsAreUndoable && this.AutomaticallyCaptureSubItems)
+                        {
+                            foreach (IUndoableItem ul in LinqExtensions.Where(
+                                items.Cast<IUndoableItem>(),
+                                (p, thisL1) => p.IsCapturedIntoUndoContext && p.ParentUndoContext == thisL1,
+                                this))
+                            {
+                                ul.ReleaseFromUndoContext();
+                            }
+                        }
+
+                        toInvokeOutsideLock = innerState =>
+                        {
+                            var convertedState = (Tuple<ObservableListBase<T>, IEnumerable<T>, int>)innerState;
+
+                            convertedState.Item1.RaiseCollectionChangedRemoveMultiple(
+                                convertedState.Item2,
+                                convertedState.Item3);
+                            convertedState.Item1.RaisePropertyChanged(nameof(convertedState.Item1.Count));
+                            convertedState.Item1.ContentsMayHaveChanged();
+                        };
+
+                        state = new Tuple<ObservableListBase<T>, IEnumerable<T>, int>(
+                            this,
+                            items,
+                            index);
+
+                        break;
+                    }
 
                 case RemoveUndoLevel<T> rul:
-                {
-                    T item = rul.RemovedItem;
-                    var index = rul.Index;
-
-                    this.InternalContainer.Insert(
-                        index,
-                        item);
-
-                    if (this.ItemsAreUndoable && this.AutomaticallyCaptureSubItems && item is IUndoableItem ul &&
-                        !ul.IsCapturedIntoUndoContext)
                     {
-                        ul.CaptureIntoUndoContext(this);
+                        T item = rul.RemovedItem;
+                        var index = rul.Index;
+
+                        this.InternalContainer.Insert(
+                            index,
+                            item);
+
+                        if (this.ItemsAreUndoable && this.AutomaticallyCaptureSubItems && item is IUndoableItem ul &&
+                            !ul.IsCapturedIntoUndoContext)
+                        {
+                            ul.CaptureIntoUndoContext(this);
+                        }
+
+                        toInvokeOutsideLock = innerState =>
+                        {
+                            var convertedState = (Tuple<ObservableListBase<T>, T, int>)innerState;
+
+                            convertedState.Item1.RaiseCollectionChangedAdd(
+                                convertedState.Item2,
+                                convertedState.Item3);
+                            convertedState.Item1.RaisePropertyChanged(nameof(convertedState.Item1.Count));
+                            convertedState.Item1.ContentsMayHaveChanged();
+                        };
+
+                        state = new Tuple<ObservableListBase<T>, T, int>(
+                            this,
+                            item,
+                            index);
+
+                        break;
                     }
 
-                    toInvokeOutsideLock = innerState =>
+                case RemoveMultipleUndoLevel<T> rmul:
                     {
-                        var convertedState = (Tuple<ObservableListBase<T>, T, int>)innerState;
+                        T[] items = rmul.RemovedItems;
+                        int[] indexes = rmul.Indexes;
 
-                        convertedState.Item1.RaiseCollectionChangedAdd(
-                            convertedState.Item2,
-                            convertedState.Item3);
-                        convertedState.Item1.RaisePropertyChanged(nameof(convertedState.Item1.Count));
-                        convertedState.Item1.ContentsMayHaveChanged();
-                    };
+                        for (int i = 0; i < items.Length; i++)
+                        {
+                            this.InternalContainer.Insert(indexes[i], items[i]);
+                        }
 
-                    state = new Tuple<ObservableListBase<T>, T, int>(
-                        this,
-                        item,
-                        index);
+                        if (this.ItemsAreUndoable && this.AutomaticallyCaptureSubItems)
+                        {
+                            foreach (IUndoableItem ul in items.Cast<IUndoableItem>()
+                                .Where(p => !p.IsCapturedIntoUndoContext))
+                            {
+                                ul.CaptureIntoUndoContext(this);
+                            }
+                        }
 
-                    break;
-                }
+                        toInvokeOutsideLock = innerState =>
+                        {
+                            var convertedState = (Tuple<ObservableListBase<T>, IEnumerable<T>, IEnumerable<int>>)innerState;
+
+                            convertedState.Item1.RaiseCollectionChangedAddMultiple(
+                                convertedState.Item2,
+                                convertedState.Item3);
+                            convertedState.Item1.RaisePropertyChanged(nameof(convertedState.Item1.Count));
+                            convertedState.Item1.ContentsMayHaveChanged();
+                        };
+
+                        state = new Tuple<ObservableListBase<T>, IEnumerable<T>, IEnumerable<int>>(
+                            this,
+                            items,
+                            indexes);
+
+                        break;
+                    }
 
                 case ClearUndoLevel<T> cul:
-                {
-                    foreach (T t in cul.OriginalItems)
                     {
-                        this.InternalContainer.Add(t);
-                    }
-
-                    if (this.ItemsAreUndoable && this.AutomaticallyCaptureSubItems)
-                    {
-                        foreach (IUndoableItem ul in cul.OriginalItems.Cast<IUndoableItem>()
-                            .Where(p => !p.IsCapturedIntoUndoContext))
+                        foreach (T t in cul.OriginalItems)
                         {
-                            ul.CaptureIntoUndoContext(this);
+                            this.InternalContainer.Add(t);
                         }
+
+                        if (this.ItemsAreUndoable && this.AutomaticallyCaptureSubItems)
+                        {
+                            foreach (IUndoableItem ul in cul.OriginalItems.Cast<IUndoableItem>()
+                                .Where(p => !p.IsCapturedIntoUndoContext))
+                            {
+                                ul.CaptureIntoUndoContext(this);
+                            }
+                        }
+
+                        toInvokeOutsideLock = innerState =>
+                        {
+                            var convertedState = (ObservableListBase<T>)innerState;
+
+                            convertedState.RaiseCollectionReset();
+                            convertedState.RaisePropertyChanged(nameof(convertedState.Count));
+                            convertedState.ContentsMayHaveChanged();
+                        };
+
+                        state = this;
+
+                        break;
                     }
-
-                    toInvokeOutsideLock = innerState =>
-                    {
-                        var convertedState = (ObservableListBase<T>)innerState;
-
-                        convertedState.RaiseCollectionReset();
-                        convertedState.RaisePropertyChanged(nameof(convertedState.Count));
-                        convertedState.ContentsMayHaveChanged();
-                    };
-
-                    state = this;
-
-                    break;
-                }
 
                 case ChangeAtUndoLevel<T> caul:
-                {
-                    T oldItem = caul.NewValue;
-                    T newItem = caul.OldValue;
-                    var index = caul.Index;
-
-                    this.InternalContainer[index] = newItem;
-
-                    if (this.ItemsAreUndoable && this.AutomaticallyCaptureSubItems)
                     {
-                        if (newItem is IUndoableItem ul && !ul.IsCapturedIntoUndoContext)
+                        T oldItem = caul.NewValue;
+                        T newItem = caul.OldValue;
+                        var index = caul.Index;
+
+                        this.InternalContainer[index] = newItem;
+
+                        if (this.ItemsAreUndoable && this.AutomaticallyCaptureSubItems)
                         {
-                            ul.CaptureIntoUndoContext(this);
+                            if (newItem is IUndoableItem ul && !ul.IsCapturedIntoUndoContext)
+                            {
+                                ul.CaptureIntoUndoContext(this);
+                            }
+
+                            if (oldItem is IUndoableItem ol && ol.IsCapturedIntoUndoContext && ol.ParentUndoContext == this)
+                            {
+                                ol.ReleaseFromUndoContext();
+                            }
                         }
 
-                        if (oldItem is IUndoableItem ol && ol.IsCapturedIntoUndoContext && ol.ParentUndoContext == this)
+                        toInvokeOutsideLock = innerState =>
                         {
-                            ol.ReleaseFromUndoContext();
-                        }
+                            var convertedState = (Tuple<ObservableListBase<T>, T, T, int>)innerState;
+
+                            convertedState.Item1.RaiseCollectionChangedChanged(
+                                convertedState.Item2,
+                                convertedState.Item3,
+                                convertedState.Item4);
+                            convertedState.Item1.RaisePropertyChanged(nameof(convertedState.Item1.Count));
+                            convertedState.Item1.ContentsMayHaveChanged();
+                        };
+
+                        state = new Tuple<ObservableListBase<T>, T, T, int>(
+                            this,
+                            oldItem,
+                            newItem,
+                            index);
+
+                        break;
                     }
 
-                    toInvokeOutsideLock = innerState =>
-                    {
-                        var convertedState = (Tuple<ObservableListBase<T>, T, T, int>)innerState;
-
-                        convertedState.Item1.RaiseCollectionChangedChanged(
-                            convertedState.Item2,
-                            convertedState.Item3,
-                            convertedState.Item4);
-                        convertedState.Item1.RaisePropertyChanged(nameof(convertedState.Item1.Count));
-                        convertedState.Item1.ContentsMayHaveChanged();
-                    };
-
-                    state = new Tuple<ObservableListBase<T>, T, T, int>(
-                        this,
-                        oldItem,
-                        newItem,
-                        index);
-
-                    break;
-                }
-
                 default:
-                {
-                    toInvokeOutsideLock = null;
-                    state = null;
+                    {
+                        toInvokeOutsideLock = null;
+                        state = null;
 
-                    return false;
-                }
+                        return false;
+                    }
             }
 
             return true;
@@ -1060,192 +1157,229 @@ namespace IX.Observable
             switch (undoRedoLevel)
             {
                 case AddUndoLevel<T> aul:
-                {
-                    var index = aul.Index;
-                    T item = aul.AddedItem;
-
-                    this.InternalContainer.Insert(
-                        index,
-                        item);
-
-                    if (this.ItemsAreUndoable && this.AutomaticallyCaptureSubItems && item is IUndoableItem ul &&
-                        !ul.IsCapturedIntoUndoContext)
                     {
-                        ul.CaptureIntoUndoContext(this);
-                    }
+                        var index = aul.Index;
+                        T item = aul.AddedItem;
 
-                    toInvokeOutsideLock = innerState =>
-                    {
-                        var convertedState = (Tuple<ObservableListBase<T>, T, int>)innerState;
+                        this.InternalContainer.Insert(
+                            index,
+                            item);
 
-                        convertedState.Item1.RaiseCollectionChangedAdd(
-                            convertedState.Item2,
-                            convertedState.Item3);
-                        convertedState.Item1.RaisePropertyChanged(nameof(convertedState.Item1.Count));
-                        convertedState.Item1.ContentsMayHaveChanged();
-                    };
-
-                    state = new Tuple<ObservableListBase<T>, T, int>(
-                        this,
-                        item,
-                        index);
-
-                    break;
-                }
-
-                case AddMultipleUndoLevel<T> amul:
-                {
-                    var index = amul.Index;
-                    IEnumerable<T> items = amul.AddedItems;
-
-                    IEnumerableExtensions.ForEach(
-                        items.Reverse(), (
-                            p,
-                            thisL1,
-                            indexL1) => thisL1.InternalContainer.Insert(
-                            indexL1,
-                            p),
-                        this,
-                        index);
-
-                    if (this.ItemsAreUndoable && this.AutomaticallyCaptureSubItems)
-                    {
-                        foreach (IUndoableItem ul in amul.AddedItems.Cast<IUndoableItem>()
-                            .Where(p => !p.IsCapturedIntoUndoContext))
+                        if (this.ItemsAreUndoable && this.AutomaticallyCaptureSubItems && item is IUndoableItem ul &&
+                            !ul.IsCapturedIntoUndoContext)
                         {
                             ul.CaptureIntoUndoContext(this);
                         }
+
+                        toInvokeOutsideLock = innerState =>
+                        {
+                            var convertedState = (Tuple<ObservableListBase<T>, T, int>)innerState;
+
+                            convertedState.Item1.RaiseCollectionChangedAdd(
+                                convertedState.Item2,
+                                convertedState.Item3);
+                            convertedState.Item1.RaisePropertyChanged(nameof(convertedState.Item1.Count));
+                            convertedState.Item1.ContentsMayHaveChanged();
+                        };
+
+                        state = new Tuple<ObservableListBase<T>, T, int>(
+                            this,
+                            item,
+                            index);
+
+                        break;
                     }
 
-                    toInvokeOutsideLock = innerState =>
+                case AddMultipleUndoLevel<T> amul:
                     {
-                        var convertedState = (Tuple<ObservableListBase<T>, IEnumerable<T>, int>)innerState;
+                        var index = amul.Index;
+                        IEnumerable<T> items = amul.AddedItems;
 
-                        convertedState.Item1.RaiseCollectionChangedAddMultiple(
-                            convertedState.Item2,
-                            convertedState.Item3);
-                        convertedState.Item1.RaisePropertyChanged(nameof(convertedState.Item1.Count));
-                        convertedState.Item1.ContentsMayHaveChanged();
-                    };
+                        IEnumerableExtensions.ForEach(
+                            items.Reverse(), (
+                                p,
+                                thisL1,
+                                indexL1) => thisL1.InternalContainer.Insert(
+                                indexL1,
+                                p),
+                            this,
+                            index);
 
-                    state = new Tuple<ObservableListBase<T>, IEnumerable<T>, int>(
-                        this,
-                        items,
-                        index);
+                        if (this.ItemsAreUndoable && this.AutomaticallyCaptureSubItems)
+                        {
+                            foreach (IUndoableItem ul in amul.AddedItems.Cast<IUndoableItem>()
+                                .Where(p => !p.IsCapturedIntoUndoContext))
+                            {
+                                ul.CaptureIntoUndoContext(this);
+                            }
+                        }
 
-                    break;
-                }
+                        toInvokeOutsideLock = innerState =>
+                        {
+                            var convertedState = (Tuple<ObservableListBase<T>, IEnumerable<T>, int>)innerState;
+
+                            convertedState.Item1.RaiseCollectionChangedAddMultiple(
+                                convertedState.Item2,
+                                convertedState.Item3);
+                            convertedState.Item1.RaisePropertyChanged(nameof(convertedState.Item1.Count));
+                            convertedState.Item1.ContentsMayHaveChanged();
+                        };
+
+                        state = new Tuple<ObservableListBase<T>, IEnumerable<T>, int>(
+                            this,
+                            items,
+                            index);
+
+                        break;
+                    }
 
                 case RemoveUndoLevel<T> rul:
-                {
-                    T item = rul.RemovedItem;
-                    var index = rul.Index;
-
-                    this.InternalContainer.RemoveAt(index);
-
-                    if (this.ItemsAreUndoable && this.AutomaticallyCaptureSubItems && item is IUndoableItem ul &&
-                        ul.IsCapturedIntoUndoContext && ul.ParentUndoContext == this)
                     {
-                        ul.ReleaseFromUndoContext();
-                    }
+                        T item = rul.RemovedItem;
+                        var index = rul.Index;
 
-                    toInvokeOutsideLock = innerState =>
-                    {
-                        var convertedState = (Tuple<ObservableListBase<T>, T, int>)innerState;
+                        this.InternalContainer.RemoveAt(index);
 
-                        convertedState.Item1.RaiseCollectionChangedRemove(
-                            convertedState.Item2,
-                            convertedState.Item3);
-                        convertedState.Item1.RaisePropertyChanged(nameof(convertedState.Item1.Count));
-                        convertedState.Item1.ContentsMayHaveChanged();
-                    };
-
-                    state = new Tuple<ObservableListBase<T>, T, int>(
-                        this,
-                        item,
-                        index);
-
-                    break;
-                }
-
-                case ClearUndoLevel<T> cul:
-                {
-                    this.InternalContainer.Clear();
-
-                    if (this.ItemsAreUndoable && this.AutomaticallyCaptureSubItems)
-                    {
-                        foreach (IUndoableItem ul in LinqExtensions.Where(
-                            cul.OriginalItems.Cast<IUndoableItem>(), (
-                                    p,
-                                    thisL1) => p.IsCapturedIntoUndoContext && p.ParentUndoContext == thisL1,
-                            this))
+                        if (this.ItemsAreUndoable && this.AutomaticallyCaptureSubItems && item is IUndoableItem ul &&
+                            ul.IsCapturedIntoUndoContext && ul.ParentUndoContext == this)
                         {
                             ul.ReleaseFromUndoContext();
                         }
+
+                        toInvokeOutsideLock = innerState =>
+                        {
+                            var convertedState = (Tuple<ObservableListBase<T>, T, int>)innerState;
+
+                            convertedState.Item1.RaiseCollectionChangedRemove(
+                                convertedState.Item2,
+                                convertedState.Item3);
+                            convertedState.Item1.RaisePropertyChanged(nameof(convertedState.Item1.Count));
+                            convertedState.Item1.ContentsMayHaveChanged();
+                        };
+
+                        state = new Tuple<ObservableListBase<T>, T, int>(
+                            this,
+                            item,
+                            index);
+
+                        break;
                     }
 
-                    toInvokeOutsideLock = innerState =>
+                case RemoveMultipleUndoLevel<T> rmul:
                     {
-                        var convertedState = (ObservableListBase<T>)innerState;
+                        for (var i = 0; i < rmul.Indexes.Length; i++)
+                        {
+                            this.InternalContainer.RemoveAt(rmul.Indexes[i]);
+                        }
 
-                        convertedState.RaiseCollectionReset();
-                        convertedState.RaisePropertyChanged(nameof(convertedState.Count));
-                        convertedState.ContentsMayHaveChanged();
-                    };
+                        if (this.ItemsAreUndoable && this.AutomaticallyCaptureSubItems)
+                        {
+                            foreach (IUndoableItem ul in LinqExtensions.Where(
+                                rmul.RemovedItems.Cast<IUndoableItem>(),
+                                (p, thisL1) => p.IsCapturedIntoUndoContext && p.ParentUndoContext == thisL1,
+                                this))
+                            {
+                                ul.ReleaseFromUndoContext();
+                            }
+                        }
 
-                    state = this;
+                        toInvokeOutsideLock = innerState =>
+                        {
+                            var convertedState = (Tuple<ObservableListBase<T>, IEnumerable<T>, IEnumerable<int>>)innerState;
 
-                    break;
-                }
+                            convertedState.Item1.RaiseCollectionChangedRemoveMultiple(
+                                convertedState.Item2,
+                                convertedState.Item3);
+                            convertedState.Item1.RaisePropertyChanged(nameof(convertedState.Item1.Count));
+                            convertedState.Item1.ContentsMayHaveChanged();
+                        };
+
+                        state = new Tuple<ObservableListBase<T>, IEnumerable<T>, IEnumerable<int>>(
+                            this,
+                            rmul.RemovedItems,
+                            rmul.Indexes);
+
+                        break;
+                    }
+
+                case ClearUndoLevel<T> cul:
+                    {
+                        this.InternalContainer.Clear();
+
+                        if (this.ItemsAreUndoable && this.AutomaticallyCaptureSubItems)
+                        {
+                            foreach (IUndoableItem ul in LinqExtensions.Where(
+                                cul.OriginalItems.Cast<IUndoableItem>(), (
+                                        p,
+                                        thisL1) => p.IsCapturedIntoUndoContext && p.ParentUndoContext == thisL1,
+                                this))
+                            {
+                                ul.ReleaseFromUndoContext();
+                            }
+                        }
+
+                        toInvokeOutsideLock = innerState =>
+                        {
+                            var convertedState = (ObservableListBase<T>)innerState;
+
+                            convertedState.RaiseCollectionReset();
+                            convertedState.RaisePropertyChanged(nameof(convertedState.Count));
+                            convertedState.ContentsMayHaveChanged();
+                        };
+
+                        state = this;
+
+                        break;
+                    }
 
                 case ChangeAtUndoLevel<T> caul:
-                {
-                    T oldItem = caul.OldValue;
-                    T newItem = caul.NewValue;
-                    var index = caul.Index;
-
-                    this.InternalContainer[index] = newItem;
-
-                    if (this.ItemsAreUndoable && this.AutomaticallyCaptureSubItems)
                     {
-                        if (newItem is IUndoableItem ul && !ul.IsCapturedIntoUndoContext)
+                        T oldItem = caul.OldValue;
+                        T newItem = caul.NewValue;
+                        var index = caul.Index;
+
+                        this.InternalContainer[index] = newItem;
+
+                        if (this.ItemsAreUndoable && this.AutomaticallyCaptureSubItems)
                         {
-                            ul.CaptureIntoUndoContext(this);
+                            if (newItem is IUndoableItem ul && !ul.IsCapturedIntoUndoContext)
+                            {
+                                ul.CaptureIntoUndoContext(this);
+                            }
+
+                            if (oldItem is IUndoableItem ol && ol.IsCapturedIntoUndoContext && ol.ParentUndoContext == this)
+                            {
+                                ol.ReleaseFromUndoContext();
+                            }
                         }
 
-                        if (oldItem is IUndoableItem ol && ol.IsCapturedIntoUndoContext && ol.ParentUndoContext == this)
+                        toInvokeOutsideLock = innerState =>
                         {
-                            ol.ReleaseFromUndoContext();
-                        }
+                            var convertedState = (Tuple<ObservableListBase<T>, T, T, int>)innerState;
+
+                            convertedState.Item1.RaiseCollectionChangedChanged(
+                                convertedState.Item2,
+                                convertedState.Item3,
+                                convertedState.Item4);
+                            convertedState.Item1.RaisePropertyChanged(nameof(convertedState.Item1.Count));
+                            convertedState.Item1.ContentsMayHaveChanged();
+                        };
+                        state = new Tuple<ObservableListBase<T>, T, T, int>(
+                            this,
+                            oldItem,
+                            newItem,
+                            index);
+
+                        break;
                     }
 
-                    toInvokeOutsideLock = innerState =>
-                    {
-                        var convertedState = (Tuple<ObservableListBase<T>, T, T, int>)innerState;
-
-                        convertedState.Item1.RaiseCollectionChangedChanged(
-                            convertedState.Item2,
-                            convertedState.Item3,
-                            convertedState.Item4);
-                        convertedState.Item1.RaisePropertyChanged(nameof(convertedState.Item1.Count));
-                        convertedState.Item1.ContentsMayHaveChanged();
-                    };
-                    state = new Tuple<ObservableListBase<T>, T, T, int>(
-                        this,
-                        oldItem,
-                        newItem,
-                        index);
-
-                    break;
-                }
-
                 default:
-                {
-                    toInvokeOutsideLock = null;
-                    state = null;
+                    {
+                        toInvokeOutsideLock = null;
+                        state = null;
 
-                    return false;
-                }
+                        return false;
+                    }
             }
 
             return true;
