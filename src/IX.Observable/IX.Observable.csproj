@@ -1,4 +1,4 @@
-﻿<!--EXTERNAL_PROPERTIES: TargetFrameworkIsFramework-->
+<!--EXTERNAL_PROPERTIES: TargetFrameworkIsFramework-->
 <!--EXTERNAL_PROPERTIES: TargetFrameworkIsStandard-->
 <Project Sdk="Microsoft.NET.Sdk">
 
@@ -34,23 +34,23 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFrameworkIsStandard)'=='true'">
-    <PackageReference Include="System.Collections" Version="4.3.0" />
-    <PackageReference Include="System.Diagnostics.Debug" Version="4.3.0" />
-    <PackageReference Include="System.Diagnostics.Tools" Version="4.3.0" />
-    <PackageReference Include="System.Linq" Version="4.3.0" />
-    <PackageReference Include="System.ObjectModel" Version="4.3.0" />
-    <PackageReference Include="System.Runtime.Serialization.Primitives" Version="4.3.0" />
-    <PackageReference Include="System.Threading" Version="4.3.0" />
-    <PackageReference Include="System.Resources.ResourceManager" Version="4.3.0" />
-    <PackageReference Include="System.Threading.Tasks" Version="4.3.0" />
+    <PackageReference Include="System.Collections" Version="[4.3.0,5)" />
+    <PackageReference Include="System.Diagnostics.Debug" Version="[4.3.0,5)" />
+    <PackageReference Include="System.Diagnostics.Tools" Version="[4.3.0,5)" />
+    <PackageReference Include="System.Linq" Version="[4.3.0,5)" />
+    <PackageReference Include="System.ObjectModel" Version="[4.3.0,5)" />
+    <PackageReference Include="System.Runtime.Serialization.Primitives" Version="[4.3.0,5)" />
+    <PackageReference Include="System.Threading" Version="[4.3.0,5)" />
+    <PackageReference Include="System.Resources.ResourceManager" Version="[4.3.0,5)" />
+    <PackageReference Include="System.Threading.Tasks" Version="[4.3.0,5)" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="IX.Abstractions" Version="0.5.1.1" />
-    <PackageReference Include="IX.Abstractions.Collections" Version="0.5.1.1" />
-    <PackageReference Include="IX.Abstractions.Threading" Version="0.5.1.1" />
-    <PackageReference Include="IX.StandardExtensions.ComponentModel" Version="0.5.1.1" />
-    <PackageReference Include="IX.StandardExtensions.Threading" Version="0.5.1.1" />
+    <PackageReference Include="IX.Abstractions" Version="[0.5.1.1,0.5.2)" />
+    <PackageReference Include="IX.Abstractions.Collections" Version="[0.5.1.2,0.5.2)" />
+    <PackageReference Include="IX.Abstractions.Threading" Version="[0.5.1.2,0.5.2)" />
+    <PackageReference Include="IX.StandardExtensions.ComponentModel" Version="[0.5.1.2,0.5.2)" />
+    <PackageReference Include="IX.StandardExtensions.Threading" Version="[0.5.1.2,0.5.2)" />
     <ProjectReference Include="..\IX.Undoable\IX.Undoable.csproj" />
   </ItemGroup>
 
@@ -98,7 +98,7 @@
 
   <!-- Project system and dependencies -->
   <ItemGroup>
-    <PackageReference Include="IX.Framework.ProjectSystem" Version="1.0.0.10">
+    <PackageReference Include="IX.Framework.ProjectSystem" Version="1.0.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
