@@ -1,4 +1,4 @@
-﻿<!--EXTERNAL_PROPERTIES: TargetFrameworkIsFramework-->
+<!--EXTERNAL_PROPERTIES: TargetFrameworkIsFramework-->
 <!--EXTERNAL_PROPERTIES: TargetFrameworkIsStandard-->
 <Project Sdk="Microsoft.NET.Sdk">
 
@@ -80,7 +80,7 @@
 
   <!-- Project system and dependencies -->
   <ItemGroup>
-    <PackageReference Include="IX.Framework.ProjectSystem" Version="1.0.0.10">
+    <PackageReference Include="IX.Framework.ProjectSystem" Version="1.0.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
