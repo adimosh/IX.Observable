@@ -704,5 +704,58 @@ namespace IX.UnitTests.IX.Observable
                 4,
                 list[2]);
         }
+
+        /// <summary>
+        ///     Tests Undo after Add on an ObservableList.
+        /// </summary>
+        /// <param name="list">The list.</param>
+        [Theory(DisplayName = "ObservableList, Undo with RemoveRange")]
+        [MemberData(nameof(GenerateData))]
+        public void UnitTest17(ObservableList<int> list)
+        {
+            // ARRANGE
+            EnvironmentSettings.AlwaysSuppressCurrentSynchronizationContext = true;
+
+            // ACT
+            list.RemoveRange(3);
+
+            Assert.False(list.Contains(4));
+            Assert.False(list.Contains(23));
+
+            list.Undo();
+
+            // ASSERT
+            Assert.True(list.Contains(4));
+            Assert.True(list.Contains(23));
+        }
+
+        /// <summary>
+        ///     Tests Undo after Add on an ObservableList.
+        /// </summary>
+        /// <param name="list">The list.</param>
+        [Theory(DisplayName = "ObservableList, Redo with RemoveRange")]
+        [MemberData(nameof(GenerateData))]
+        public void UnitTest18(ObservableList<int> list)
+        {
+            // ARRANGE
+            EnvironmentSettings.AlwaysSuppressCurrentSynchronizationContext = true;
+
+            // ACT
+            list.RemoveRange(3);
+
+            Assert.False(list.Contains(4));
+            Assert.False(list.Contains(23));
+
+            list.Undo();
+
+            Assert.True(list.Contains(4));
+            Assert.True(list.Contains(23));
+
+            list.Redo();
+
+            // ASSERT
+            Assert.False(list.Contains(4));
+            Assert.False(list.Contains(23));
+        }
     }
 }

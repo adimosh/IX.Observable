@@ -1017,7 +1017,7 @@ namespace IX.Observable
                         T[] items = rmul.RemovedItems;
                         int[] indexes = rmul.Indexes;
 
-                        for (int i = 0; i < items.Length; i++)
+                        for (int i = items.Length - 1; i >= 0; i--)
                         {
                             this.InternalContainer.Insert(indexes[i], items[i]);
                         }
