@@ -321,7 +321,7 @@ namespace IX.Observable
                     throw new ArgumentOutOfRangeException(nameof(startIndex));
                 }
 
-                itemsList = this.InternalContainer.Skip(startIndex).ToArray();
+                itemsList = this.InternalContainer.Skip(startIndex).Reverse().ToArray();
                 indexesList = new int[itemsList.Length];
                 for (int i = 0; i < indexesList.Length; i++)
                 {
@@ -335,7 +335,6 @@ namespace IX.Observable
                     for (var index = this.InternalContainer.Count - 1; index >= startIndex; index--)
                     {
                         // Remove item (in reverse order)
-                        T item = this.InternalContainer[index];
                         this.InternalContainer.RemoveAt(index);
                     }
 
@@ -412,7 +411,7 @@ namespace IX.Observable
                     throw new ArgumentOutOfRangeException(nameof(length));
                 }
 
-                itemsList = this.InternalContainer.Skip(startIndex).Take(length).ToArray();
+                itemsList = this.InternalContainer.Skip(startIndex).Take(length).Reverse().ToArray();
                 indexesList = new int[itemsList.Length];
                 for (int i = 0; i < indexesList.Length; i++)
                 {
@@ -426,7 +425,6 @@ namespace IX.Observable
                     for (var index = startIndex + length - 1; index >= startIndex; index--)
                     {
                         // Remove item (in reverse order)
-                        T item = this.InternalContainer[index];
                         this.InternalContainer.RemoveAt(index);
                     }
 
