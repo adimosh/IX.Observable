@@ -450,7 +450,6 @@ namespace IX.Observable
             this.ContentsMayHaveChanged();
         }
 
-#pragma warning disable HAA0401 // Possible allocation of reference type enumerator - Yes, we know !!! It's a damn IEnumerable !!!
         /// <summary>
         ///     Removes a range of items from the <see cref="ObservableCollectionBase{T}" />.
         /// </summary>
@@ -501,9 +500,6 @@ namespace IX.Observable
                     {
                         // Remove an item
                         this.InternalContainer.RemoveAt(item.Index);
-
-                        // Push an undo level for it
-                        this.PushUndoLevel(new RemoveUndoLevel<T> { RemovedItem = item.Item, Index = item.Index });
                     }
 
                     // Push undo transaction
@@ -532,7 +528,6 @@ namespace IX.Observable
             // Contents may have changed
             this.ContentsMayHaveChanged();
         }
-#pragma warning restore HAA0401 // Possible allocation of reference type enumerator
 
         /// <summary>
         ///     Removes a range of items from the <see cref="ObservableCollectionBase{T}" />.
