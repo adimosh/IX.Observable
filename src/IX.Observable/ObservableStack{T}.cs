@@ -9,6 +9,7 @@ using System.Threading;
 using IX.Observable.Adapters;
 using IX.Observable.DebugAide;
 using IX.Observable.UndoLevels;
+using IX.StandardExtensions.Contracts;
 using IX.System.Collections.Generic;
 using IX.Undoable;
 using JetBrains.Annotations;
@@ -30,6 +31,8 @@ namespace IX.Observable
     [PublicAPI]
     public class ObservableStack<T> : ObservableCollectionBase<T>, IStack<T>
     {
+        #region Constructors
+
         /// <summary>
         ///     Initializes a new instance of the <see cref="ObservableStack{T}" /> class.
         /// </summary>
@@ -183,17 +186,56 @@ namespace IX.Observable
         {
         }
 
+        #endregion
+
+        /// <summary>
+        /// Gets a value indicating whether this stack is empty.
+        /// </summary>
+        /// <value>
+        /// <c>true</c> if this stack is empty; otherwise, <c>false</c>.
+        /// </value>
+        public bool IsEmpty => this.Count == 0;
+
+        #region Stack methods
+
         /// <summary>
         ///     Peeks in the stack to view the topmost item, without removing it.
         /// </summary>
         /// <returns>The topmost element in the stack, if any.</returns>
         public T Peek()
         {
-            this.ThrowIfCurrentObjectDisposed();
+            this.RequiresNotDisposed();
 
             using (this.ReadLock())
             {
                 return ((StackCollectionAdapter<T>)this.InternalContainer).Peek();
+            }
+        }
+
+        /// <summary>
+        /// Attempts to peek at the topmost item from the stack, without removing it.
+        /// </summary>
+        /// <param name="item">The topmost element in the stack, default if unsuccessful.</param>
+        /// <returns>
+        /// <see langword="true" /> if an item is peeked at successfully, <see langword="false" /> otherwise, or if the
+        /// stack is empty.
+        /// </returns>
+        public bool TryPeek(out T item)
+        {
+            this.RequiresNotDisposed();
+
+            using (this.ReadLock())
+            {
+                var container = (StackCollectionAdapter<T>)this.InternalContainer;
+
+                if (container.Count == 0)
+                {
+                    item = default;
+                    return false;
+                }
+
+                item = container.Peek();
+                return true;
             }
         }
 
@@ -203,7 +245,7 @@ namespace IX.Observable
         /// <returns>The topmost element in the stack, if any.</returns>
         public T Pop()
         {
-            this.ThrowIfCurrentObjectDisposed();
+            this.RequiresNotDisposed();
 
             T item;
             int index;
@@ -225,12 +267,57 @@ namespace IX.Observable
         }
 
         /// <summary>
+        /// Attempts to pop the topmost item from the stack, and remove it if successful.
+        /// </summary>
+        /// <param name="item">The topmost element in the stack, default if unsuccessful.</param>
+        /// <returns>
+        /// <see langword="true" /> if an item is popped successfully, <see langword="false" /> otherwise, or if the
+        /// stack is empty.
+        /// </returns>
+        public bool TryPop(out T item)
+        {
+            this.RequiresNotDisposed();
+
+            int index;
+
+            using (var @lock = this.ReadWriteLock())
+            {
+                var container = (StackCollectionAdapter<T>)this.InternalContainer;
+
+                if (container.Count == 0)
+                {
+                    item = default;
+                    return false;
+                }
+
+                @lock.Upgrade();
+
+                if (container.Count == 0)
+                {
+                    item = default;
+                    return false;
+                }
+
+                item = container.Pop();
+                index = container.Count;
+            }
+
+            this.RaisePropertyChanged(nameof(this.Count));
+            this.RaisePropertyChanged(Constants.ItemsName);
+            this.RaiseCollectionChangedRemove(
+                item,
+                index);
+
+            return true;
+        }
+
+        /// <summary>
         ///     Pushes an element to the top of the stack.
         /// </summary>
         /// <param name="item">The item to push.</param>
         public void Push(T item)
         {
-            this.ThrowIfCurrentObjectDisposed();
+            this.RequiresNotDisposed();
 
             int index;
 
@@ -249,12 +336,44 @@ namespace IX.Observable
         }
 
         /// <summary>
+        /// Pushes a range of elements to the top of the stack.
+        /// </summary>
+        /// <param name="items">The item range to push.</param>
+        public void PushRange(T[] items)
+        {
+            Contract.RequiresNotNull(in items, nameof(items));
+
+            foreach (var item in items)
+            {
+                this.Push(item);
+            }
+        }
+
+        /// <summary>
+        /// Pushes a range of elements to the top of the stack.
+        /// </summary>
+        /// <param name="items">The item range to push.</param>
+        /// <param name="startIndex">The start index.</param>
+        /// <param name="count">The number of items to push.</param>
+        public void PushRange(T[] items, int startIndex, int count)
+        {
+            Contract.RequiresNotNull(in items, nameof(items));
+            Contract.RequiresValidArrayRange(in startIndex, in count, in items, nameof(count));
+
+            ReadOnlySpan<T> itemsSpan = new ReadOnlySpan<T>(items, startIndex, count);
+            foreach (var item in itemsSpan)
+            {
+                this.Push(item);
+            }
+        }
+
+        /// <summary>
         ///     Copies all elements of the stack to a new array.
         /// </summary>
         /// <returns>An array containing all items in the stack.</returns>
         public T[] ToArray()
         {
-            this.ThrowIfCurrentObjectDisposed();
+            this.RequiresNotDisposed();
 
             using (this.ReadLock())
             {
@@ -268,13 +387,17 @@ namespace IX.Observable
         /// </summary>
         public void TrimExcess()
         {
-            this.ThrowIfCurrentObjectDisposed();
+            this.RequiresNotDisposed();
 
             using (this.WriteLock())
             {
                 ((StackCollectionAdapter<T>)this.InternalContainer).TrimExcess();
             }
         }
+
+        #endregion
+
+        #region Undo/Redo
 
         /// <summary>
         ///     Has the last undone operation redone.
@@ -553,6 +676,8 @@ namespace IX.Observable
 
             return true;
         }
+
+        #endregion
 
         /// <summary>
         ///     Interprets the block state changes outside the write lock.

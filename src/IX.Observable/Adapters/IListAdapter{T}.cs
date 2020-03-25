@@ -1,4 +1,4 @@
-﻿// <copyright file="IListAdapter{T}.cs" company="Adrian Mos">
+// <copyright file="IListAdapter{T}.cs" company="Adrian Mos">
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
@@ -13,9 +13,9 @@ namespace IX.Observable.Adapters
     /// <typeparam name="T">The type of item.</typeparam>
     /// <seealso cref="ICollectionAdapter{T}" />
     /// <seealso cref="IList" />
-    /// <seealso cref="global::System.Collections.Generic.IList{T}" />
-    /// <seealso cref="global::System.Collections.Generic.IReadOnlyList{T}" />
-    public interface IListAdapter<T> : ICollectionAdapter<T>, IList<T>, IReadOnlyList<T>, IList
+    /// <seealso cref="IList{T}" />
+    /// <seealso cref="IReadOnlyList{T}" />
+    public interface IListAdapter<T> : ICollectionAdapter<T>, IList<T>
     {
     }
 }

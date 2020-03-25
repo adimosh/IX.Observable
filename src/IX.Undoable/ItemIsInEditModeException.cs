@@ -3,11 +3,8 @@
 // </copyright>
 
 using System;
-using JetBrains.Annotations;
-#if !STANDARD
 using System.Runtime.Serialization;
-
-#endif
+using JetBrains.Annotations;
 
 namespace IX.Undoable
 {
@@ -16,9 +13,7 @@ namespace IX.Undoable
     /// </summary>
     /// <seealso cref="InvalidOperationException" />
     /// <seealso cref="ITransactionEditableItem" />
-#if !STANDARD
     [Serializable]
-#endif
     [PublicAPI]
     public class ItemIsInEditModeException : InvalidOperationException
     {
@@ -64,7 +59,6 @@ namespace IX.Undoable
         {
         }
 
-#if !STANDARD
         /// <summary>
         ///     Initializes a new instance of the <see cref="ItemIsInEditModeException" /> class.
         /// </summary>
@@ -84,6 +78,5 @@ namespace IX.Undoable
                 context)
         {
         }
-#endif
     }
 }

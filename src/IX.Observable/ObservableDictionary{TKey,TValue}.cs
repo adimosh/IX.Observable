@@ -10,6 +10,7 @@ using System.Threading;
 using IX.Observable.Adapters;
 using IX.Observable.DebugAide;
 using IX.Observable.UndoLevels;
+using IX.StandardExtensions.Contracts;
 using IX.StandardExtensions.Threading;
 using IX.Undoable;
 using JetBrains.Annotations;
@@ -33,6 +34,8 @@ namespace IX.Observable
     public class ObservableDictionary<TKey, TValue> : ObservableCollectionBase<KeyValuePair<TKey, TValue>>,
         IDictionary<TKey, TValue>, IReadOnlyDictionary<TKey, TValue>
     {
+        #region Constructors
+
         /// <summary>
         ///     Initializes a new instance of the <see cref="ObservableDictionary{TKey, TValue}" /> class.
         /// </summary>
@@ -386,6 +389,8 @@ namespace IX.Observable
         {
         }
 
+        #endregion
+
         /// <summary>
         ///     Gets the collection of keys in this dictionary.
         /// </summary>
@@ -393,7 +398,7 @@ namespace IX.Observable
         {
             get
             {
-                this.ThrowIfCurrentObjectDisposed();
+                this.RequiresNotDisposed();
 
                 using (this.ReadLock())
                 {
@@ -414,7 +419,7 @@ namespace IX.Observable
         {
             get
             {
-                this.ThrowIfCurrentObjectDisposed();
+                this.RequiresNotDisposed();
 
                 using (this.ReadLock())
                 {
@@ -444,7 +449,7 @@ namespace IX.Observable
         {
             get
             {
-                this.ThrowIfCurrentObjectDisposed();
+                this.RequiresNotDisposed();
 
                 using (this.ReadLock())
                 {
@@ -457,7 +462,7 @@ namespace IX.Observable
                 // PRECONDITIONS
 
                 // Current object not disposed
-                this.ThrowIfCurrentObjectDisposed();
+                this.RequiresNotDisposed();
 
                 // ACTION
                 IDictionary<TKey, TValue> dictionary = this.InternalContainer;
@@ -506,7 +511,7 @@ namespace IX.Observable
             // PRECONDITIONS
 
             // Current object not disposed
-            this.ThrowIfCurrentObjectDisposed();
+            this.RequiresNotDisposed();
 
             // ACTION
 
@@ -540,7 +545,7 @@ namespace IX.Observable
         /// <returns><see langword="true" /> whether a key has been found, <see langword="false" /> otherwise.</returns>
         public bool ContainsKey(TKey key)
         {
-            this.ThrowIfCurrentObjectDisposed();
+            this.RequiresNotDisposed();
 
             using (this.ReadLock())
             {
@@ -558,7 +563,7 @@ namespace IX.Observable
             // PRECONDITIONS
 
             // Current object not disposed
-            this.ThrowIfCurrentObjectDisposed();
+            this.RequiresNotDisposed();
 
             // ACTION
             bool result;
@@ -607,7 +612,7 @@ namespace IX.Observable
             TKey key,
             out TValue value)
         {
-            this.ThrowIfCurrentObjectDisposed();
+            this.RequiresNotDisposed();
 
             using (this.ReadLock())
             {
@@ -626,6 +631,8 @@ namespace IX.Observable
             this.RaisePropertyChanged(nameof(this.Values));
             this.RaisePropertyChanged(Constants.ItemsName);
         }
+
+        #region Undo/Redo
 
         /// <summary>
         ///     Has the last operation undone.
@@ -861,6 +868,8 @@ namespace IX.Observable
 
             return true;
         }
+
+        #endregion
 
         /// <summary>
         ///     Interprets the block state changes outside the write lock.

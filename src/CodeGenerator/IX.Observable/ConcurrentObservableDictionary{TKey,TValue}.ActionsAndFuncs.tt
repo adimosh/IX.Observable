@@ -10,6 +10,7 @@
 
 using System;
 using System.Collections.Generic;
+using IX.StandardExtensions.Contracts;
 using IX.StandardExtensions.Threading;
 
 namespace IX.Observable
@@ -78,7 +79,7 @@ for (int i = 1; i <= 8; i++)
             // PRECONDITIONS
 
             // Current object not disposed
-            this.ThrowIfCurrentObjectDisposed();
+            this.RequiresNotDisposed();
 
             // ACTION
             int newIndex;
@@ -161,7 +162,7 @@ for (int i = 1; i <= 8; i++)
             // PRECONDITIONS
 
             // Current object not disposed
-            this.ThrowIfCurrentObjectDisposed();
+            this.RequiresNotDisposed();
 
             // ACTION
             int newIndex;
@@ -244,7 +245,7 @@ for (int i = 1; i <= 8; i++)
             // PRECONDITIONS
 
             // Current object not disposed
-            this.ThrowIfCurrentObjectDisposed();
+            this.RequiresNotDisposed();
 
             // ACTION
             int oldIndex;

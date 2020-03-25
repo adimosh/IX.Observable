@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.Serialization;
 using IX.Observable.DebugAide;
+using IX.StandardExtensions.Contracts;
 using IX.StandardExtensions.Threading;
 using IX.System.Threading;
 using JetBrains.Annotations;
@@ -31,6 +32,8 @@ namespace IX.Observable
     public partial class ConcurrentObservableDictionary<TKey, TValue> : ObservableDictionary<TKey, TValue>
     {
         private Lazy<ReaderWriterLockSlim> locker;
+
+        #region Constructors
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="ConcurrentObservableDictionary{TKey, TValue}" /> class.
@@ -393,6 +396,8 @@ namespace IX.Observable
             this.locker = EnvironmentSettings.GenerateDefaultLocker();
         }
 
+        #endregion
+
         /// <summary>
         ///     Gets a synchronization lock item to be used when trying to synchronize read/write operations between threads.
         /// </summary>
@@ -418,7 +423,7 @@ namespace IX.Observable
             // PRECONDITIONS
 
             // Current object not disposed
-            this.ThrowIfCurrentObjectDisposed();
+            this.RequiresNotDisposed();
 
             // ACTION
             int newIndex;
@@ -495,7 +500,7 @@ namespace IX.Observable
             // PRECONDITIONS
 
             // Current object not disposed
-            this.ThrowIfCurrentObjectDisposed();
+            this.RequiresNotDisposed();
 
             // ACTION
             int newIndex;
@@ -572,7 +577,7 @@ namespace IX.Observable
             // PRECONDITIONS
 
             // Current object not disposed
-            this.ThrowIfCurrentObjectDisposed();
+            this.RequiresNotDisposed();
 
             // ACTION
             int oldIndex;
