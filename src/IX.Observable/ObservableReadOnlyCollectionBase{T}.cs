@@ -282,7 +282,7 @@ namespace IX.Observable
             }
 
             return AtomicEnumerator<T>.FromCollection(
-                this.InternalContainer,
+                (CollectionAdapter<T>)this.InternalContainer,
                 this.ReadLock);
         }
 
