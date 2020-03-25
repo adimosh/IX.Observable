@@ -10,6 +10,7 @@ using System.Threading;
 using IX.Observable.Adapters;
 using IX.Observable.DebugAide;
 using IX.Observable.UndoLevels;
+using IX.StandardExtensions.Contracts;
 using IX.StandardExtensions.Threading;
 using JetBrains.Annotations;
 
@@ -94,7 +95,7 @@ namespace IX.Observable
         public void SetMasterList<TList>(TList list)
             where TList : class, IList<T>, INotifyCollectionChanged
         {
-            this.ThrowIfCurrentObjectDisposed();
+            this.RequiresNotDisposed();
 
             using (this.WriteLock())
             {
@@ -114,7 +115,7 @@ namespace IX.Observable
         public void SetSlaveList<TList>(TList list)
             where TList : class, IEnumerable<T>, INotifyCollectionChanged
         {
-            this.ThrowIfCurrentObjectDisposed();
+            this.RequiresNotDisposed();
 
             using (this.WriteLock())
             {
@@ -134,7 +135,7 @@ namespace IX.Observable
         public void RemoveSlaveList<TList>(TList list)
             where TList : class, IEnumerable<T>, INotifyCollectionChanged
         {
-            this.ThrowIfCurrentObjectDisposed();
+            this.RequiresNotDisposed();
 
             using (this.WriteLock())
             {
@@ -202,7 +203,7 @@ namespace IX.Observable
         /// <param name="index">The index at which to remove an item from.</param>
         public override void RemoveAt(int index)
         {
-            this.ThrowIfCurrentObjectDisposed();
+            this.RequiresNotDisposed();
 
             T item;
 
@@ -236,7 +237,7 @@ namespace IX.Observable
         /// <remarks>On concurrent collections, this method is write-synchronized.</remarks>
         protected override T[] ClearInternal()
         {
-            this.ThrowIfCurrentObjectDisposed();
+            this.RequiresNotDisposed();
 
             T[] originalArray;
 

@@ -21,23 +21,15 @@ namespace IX.Observable.Adapters
         /// <summary>
         ///     The base stack.
         /// </summary>
-        private readonly Stack<T> stack;
-
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="StackCollectionAdapter{T}" /> class.
-        /// </summary>
-        internal StackCollectionAdapter()
-        {
-            this.stack = new Stack<T>();
-        }
+        private readonly System.Collections.Generic.Stack<T> stack;
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="StackCollectionAdapter{T}" /> class.
         /// </summary>
         /// <param name="stack">The stack.</param>
-        internal StackCollectionAdapter(Stack<T> stack)
+        internal StackCollectionAdapter(System.Collections.Generic.Stack<T> stack)
         {
-            this.stack = new Stack<T>(stack);
+            this.stack = new System.Collections.Generic.Stack<T>(stack);
         }
 
         /// <summary>

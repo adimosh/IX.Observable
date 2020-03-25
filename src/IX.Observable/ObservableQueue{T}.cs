@@ -11,6 +11,7 @@ using System.Threading;
 using IX.Observable.Adapters;
 using IX.Observable.DebugAide;
 using IX.Observable.UndoLevels;
+using IX.StandardExtensions.Contracts;
 using IX.StandardExtensions.Threading;
 using IX.System.Collections.Generic;
 using IX.Undoable;
@@ -31,6 +32,8 @@ namespace IX.Observable
     [PublicAPI]
     public class ObservableQueue<T> : ObservableCollectionBase<T>, IQueue<T>
     {
+        #region Constructors
+
         /// <summary>
         ///     Initializes a new instance of the <see cref="ObservableQueue{T}" /> class.
         /// </summary>
@@ -184,13 +187,25 @@ namespace IX.Observable
         {
         }
 
+        #endregion
+
+        /// <summary>
+        ///     Gets a value indicating whether this queue is empty.
+        /// </summary>
+        /// <value>
+        ///     <c>true</c> if this queue is empty; otherwise, <c>false</c>.
+        /// </value>
+        public bool IsEmpty => this.Count == 0;
+
+        #region Queue-specific methods
+
         /// <summary>
         ///     De-queues and removes an item from the queue.
         /// </summary>
         /// <returns>The de-queued item.</returns>
         public T Dequeue()
         {
-            this.ThrowIfCurrentObjectDisposed();
+            this.RequiresNotDisposed();
 
             T item;
 
@@ -219,7 +234,7 @@ namespace IX.Observable
         /// </returns>
         public bool TryDequeue(out T item)
         {
-            this.ThrowIfCurrentObjectDisposed();
+            this.RequiresNotDisposed();
 
             using (ReadWriteSynchronizationLocker locker = this.ReadWriteLock())
             {
@@ -252,7 +267,7 @@ namespace IX.Observable
         /// <param name="item">The item to queue.</param>
         public void Enqueue(T item)
         {
-            this.ThrowIfCurrentObjectDisposed();
+            this.RequiresNotDisposed();
 
             int newIndex;
 
@@ -272,16 +287,74 @@ namespace IX.Observable
         }
 
         /// <summary>
+        ///     Queues a range of elements, adding them to the queue.
+        /// </summary>
+        /// <param name="items">The item range to push.</param>
+        public void EnqueueRange(T[] items)
+        {
+            Contract.RequiresNotNull(in items, nameof(items));
+
+            foreach (var item in items)
+            {
+                this.Enqueue(item);
+            }
+        }
+
+        /// <summary>
+        ///     Queues a range of elements, adding them to the queue.
+        /// </summary>
+        /// <param name="items">The item range to enqueue.</param>
+        /// <param name="startIndex">The start index.</param>
+        /// <param name="count">The number of items to enqueue.</param>
+        public void EnqueueRange(
+            T[] items,
+            int startIndex,
+            int count)
+        {
+            Contract.RequiresNotNull(in items, nameof(items));
+            Contract.RequiresValidArrayRange(in startIndex, in count, in items, nameof(count));
+
+            ReadOnlySpan<T> itemsSpan = new ReadOnlySpan<T>(items, startIndex, count);
+            foreach (var item in itemsSpan)
+            {
+                this.Enqueue(item);
+            }
+        }
+
+        /// <summary>
         ///     Peeks at the topmost item in the queue without de-queuing it.
         /// </summary>
         /// <returns>The topmost item in the queue.</returns>
         public T Peek()
         {
-            this.ThrowIfCurrentObjectDisposed();
+            this.RequiresNotDisposed();
 
             using (this.ReadLock())
             {
                 return ((QueueCollectionAdapter<T>)this.InternalContainer).Peek();
+            }
+        }
+
+        /// <summary>
+        /// Attempts to peek at the current queue and return the item that is next in line to be dequeued.
+        /// </summary>
+        /// <param name="item">The item, or default if unsuccessful.</param>
+        /// <returns><see langword="true" /> if an item is found, <see langword="false" /> otherwise, or if the queue is empty.</returns>
+        public bool TryPeek(out T item)
+        {
+            this.RequiresNotDisposed();
+
+            using (this.ReadLock())
+            {
+                var ip = (QueueCollectionAdapter<T>)this.InternalContainer;
+                if (ip.Count == 0)
+                {
+                    item = default;
+                    return false;
+                }
+
+                item = ip.Peek();
+                return true;
             }
         }
 
@@ -291,7 +364,7 @@ namespace IX.Observable
         /// <returns>An array of items that are contained in the queue.</returns>
         public T[] ToArray()
         {
-            this.ThrowIfCurrentObjectDisposed();
+            this.RequiresNotDisposed();
 
             using (this.ReadLock())
             {
@@ -305,13 +378,17 @@ namespace IX.Observable
         /// </summary>
         public void TrimExcess()
         {
-            this.ThrowIfCurrentObjectDisposed();
+            this.RequiresNotDisposed();
 
             using (this.WriteLock())
             {
                 ((QueueCollectionAdapter<T>)this.InternalContainer).TrimExcess();
             }
         }
+
+        #endregion
+
+        #region Undo/Redo
 
         /// <summary>
         ///     Has the last operation undone.
@@ -625,5 +702,7 @@ namespace IX.Observable
             this.RaisePropertyChanged(Constants.ItemsName);
             this.RaiseCollectionReset();
         }
+
+        #endregion
     }
 }

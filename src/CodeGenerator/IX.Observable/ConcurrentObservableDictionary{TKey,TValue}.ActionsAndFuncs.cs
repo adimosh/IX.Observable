@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using IX.StandardExtensions.Contracts;
 using IX.StandardExtensions.Threading;
 
 namespace IX.Observable
@@ -29,7 +30,7 @@ namespace IX.Observable
             // PRECONDITIONS
 
             // Current object not disposed
-            this.ThrowIfCurrentObjectDisposed();
+            this.RequiresNotDisposed();
 
             // ACTION
             int newIndex;
@@ -98,7 +99,7 @@ namespace IX.Observable
             // PRECONDITIONS
 
             // Current object not disposed
-            this.ThrowIfCurrentObjectDisposed();
+            this.RequiresNotDisposed();
 
             // ACTION
             int newIndex;
@@ -167,7 +168,7 @@ namespace IX.Observable
             // PRECONDITIONS
 
             // Current object not disposed
-            this.ThrowIfCurrentObjectDisposed();
+            this.RequiresNotDisposed();
 
             // ACTION
             int oldIndex;
@@ -238,7 +239,7 @@ namespace IX.Observable
             // PRECONDITIONS
 
             // Current object not disposed
-            this.ThrowIfCurrentObjectDisposed();
+            this.RequiresNotDisposed();
 
             // ACTION
             int newIndex;
@@ -309,7 +310,7 @@ namespace IX.Observable
             // PRECONDITIONS
 
             // Current object not disposed
-            this.ThrowIfCurrentObjectDisposed();
+            this.RequiresNotDisposed();
 
             // ACTION
             int newIndex;
@@ -380,7 +381,7 @@ namespace IX.Observable
             // PRECONDITIONS
 
             // Current object not disposed
-            this.ThrowIfCurrentObjectDisposed();
+            this.RequiresNotDisposed();
 
             // ACTION
             int oldIndex;
@@ -453,7 +454,7 @@ namespace IX.Observable
             // PRECONDITIONS
 
             // Current object not disposed
-            this.ThrowIfCurrentObjectDisposed();
+            this.RequiresNotDisposed();
 
             // ACTION
             int newIndex;
@@ -526,7 +527,7 @@ namespace IX.Observable
             // PRECONDITIONS
 
             // Current object not disposed
-            this.ThrowIfCurrentObjectDisposed();
+            this.RequiresNotDisposed();
 
             // ACTION
             int newIndex;
@@ -599,7 +600,7 @@ namespace IX.Observable
             // PRECONDITIONS
 
             // Current object not disposed
-            this.ThrowIfCurrentObjectDisposed();
+            this.RequiresNotDisposed();
 
             // ACTION
             int oldIndex;
@@ -674,7 +675,7 @@ namespace IX.Observable
             // PRECONDITIONS
 
             // Current object not disposed
-            this.ThrowIfCurrentObjectDisposed();
+            this.RequiresNotDisposed();
 
             // ACTION
             int newIndex;
@@ -749,7 +750,7 @@ namespace IX.Observable
             // PRECONDITIONS
 
             // Current object not disposed
-            this.ThrowIfCurrentObjectDisposed();
+            this.RequiresNotDisposed();
 
             // ACTION
             int newIndex;
@@ -824,7 +825,7 @@ namespace IX.Observable
             // PRECONDITIONS
 
             // Current object not disposed
-            this.ThrowIfCurrentObjectDisposed();
+            this.RequiresNotDisposed();
 
             // ACTION
             int oldIndex;
@@ -901,7 +902,7 @@ namespace IX.Observable
             // PRECONDITIONS
 
             // Current object not disposed
-            this.ThrowIfCurrentObjectDisposed();
+            this.RequiresNotDisposed();
 
             // ACTION
             int newIndex;
@@ -978,7 +979,7 @@ namespace IX.Observable
             // PRECONDITIONS
 
             // Current object not disposed
-            this.ThrowIfCurrentObjectDisposed();
+            this.RequiresNotDisposed();
 
             // ACTION
             int newIndex;
@@ -1055,7 +1056,7 @@ namespace IX.Observable
             // PRECONDITIONS
 
             // Current object not disposed
-            this.ThrowIfCurrentObjectDisposed();
+            this.RequiresNotDisposed();
 
             // ACTION
             int oldIndex;
@@ -1134,7 +1135,7 @@ namespace IX.Observable
             // PRECONDITIONS
 
             // Current object not disposed
-            this.ThrowIfCurrentObjectDisposed();
+            this.RequiresNotDisposed();
 
             // ACTION
             int newIndex;
@@ -1213,7 +1214,7 @@ namespace IX.Observable
             // PRECONDITIONS
 
             // Current object not disposed
-            this.ThrowIfCurrentObjectDisposed();
+            this.RequiresNotDisposed();
 
             // ACTION
             int newIndex;
@@ -1292,7 +1293,7 @@ namespace IX.Observable
             // PRECONDITIONS
 
             // Current object not disposed
-            this.ThrowIfCurrentObjectDisposed();
+            this.RequiresNotDisposed();
 
             // ACTION
             int oldIndex;
@@ -1373,7 +1374,7 @@ namespace IX.Observable
             // PRECONDITIONS
 
             // Current object not disposed
-            this.ThrowIfCurrentObjectDisposed();
+            this.RequiresNotDisposed();
 
             // ACTION
             int newIndex;
@@ -1454,7 +1455,7 @@ namespace IX.Observable
             // PRECONDITIONS
 
             // Current object not disposed
-            this.ThrowIfCurrentObjectDisposed();
+            this.RequiresNotDisposed();
 
             // ACTION
             int newIndex;
@@ -1535,7 +1536,7 @@ namespace IX.Observable
             // PRECONDITIONS
 
             // Current object not disposed
-            this.ThrowIfCurrentObjectDisposed();
+            this.RequiresNotDisposed();
 
             // ACTION
             int oldIndex;
@@ -1618,7 +1619,7 @@ namespace IX.Observable
             // PRECONDITIONS
 
             // Current object not disposed
-            this.ThrowIfCurrentObjectDisposed();
+            this.RequiresNotDisposed();
 
             // ACTION
             int newIndex;
@@ -1701,7 +1702,7 @@ namespace IX.Observable
             // PRECONDITIONS
 
             // Current object not disposed
-            this.ThrowIfCurrentObjectDisposed();
+            this.RequiresNotDisposed();
 
             // ACTION
             int newIndex;
@@ -1784,7 +1785,7 @@ namespace IX.Observable
             // PRECONDITIONS
 
             // Current object not disposed
-            this.ThrowIfCurrentObjectDisposed();
+            this.RequiresNotDisposed();
 
             // ACTION
             int oldIndex;

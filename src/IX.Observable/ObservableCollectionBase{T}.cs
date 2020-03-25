@@ -12,6 +12,7 @@ using System.Threading;
 using IX.Guaranteed;
 using IX.Observable.Adapters;
 using IX.Observable.UndoLevels;
+using IX.StandardExtensions.Contracts;
 using IX.StandardExtensions.Threading;
 using IX.Undoable;
 using JetBrains.Annotations;
@@ -127,7 +128,7 @@ namespace IX.Observable
                     return false;
                 }
 
-                this.ThrowIfCurrentObjectDisposed();
+                this.RequiresNotDisposed();
 
                 return this.ParentUndoContext?.CanRedo ?? this.ReadLock(
                            thisL1 => thisL1.undoContext.IsValueCreated && thisL1.undoContext.Value.RedoStack.Count > 0,
@@ -151,7 +152,7 @@ namespace IX.Observable
                     return false;
                 }
 
-                this.ThrowIfCurrentObjectDisposed();
+                this.RequiresNotDisposed();
 
                 return this.ParentUndoContext?.CanUndo ?? this.ReadLock(
                            thisL1 => thisL1.undoContext.IsValueCreated && thisL1.undoContext.Value.UndoStack.Count > 0,
@@ -261,7 +262,7 @@ namespace IX.Observable
             // PRECONDITIONS
 
             // Current object not disposed
-            this.ThrowIfCurrentObjectDisposed();
+            this.RequiresNotDisposed();
 
             // ACTION
             int newIndex;
@@ -332,7 +333,7 @@ namespace IX.Observable
             // PRECONDITIONS
 
             // Current object not disposed
-            this.ThrowIfCurrentObjectDisposed();
+            this.RequiresNotDisposed();
 
             // ACTION
             int oldIndex;
@@ -405,7 +406,7 @@ namespace IX.Observable
         /// </summary>
         public void ReleaseFromUndoContext()
         {
-            this.ThrowIfCurrentObjectDisposed();
+            this.RequiresNotDisposed();
 
             using (this.WriteLock())
             {
@@ -437,7 +438,7 @@ namespace IX.Observable
                 return;
             }
 
-            this.ThrowIfCurrentObjectDisposed();
+            this.RequiresNotDisposed();
 
             if (this.ParentUndoContext != null)
             {
@@ -506,7 +507,7 @@ namespace IX.Observable
                 return;
             }
 
-            this.ThrowIfCurrentObjectDisposed();
+            this.RequiresNotDisposed();
 
             if (this.ParentUndoContext != null)
             {
@@ -568,7 +569,7 @@ namespace IX.Observable
             }
 
             // Current object not disposed
-            this.ThrowIfCurrentObjectDisposed();
+            this.RequiresNotDisposed();
 
             // Current object captured in an undo/redo context
             if (!this.IsCapturedIntoUndoContext)
@@ -651,7 +652,7 @@ namespace IX.Observable
             }
 
             // Current object not disposed
-            this.ThrowIfCurrentObjectDisposed();
+            this.RequiresNotDisposed();
 
             // Current object captured in an undo/redo context
             if (!this.IsCapturedIntoUndoContext)
@@ -750,7 +751,7 @@ namespace IX.Observable
             IUndoableItem parent,
             bool captureSubItems)
         {
-            this.ThrowIfCurrentObjectDisposed();
+            this.RequiresNotDisposed();
 
             if (parent == null)
             {
@@ -1178,7 +1179,7 @@ namespace IX.Observable
             // PRECONDITIONS
 
             // Current object not disposed
-            this.ThrowIfCurrentObjectDisposed();
+            this.RequiresNotDisposed();
 
             // ACTION
             T[] tempArray;

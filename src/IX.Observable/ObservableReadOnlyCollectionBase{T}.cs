@@ -9,6 +9,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Threading;
 using IX.Observable.Adapters;
+using IX.StandardExtensions.Contracts;
 using IX.StandardExtensions.Threading;
 
 namespace IX.Observable
@@ -56,7 +57,7 @@ namespace IX.Observable
         /// </remarks>
         public virtual int Count => this.InvokeIfNotDisposed(
             thisL1 => thisL1.ReadLock(
-                thisL2 => ((ICollection<T>)thisL2.InternalContainer).Count,
+                thisL2 => thisL2.InternalContainer.Count,
                 thisL1), this);
 
         /// <summary>
@@ -104,6 +105,7 @@ namespace IX.Observable
         protected internal ICollectionAdapter<T> InternalContainer
         {
             get => this.internalContainer;
+
             set
             {
                 if (this.internalContainer != null)
@@ -151,7 +153,7 @@ namespace IX.Observable
         /// </remarks>
         public bool Contains(T item)
         {
-            this.ThrowIfCurrentObjectDisposed();
+            this.RequiresNotDisposed();
 
             using (this.ReadLock())
             {
@@ -175,7 +177,7 @@ namespace IX.Observable
             T[] array,
             int arrayIndex)
         {
-            this.ThrowIfCurrentObjectDisposed();
+            this.RequiresNotDisposed();
 
             using (this.ReadLock())
             {
@@ -194,11 +196,11 @@ namespace IX.Observable
         /// <remarks>On concurrent collections, this method is read-synchronized.</remarks>
         public T[] CopyToArray(int fromIndex)
         {
-            this.ThrowIfCurrentObjectDisposed();
+            this.RequiresNotDisposed();
 
             using (this.ReadLock())
             {
-                var clount = ((ICollection<T>)this.InternalContainer).Count;
+                var clount = this.InternalContainer.Count;
 
                 if (fromIndex >= clount || fromIndex < 0)
                 {
@@ -230,11 +232,11 @@ namespace IX.Observable
         /// <remarks>On concurrent collections, this method is read-synchronized.</remarks>
         public T[] CopyToArray()
         {
-            this.ThrowIfCurrentObjectDisposed();
+            this.RequiresNotDisposed();
 
             using (this.ReadLock())
             {
-                var clount = ((ICollection<T>)this.InternalContainer).Count;
+                var clount = this.InternalContainer.Count;
 
                 var array = new T[clount];
                 this.InternalContainer.CopyTo(
@@ -244,7 +246,6 @@ namespace IX.Observable
             }
         }
 
-#pragma warning disable HAA0401 // Possible allocation of reference type enumerator - Acceptable
         /// <summary>
         ///     Returns a locking enumerator that iterates through the collection.
         /// </summary>
@@ -263,17 +264,25 @@ namespace IX.Observable
         ///         <see cref="IEnumerator{T}.Current" />.
         ///     </para>
         /// </remarks>
+        [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
+            "Performance",
+            "HAA0401:Possible allocation of reference type enumerator",
+            Justification = "We're doing an atomic enumerator, so we don't care.")]
+        [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
+            "Performance",
+            "HAA0603:Delegate allocation from a method group",
+            Justification = "It's for the atomic enumerator.")]
         public virtual IEnumerator<T> GetEnumerator()
         {
-            this.ThrowIfCurrentObjectDisposed();
+            this.RequiresNotDisposed();
 
             if (this.SynchronizationLock == null)
             {
                 return this.InternalContainer.GetEnumerator();
             }
 
-            return new AtomicEnumerator<T, IEnumerator<T>>(
-                this.InternalContainer.GetEnumerator(),
+            return AtomicEnumerator<T>.FromCollection(
+                this.InternalContainer,
                 this.ReadLock);
         }
 
@@ -283,8 +292,11 @@ namespace IX.Observable
         /// <returns>
         ///     An <see cref="IEnumerator" /> object that can be used to iterate through the collection.
         /// </returns>
+        [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
+            "Performance",
+            "HAA0401:Possible allocation of reference type enumerator",
+            Justification = "Unavoidable with this interface.")]
         IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
-#pragma warning restore HAA0401 // Possible allocation of reference type enumerator
 
         /// <summary>
         ///     Copies the contents of the container to an array.
@@ -298,7 +310,7 @@ namespace IX.Observable
             Array array,
             int index)
         {
-            this.ThrowIfCurrentObjectDisposed();
+            this.RequiresNotDisposed();
 
             T[] tempArray;
 
@@ -345,25 +357,29 @@ namespace IX.Observable
         {
         }
 
-#pragma warning disable ERP022 // Catching everything considered harmful. - Acceptable
         /// <summary>
         ///     Disposes the managed context.
         /// </summary>
+        [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
+            "CodeSmell",
+            "ERP022:Unobserved exception in generic exception handler",
+            Justification = "Acceptable.")]
+        [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
+            "ReSharper",
+            "EmptyGeneralCatchClause",
+            Justification = "Acceptable.")]
         protected override void DisposeManagedContext()
         {
             try
             {
                 this.internalContainer.Clear();
             }
-
-            // ReSharper disable once EmptyGeneralCatchClause
             catch
             {
             }
 
             base.DisposeManagedContext();
         }
-#pragma warning restore ERP022 // Catching everything considered harmful.
 
         /// <summary>
         ///     Disposes the general context.

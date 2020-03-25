@@ -37,37 +37,16 @@ namespace IX.Observable.Adapters
         public abstract bool IsReadOnly { get; }
 
         /// <summary>
-        /// Gets a value indicating whether this instance is synchronized.
-        /// </summary>
-        /// <value>
-        /// <see langword="true"/> if this instance is synchronized; otherwise, <see langword="false"/>.
-        /// </value>
-        /// <remarks>This is obsolete, and should not be used anymore. Returns <see langword="false"/> always.</remarks>
-        [Obsolete]
-        public bool IsSynchronized => false;
-
-        /// <summary>
-        /// Gets the synchronize root.
-        /// </summary>
-        /// <value>
-        /// The synchronize root.
-        /// </value>
-        /// <remarks>This is obsolete, and should not be used anymore. Returns <see langword="null"/> always.</remarks>
-        [Obsolete]
-        public object SyncRoot => null;
-
-        /// <summary>
-        /// Adds the specified item.
-        /// </summary>
-        /// <param name="item">The item.</param>
-        void ICollection<T>.Add(T item) => this.Add(item);
-
-        /// <summary>
         /// Adds the specified item.
         /// </summary>
         /// <param name="item">The item.</param>
         /// <returns>The index of the freshly-added item.</returns>
         public abstract int Add(T item);
+
+        /// <summary>Adds an item to the <see cref="ICollection{TItem}" />.</summary>
+        /// <param name="item">The object to add to the <see cref="ICollection{TItem}" />.</param>
+        /// <exception cref="NotSupportedException">The <see cref="ICollection{TItem}" /> is read-only.</exception>
+        void ICollection<T>.Add(T item) => this.Add(item);
 
         /// <summary>
         /// Clears this instance.
@@ -103,32 +82,22 @@ namespace IX.Observable.Adapters
         /// <returns>The index of the removed item, or <c>-1</c> if removal was not successful.</returns>
         public abstract int Remove(T item);
 
-        /// <summary>
-        /// Removes the specified item.
-        /// </summary>
-        /// <param name="item">The item.</param>
-        /// <returns><see langword="true"/> if the removal was a success, <see langword="false"/> otherwise.</returns>
+        /// <summary>Removes the first occurrence of a specific object from the <see cref="ICollection{TItem}" />.</summary>
+        /// <param name="item">The object to remove from the <see cref="ICollection{TItem}" />.</param>
+        /// <returns>
+        /// <see langword="true" /> if <paramref name="item" /> was successfully removed from the <see cref="ICollection{TItem}" />; otherwise, <see langword="false" />. This method also returns <see langword="false" /> if <paramref name="item" /> is not found in the original <see cref="ICollection{TItem}" />.</returns>
+        /// <exception cref="NotSupportedException">The <see cref="ICollection{TItem}" /> is read-only.</exception>
         bool ICollection<T>.Remove(T item) => this.Remove(item) != -1;
 
-#pragma warning disable HAA0401 // Possible allocation of reference type enumerator - Unavoidable here, this pattern is highly not recommended
         /// <summary>
         /// Returns an enumerator that iterates through the collection.
         /// </summary>
         /// <returns>An enumerator that can be used to iterate through the collection.</returns>
+        [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
+            "Performance",
+            "HAA0401:Possible allocation of reference type enumerator",
+            Justification = "Unavoidable.")]
         IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
-#pragma warning restore HAA0401 // Possible allocation of reference type enumerator
-
-        /// <summary>
-        /// Copies the contents of the container to an array.
-        /// </summary>
-        /// <param name="array">The array.</param>
-        /// <param name="index">Index of the array.</param>
-        void ICollection.CopyTo(Array array, int index)
-        {
-            var tempArray = new T[this.Count - index];
-            this.CopyTo(tempArray, index);
-            tempArray.CopyTo(array, index);
-        }
 
         /// <summary>
         /// Triggers the reset.

@@ -21,23 +21,15 @@ namespace IX.Observable.Adapters
         /// <summary>
         ///     The base queue.
         /// </summary>
-        private readonly Queue<T> queue;
-
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="QueueCollectionAdapter{T}" /> class.
-        /// </summary>
-        internal QueueCollectionAdapter()
-        {
-            this.queue = new Queue<T>();
-        }
+        private readonly System.Collections.Generic.Queue<T> queue;
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="QueueCollectionAdapter{T}" /> class.
         /// </summary>
         /// <param name="queue">The queue.</param>
-        internal QueueCollectionAdapter(Queue<T> queue)
+        internal QueueCollectionAdapter(System.Collections.Generic.Queue<T> queue)
         {
-            this.queue = new Queue<T>(queue);
+            this.queue = new System.Collections.Generic.Queue<T>(queue);
         }
 
         /// <summary>

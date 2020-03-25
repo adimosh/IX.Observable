@@ -119,22 +119,26 @@ namespace IX.Observable
         /// <returns>The item at the specified index.</returns>
         public virtual T this[int index]
         {
-            get => this.InvokeIfNotDisposed(
-                (
-                    indexL1,
-                    thisL1) => thisL1.ReadLock(
-                    (
-                        indexL2,
-                        thisL2) => thisL2.InternalContainer[indexL2], indexL1,
-                    thisL1), index,
-                this);
+            get
+            {
+                // PRECONDITIONS
+
+                // Current object not disposed
+                this.RequiresNotDisposed();
+
+                // ACTION
+                using (this.ReadLock())
+                {
+                    return this.InternalContainer[index];
+                }
+            }
 
             set
             {
                 // PRECONDITIONS
 
                 // Current object not disposed
-                this.ThrowIfCurrentObjectDisposed();
+                this.RequiresNotDisposed();
 
                 // ACTION
                 T oldValue;
@@ -191,7 +195,6 @@ namespace IX.Observable
             }
         }
 
-#pragma warning disable HAA0601 // Value type to reference type conversion causing boxing allocation - Nothing we can do about it
         /// <summary>
         ///     Gets the item at the specified index.
         /// </summary>
@@ -213,7 +216,6 @@ namespace IX.Observable
                 this[index] = v;
             }
         }
-#pragma warning restore HAA0601 // Value type to reference type conversion causing boxing allocation
 
         /// <summary>
         ///     Determines the index of a specific item, if any.
@@ -222,7 +224,7 @@ namespace IX.Observable
         /// <returns>The index of the item, or <c>-1</c> if not found.</returns>
         public virtual int IndexOf(T item)
         {
-            this.ThrowIfCurrentObjectDisposed();
+            this.RequiresNotDisposed();
 
             using (this.ReadLock())
             {
@@ -242,7 +244,7 @@ namespace IX.Observable
             // PRECONDITIONS
 
             // Current object not disposed
-            this.ThrowIfCurrentObjectDisposed();
+            this.RequiresNotDisposed();
 
             T[] itemsList = items.ToArray();
 
@@ -307,11 +309,10 @@ namespace IX.Observable
             }
 
             // Current object not disposed
-            this.ThrowIfCurrentObjectDisposed();
+            this.RequiresNotDisposed();
 
             // ACTION
             T[] itemsList;
-            int[] indexesList;
 
             // Inside a write lock
             using (this.WriteLock())
@@ -322,7 +323,7 @@ namespace IX.Observable
                 }
 
                 itemsList = this.InternalContainer.Skip(startIndex).Reverse().ToArray();
-                indexesList = new int[itemsList.Length];
+                var indexesList = new int[itemsList.Length];
                 for (int i = 0; i < indexesList.Length; i++)
                 {
                     indexesList[i] = this.InternalContainer.Count - 1 - i;
@@ -392,11 +393,10 @@ namespace IX.Observable
             }
 
             // Current object not disposed
-            this.ThrowIfCurrentObjectDisposed();
+            this.RequiresNotDisposed();
 
             // ACTION
             T[] itemsList;
-            int[] indexesList;
 
             // Inside a write lock
             using (this.WriteLock())
@@ -412,7 +412,7 @@ namespace IX.Observable
                 }
 
                 itemsList = this.InternalContainer.Skip(startIndex).Take(length).Reverse().ToArray();
-                indexesList = new int[itemsList.Length];
+                var indexesList = new int[itemsList.Length];
                 for (int i = 0; i < indexesList.Length; i++)
                 {
                     indexesList[i] = startIndex + length - 1 - i;
@@ -460,13 +460,10 @@ namespace IX.Observable
         public virtual void RemoveRange(IEnumerable<T> items)
         {
             // PRECONDITIONS
-            if (items == null)
-            {
-                throw new ArgumentNullException(nameof(items));
-            }
+            Contract.RequiresNotNull(in items, nameof(items));
 
             // Current object not disposed
-            this.ThrowIfCurrentObjectDisposed();
+            this.RequiresNotDisposed();
 
             // ACTION
             // Inside a write lock
@@ -553,7 +550,7 @@ namespace IX.Observable
             // PRECONDITIONS
 
             // Current object not disposed
-            this.ThrowIfCurrentObjectDisposed();
+            this.RequiresNotDisposed();
 
             // ACTION
 
@@ -615,7 +612,7 @@ namespace IX.Observable
             }
 
             // Current object not disposed
-            this.ThrowIfCurrentObjectDisposed();
+            this.RequiresNotDisposed();
 
             T[] itemsList = items.ToArray();
 
@@ -671,7 +668,7 @@ namespace IX.Observable
             // PRECONDITIONS
 
             // Current object not disposed
-            this.ThrowIfCurrentObjectDisposed();
+            this.RequiresNotDisposed();
 
             // ACTION
             T item;
