@@ -2,8 +2,8 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
+using IX.DataGeneration;
 using IX.Observable;
-using IX.StandardExtensions.TestUtils;
 using Xunit;
 using EnvironmentSettings = IX.StandardExtensions.ComponentModel.EnvironmentSettings;
 

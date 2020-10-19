@@ -2,19 +2,4 @@
 
   <Import Project="../opt/msbuild/Standard.Build.props" />
 
-  <PropertyGroup>
-    <LangVersion>latest</LangVersion>
-  </PropertyGroup>
-
-  <PropertyGroup>
-    <PackageReleaseNotes>- Modernized for SemVer 2.
-- Package updates.
-- Signed assemblies
-- Adapted for contracts and new AtomicEnumerator.
-    </PackageReleaseNotes>
-    <SignAssembly>true</SignAssembly>
-    <DelaySign>false</DelaySign>
-    <AssemblyOriginatorKeyFile>../../opt/snk/ix.framework.strongname.snk</AssemblyOriginatorKeyFile>
-  </PropertyGroup>
-
 </Project>

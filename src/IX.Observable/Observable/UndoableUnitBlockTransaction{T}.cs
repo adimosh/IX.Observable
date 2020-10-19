@@ -15,8 +15,8 @@ namespace IX.Observable
 
         internal UndoableUnitBlockTransaction(ObservableCollectionBase<T> collectionBase)
         {
-            Contract.RequiresNotNullPrivate(
-                in collectionBase,
+            Requires.NotNull(
+                collectionBase,
                 nameof(collectionBase));
 
             this.collectionBase = collectionBase;

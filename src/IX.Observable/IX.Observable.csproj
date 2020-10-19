@@ -18,13 +18,18 @@
   <PropertyGroup>
     <Title>IX Observable</Title>
     <Description>A library with several collection types (dictionary, stack, etc.) that have been made observable.</Description>
+    <RootNamespace>IX</RootNamespace>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
-  <!-- Code imports -->
-  <ItemGroup>
-    <Compile Include="..\CodeGenerator\IX.Observable\ConcurrentObservableDictionary{TKey,TValue}.ActionsAndFuncs.cs" Link="ConcurrentObservableDictionary{TKey,TValue}.ActionsAndFuncs.cs" />
-    <Compile Include="..\CodeGenerator\IX.Observable\ObservableBase.ActionsAndFuncs.cs" Link="ObservableBase.ActionsAndFuncs.cs" />
-  </ItemGroup>
+  <PropertyGroup>
+    <PackageReleaseNotes>- Used new merged framework.
+- Merged Undoable.
+    </PackageReleaseNotes>
+    <SignAssembly>true</SignAssembly>
+    <DelaySign>false</DelaySign>
+    <AssemblyOriginatorKeyFile>../../opt/snk/ix.framework.strongname.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
 
   <!-- References -->
   <ItemGroup Condition="'$(TargetFrameworkIsFramework)'=='true'">
@@ -34,16 +39,33 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="IX.Abstractions" Version="[0.5.3,0.6)" />
-    <PackageReference Include="IX.Abstractions.Collections" Version="[0.5.3,0.6)" />
-    <PackageReference Include="IX.Abstractions.Threading" Version="[0.5.3,0.6)" />
-    <PackageReference Include="IX.StandardExtensions.ComponentModel" Version="[0.5.3,0.6)" />
-    <PackageReference Include="IX.StandardExtensions.Threading" Version="[0.5.3,0.6)" />
-    <ProjectReference Include="..\IX.Undoable\IX.Undoable.csproj" />
+    <PackageReference Include="IX.StandardExtensions" Version="[0.7.1,0.8)" />
+  </ItemGroup>
+
+  <!-- Text templates -->
+  <ItemGroup>
+    <None Update="Observable\ConcurrentObservableDictionary{TKey,TValue}.ActionsAndFuncs.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>ConcurrentObservableDictionary{TKey,TValue}.ActionsAndFuncs.cs</LastGenOutput>
+    </None>
+    <None Update="Observable\ObservableBase.ActionsAndFuncs.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>ObservableBase.ActionsAndFuncs.cs</LastGenOutput>
+    </None>
   </ItemGroup>
 
   <!-- Resources -->
   <ItemGroup>
+    <Compile Update="Observable\ConcurrentObservableDictionary{TKey,TValue}.ActionsAndFuncs.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>ConcurrentObservableDictionary{TKey,TValue}.ActionsAndFuncs.tt</DependentUpon>
+    </Compile>
+    <Compile Update="Observable\ObservableBase.ActionsAndFuncs.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>ObservableBase.ActionsAndFuncs.tt</DependentUpon>
+    </Compile>
     <Compile Update="Resources.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -86,7 +108,7 @@
 
   <!-- Project system and dependencies -->
   <ItemGroup>
-    <PackageReference Include="IX.Framework.ProjectSystem" Version="1.0.1">
+    <PackageReference Include="IX.Framework.ProjectSystem" Version="1.0.2">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>

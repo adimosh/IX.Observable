@@ -123,4 +123,16 @@
   <data name="OperationItemTypeError" xml:space="preserve">
     <value>Il tipo dell'argomento non è un tipo compatibile all'elenco.</value>
   </data>
+  <data name="ItemAlreadyCapturedIntoUndoContextException" xml:space="preserve">
+    <value>Impossibile completare l'operazione.</value>
+  </data>
+  <data name="ItemIsInEditModeExceptionDefaultMessage" xml:space="preserve">
+    <value>L'operazione potrebbe non essere completata come l'elemento corrente è in modalità di modifica.</value>
+  </data>
+  <data name="ItemNotCapturedIntoUndoContextException" xml:space="preserve">
+    <value>Impossibile completare l'operazione come l'elemento corrente non è intrappolato in un contesto di annullamento esistente.</value>
+  </data>
+  <data name="ItemNotInEditModeExceptionDefaultMessage" xml:space="preserve">
+    <value>L'operazione potrebbe non essere completata come l'elemento corrente non è in modalità di modifica.</value>
+  </data>
 </root>

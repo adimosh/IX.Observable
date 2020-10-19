@@ -42,14 +42,17 @@ namespace IX.Observable
             EventHandler<EditCommittedEventArgs> editableHandler)
         {
             // Contract validation
-            Contract.RequiresNotNullPrivate(
-                in item,
+            Requires.NotNull(
+                out this.item,
+                item,
                 nameof(item));
-            Contract.RequiresNotNullPrivate(
-                in parentContext,
+            Requires.NotNull(
+                out this.parentContext,
+                parentContext,
                 nameof(parentContext));
-            Contract.RequiresNotNullPrivate(
-                in editableHandler,
+            Requires.NotNull(
+                out this.editableHandler,
+                editableHandler,
                 nameof(editableHandler));
 
             // Data validation
@@ -60,9 +63,6 @@ namespace IX.Observable
 
             // State
             this.items = null;
-            this.item = item;
-            this.editableHandler = editableHandler;
-            this.parentContext = parentContext;
 
             item.ReleaseFromUndoContext();
 
@@ -86,14 +86,16 @@ namespace IX.Observable
             EventHandler<EditCommittedEventArgs> editableHandler)
         {
             // Contract validation
-            Contract.RequiresNotNullPrivate(
-                in items,
+            Requires.NotNull(
+                items,
                 nameof(items));
-            Contract.RequiresNotNullPrivate(
-                in parentContext,
+            Requires.NotNull(
+                out this.parentContext,
+                parentContext,
                 nameof(parentContext));
-            Contract.RequiresNotNullPrivate(
-                in editableHandler,
+            Requires.NotNull(
+                out this.editableHandler,
+                editableHandler,
                 nameof(editableHandler));
 
             // Data validation
@@ -110,7 +112,6 @@ namespace IX.Observable
             // State
             this.items = itemsArray;
             this.item = null;
-            this.editableHandler = editableHandler;
 
             foreach (IUndoableItem undoableItem in itemsArray)
             {

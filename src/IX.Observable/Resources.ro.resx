@@ -123,4 +123,16 @@
   <data name="OperationItemTypeError" xml:space="preserve">
     <value>Tipul de argument nu este un tip compatibil cu lista.</value>
   </data>
+  <data name="ItemAlreadyCapturedIntoUndoContextException" xml:space="preserve">
+    <value>Operațiunea nu a putut fi executată deoarece elementul curent este prins într-un context de reversie.</value>
+  </data>
+  <data name="ItemIsInEditModeExceptionDefaultMessage" xml:space="preserve">
+    <value>Operațiunea nu a putut fi executată deoarece elementul este în modul de editare.</value>
+  </data>
+  <data name="ItemNotCapturedIntoUndoContextException" xml:space="preserve">
+    <value>Operațiunea nu a putut fi executată deoarece elementul curent nu este parte al unui context de reversie.</value>
+  </data>
+  <data name="ItemNotInEditModeExceptionDefaultMessage" xml:space="preserve">
+    <value>Operațiunea nu a putut fi executată deoarece elementul nu este în modul de editare.</value>
+  </data>
 </root>

@@ -123,4 +123,16 @@
   <data name="OperationItemTypeError" xml:space="preserve">
     <value>El tipo del argumento no es un tipo compatible a la lista.!</value>
   </data>
+  <data name="ItemAlreadyCapturedIntoUndoContextException" xml:space="preserve">
+    <value>No se pudo completar la operación como el elemento actual es atrapado por un contexto de deshacer existente.!</value>
+  </data>
+  <data name="ItemIsInEditModeExceptionDefaultMessage" xml:space="preserve">
+    <value>No se pudo completar la operación como el elemento actual está en modo de edición.!</value>
+  </data>
+  <data name="ItemNotCapturedIntoUndoContextException" xml:space="preserve">
+    <value>No se pudo completar la operación como el elemento actual no está atrapado en un contexto de deshacer existente.!</value>
+  </data>
+  <data name="ItemNotInEditModeExceptionDefaultMessage" xml:space="preserve">
+    <value>No se pudo completar la operación como el elemento actual no está en modo de edición.!</value>
+  </data>
 </root>

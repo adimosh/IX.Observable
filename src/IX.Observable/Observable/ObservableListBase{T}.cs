@@ -460,7 +460,7 @@ namespace IX.Observable
         public virtual void RemoveRange(IEnumerable<T> items)
         {
             // PRECONDITIONS
-            Contract.RequiresNotNull(in items, nameof(items));
+            Requires.NotNull(items, nameof(items));
 
             // Current object not disposed
             this.RequiresNotDisposed();
