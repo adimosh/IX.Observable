@@ -123,4 +123,16 @@
   <data name="OperationItemTypeError" xml:space="preserve">
     <value>引数の型がリストに互換性のある型ではありません!。</value>
   </data>
+  <data name="ItemAlreadyCapturedIntoUndoContextException" xml:space="preserve">
+    <value>既存の undo コンテキストで現在の項目はトラップは、操作を完了できませんでした!。</value>
+  </data>
+  <data name="ItemIsInEditModeExceptionDefaultMessage" xml:space="preserve">
+    <value>要求された操作は完了できませんでした</value>
+  </data>
+  <data name="ItemNotCapturedIntoUndoContextException" xml:space="preserve">
+    <value>元のファイルと出力先が同じファイルのため操作を完了できませんでした。</value>
+  </data>
+  <data name="ItemNotInEditModeExceptionDefaultMessage" xml:space="preserve">
+    <value>現在の項目が編集モードでないと、操作を完了できませんでした!。</value>
+  </data>
 </root>

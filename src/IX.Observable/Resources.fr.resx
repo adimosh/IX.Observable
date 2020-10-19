@@ -123,4 +123,16 @@
   <data name="OperationItemTypeError" xml:space="preserve">
     <value>Le type de l’argument n’est pas un type compatible à la liste.</value>
   </data>
+  <data name="ItemAlreadyCapturedIntoUndoContextException" xml:space="preserve">
+    <value>L'opération n'a pas pu être terminée car l'élément en cours est intercepté par un contexte d'annulation existant.</value>
+  </data>
+  <data name="ItemIsInEditModeExceptionDefaultMessage" xml:space="preserve">
+    <value>L'opération n'a pas pu être terminée car l'élément actuel est en mode édition.</value>
+  </data>
+  <data name="ItemNotCapturedIntoUndoContextException" xml:space="preserve">
+    <value>L'opération n'a pas pu être terminée car l'élément actuel n'est pas pris dans un contexte d'annulation existant.</value>
+  </data>
+  <data name="ItemNotInEditModeExceptionDefaultMessage" xml:space="preserve">
+    <value>L'opération n'a pas pu être terminée car l'élément actuel n'est pas en mode édition.</value>
+  </data>
 </root>

@@ -54,7 +54,7 @@ namespace IX.Observable.Adapters
             Dictionary<TKey, TValue> tempdict = this.dictionary;
             this.dictionary = new Dictionary<TKey, TValue>();
 
-            Fire.AndForget((oldDictionary) => oldDictionary.Clear(), tempdict);
+            _ = Work.OnThreadPoolAsync(oldDictionary => oldDictionary.Clear(), tempdict);
         }
 
         public override bool Contains(KeyValuePair<TKey, TValue> item) => ((ICollection<KeyValuePair<TKey, TValue>>)this.dictionary).Contains(item);

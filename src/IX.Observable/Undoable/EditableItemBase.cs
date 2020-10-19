@@ -39,8 +39,8 @@ namespace IX.Undoable
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="limit" /> is a negative number.</exception>
         protected EditableItemBase(int limit)
         {
-            Contract.RequiresNonNegative(
-                ref this.historyLevels,
+            Requires.NonNegative(
+                out this.historyLevels,
                 in limit,
                 nameof(limit));
 
@@ -222,8 +222,8 @@ namespace IX.Undoable
         /// <remarks>This method is meant to be used by containers, and should not be called directly.</remarks>
         public void CaptureIntoUndoContext(IUndoableItem parent)
         {
-            Contract.RequiresNotNull(
-                in parent,
+            Requires.NotNull(
+                parent,
                 nameof(parent));
 
             if (parent == this.ParentUndoContext)
@@ -382,8 +382,8 @@ namespace IX.Undoable
         /// </exception>
         public void UndoStateChanges(StateChange[] changesToUndo)
         {
-            Contract.RequiresNotNull(
-                in changesToUndo,
+            Requires.NotNull(
+                changesToUndo,
                 nameof(changesToUndo));
 
             if (!this.IsCapturedIntoUndoContext)
@@ -411,8 +411,8 @@ namespace IX.Undoable
         /// </exception>
         public void RedoStateChanges(StateChange[] changesToRedo)
         {
-            Contract.RequiresNotNull(
-                in changesToRedo,
+            Requires.NotNull(
+                changesToRedo,
                 nameof(changesToRedo));
 
             if (!this.IsCapturedIntoUndoContext)
