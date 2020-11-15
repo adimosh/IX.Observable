@@ -4,7 +4,7 @@
 
   <!-- Build configuration -->
   <PropertyGroup Condition="'$(OS)' == 'Windows_NT'">
-    <TargetFrameworks>net452;net46;net47;net472;netstandard2.0;netstandard2.1</TargetFrameworks>
+    <TargetFrameworks>net46;net47;net472;netstandard2.0;netstandard2.1</TargetFrameworks>
   </PropertyGroup>
   <PropertyGroup Condition="'$(OS)' != 'Windows_NT'">
     <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
@@ -23,8 +23,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <PackageReleaseNotes>- Used new merged framework.
-- Merged Undoable.
+    <PackageReleaseNotes>- Removed support for .NET 4.5.2.
     </PackageReleaseNotes>
     <SignAssembly>true</SignAssembly>
     <DelaySign>false</DelaySign>
@@ -39,7 +38,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="IX.StandardExtensions" Version="[0.7.1,0.8)" />
+    <PackageReference Include="IX.StandardExtensions" Version="[0.7.3,0.8)" />
   </ItemGroup>
 
   <!-- Text templates -->

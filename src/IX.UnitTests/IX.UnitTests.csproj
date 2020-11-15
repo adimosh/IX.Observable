@@ -2,8 +2,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup Condition="'$(OS)' == 'Windows_NT'">
-    <TargetFrameworks Condition="'$(IxDevOpsBuild)'=='true'">net452;net46;net461;net462;net47;net471;net472;net48;netcoreapp2.1;netcoreapp3.1</TargetFrameworks>
-    <TargetFrameworks Condition="'$(IxDevOpsBuild)'!='true'">net452;net48;netcoreapp3.1</TargetFrameworks>
+    <TargetFrameworks Condition="'$(IxDevOpsBuild)'=='true'">net46;net461;net462;net47;net471;net472;net48;netcoreapp2.1;netcoreapp3.1</TargetFrameworks>
+    <TargetFrameworks Condition="'$(IxDevOpsBuild)'!='true'">net46;net48;netcoreapp3.1</TargetFrameworks>
   </PropertyGroup>
   <PropertyGroup Condition="'$(OS)' != 'Windows_NT'">
     <TargetFrameworks>netcoreapp2.1;netcoreapp3.1</TargetFrameworks>
@@ -34,7 +34,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="IX.StandardExtensions" Version="0.7.1" />
+    <PackageReference Include="IX.StandardExtensions" Version="0.7.3" />
   </ItemGroup>
 
   <ItemGroup>
