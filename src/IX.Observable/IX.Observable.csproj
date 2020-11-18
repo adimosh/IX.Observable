@@ -4,10 +4,10 @@
 
   <!-- Build configuration -->
   <PropertyGroup Condition="'$(OS)' == 'Windows_NT'">
-    <TargetFrameworks>net46;net47;net472;netstandard2.0;netstandard2.1</TargetFrameworks>
+    <TargetFrameworks>net46;net47;net472;netstandard2.0;netstandard2.1;net5.0</TargetFrameworks>
   </PropertyGroup>
   <PropertyGroup Condition="'$(OS)' != 'Windows_NT'">
-    <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;netstandard2.1;net5.0</TargetFrameworks>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -23,8 +23,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <PackageReleaseNotes>- Removed support for .NET 4.5.2.
-    </PackageReleaseNotes>
+    <PackageReleaseNotes>- Added support for .NET 5.0.</PackageReleaseNotes>
     <SignAssembly>true</SignAssembly>
     <DelaySign>false</DelaySign>
     <AssemblyOriginatorKeyFile>../../opt/snk/ix.framework.strongname.snk</AssemblyOriginatorKeyFile>
