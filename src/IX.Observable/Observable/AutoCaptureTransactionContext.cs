@@ -18,9 +18,15 @@ namespace IX.Observable
     /// <seealso cref="IX.Guaranteed.OperationTransaction" />
     internal class AutoCaptureTransactionContext : OperationTransaction
     {
+#region Internal state
+
         private readonly EventHandler<EditCommittedEventArgs> editableHandler;
         private readonly IUndoableItem item;
         private readonly IUndoableItem[] items;
+
+#endregion
+
+#region Constructors
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="AutoCaptureTransactionContext" /> class.
@@ -98,11 +104,12 @@ namespace IX.Observable
 
             // Data validation
             // Multiple enumeration warning: this has to be done, as there is no efficient way to do a transactional capturing otherwise
-            var itemsArray = items.ToArray();
+            IUndoableItem[] itemsArray = items.ToArray();
             if (itemsArray.Any(
                 (
-                        item,
-                        pc) => item.IsCapturedIntoUndoContext && item.ParentUndoContext != pc, parentContext))
+                    internalItem,
+                    pc) => internalItem.IsCapturedIntoUndoContext && internalItem.ParentUndoContext != pc,
+                parentContext))
             {
                 throw new ItemAlreadyCapturedIntoUndoContextException();
             }
@@ -124,6 +131,10 @@ namespace IX.Observable
             this.AddFailure();
         }
 
+#endregion
+
+#region Methods
+
         /// <summary>
         ///     Gets invoked when the transaction commits and is successful.
         /// </summary>
@@ -131,34 +142,38 @@ namespace IX.Observable
         {
         }
 
-        private void AddFailure() => this.AddRevertStep(
-            state =>
-            {
-                var thisL1 = (AutoCaptureTransactionContext)state;
-                if (thisL1.item != null)
+        private void AddFailure() =>
+            this.AddRevertStep(
+                state =>
                 {
-                    thisL1.item.ReleaseFromUndoContext();
-
-                    if (thisL1.item is IEditCommittableItem tei)
+                    var thisL1 = (AutoCaptureTransactionContext)state;
+                    if (thisL1.item != null)
                     {
-                        tei.EditCommitted -= thisL1.editableHandler;
+                        thisL1.item.ReleaseFromUndoContext();
+
+                        if (thisL1.item is IEditCommittableItem tei)
+                        {
+                            tei.EditCommitted -= thisL1.editableHandler;
+                        }
                     }
-                }
 
-                if (thisL1.items == null)
-                {
-                    return;
-                }
-
-                foreach (IUndoableItem undoableItem in thisL1.items)
-                {
-                    undoableItem.ReleaseFromUndoContext();
-
-                    if (thisL1.item is IEditCommittableItem tei)
+                    if (thisL1.items == null)
                     {
-                        tei.EditCommitted -= thisL1.editableHandler;
+                        return;
                     }
-                }
-            }, this);
+
+                    foreach (IUndoableItem undoableItem in thisL1.items)
+                    {
+                        undoableItem.ReleaseFromUndoContext();
+
+                        if (thisL1.item is IEditCommittableItem tei)
+                        {
+                            tei.EditCommitted -= thisL1.editableHandler;
+                        }
+                    }
+                },
+                this);
+
+#endregion
     }
 }

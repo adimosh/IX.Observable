@@ -6,6 +6,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using IX.Observable.Adapters;
@@ -20,10 +21,18 @@ namespace IX.Observable
     /// <typeparam name="T">The type of the item.</typeparam>
     /// <seealso cref="INotifyPropertyChanged" />
     /// <seealso cref="IEnumerable{T}" />
-    public abstract class ObservableReadOnlyCollectionBase<T> : ObservableBase, IReadOnlyCollection<T>, ICollection
+    public abstract class ObservableReadOnlyCollectionBase<T> : ObservableBase,
+        IReadOnlyCollection<T>,
+        ICollection
     {
+#region Internal state
+
         private readonly object resetCountLocker;
         private ICollectionAdapter<T> internalContainer;
+
+#endregion
+
+#region Constructors
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="ObservableReadOnlyCollectionBase{T}" /> class.
@@ -49,24 +58,32 @@ namespace IX.Observable
             this.resetCountLocker = new object();
         }
 
+#endregion
+
+#region Properties and indexers
+
         /// <summary>
         ///     Gets the number of elements in the collection.
         /// </summary>
         /// <remarks>
         ///     <para>On concurrent collections, this property is read-synchronized.</para>
         /// </remarks>
-        public virtual int Count => this.InvokeIfNotDisposed(
-            thisL1 => thisL1.ReadLock(
-                thisL2 => thisL2.InternalContainer.Count,
-                thisL1), this);
+        public virtual int Count =>
+            this.InvokeIfNotDisposed(
+                thisL1 => thisL1.ReadLock(
+                    thisL2 => thisL2.InternalContainer.Count,
+                    thisL1),
+                this);
 
         /// <summary>
         ///     Gets a value indicating whether the <see cref="ObservableCollectionBase{T}" /> is read-only.
         /// </summary>
-        public bool IsReadOnly => this.InvokeIfNotDisposed(
-            thisL1 => thisL1.ReadLock(
-                thisL2 => thisL2.InternalContainer.IsReadOnly,
-                thisL1), this);
+        public bool IsReadOnly =>
+            this.InvokeIfNotDisposed(
+                thisL1 => thisL1.ReadLock(
+                    thisL2 => thisL2.InternalContainer.IsReadOnly,
+                    thisL1),
+                this);
 
         /// <summary>
         ///     Gets a value indicating whether this instance is synchronized.
@@ -76,7 +93,8 @@ namespace IX.Observable
         /// </value>
         [Obsolete(
             "Please do not explicitly use these properties. The newest .NET Framework guidelines do not recommend doing collection synchronization using them.")]
-        public bool IsSynchronized => false;
+        public bool IsSynchronized =>
+            false;
 
         /// <summary>
         ///     Gets the synchronization root.
@@ -94,7 +112,10 @@ namespace IX.Observable
         /// </remarks>
         [Obsolete(
             "Please do not explicitly use these properties. The newest .NET Framework guidelines do not recommend doing collection synchronization using them.")]
-        public object SyncRoot { get; } = new object();
+        public object SyncRoot
+        {
+            get;
+        } = new();
 
         /// <summary>
         ///     Gets or sets the internal object container.
@@ -104,7 +125,8 @@ namespace IX.Observable
         /// </value>
         protected internal ICollectionAdapter<T> InternalContainer
         {
-            get => this.internalContainer;
+            get =>
+                this.internalContainer;
 
             set
             {
@@ -138,7 +160,101 @@ namespace IX.Observable
         ///         this counter by one until zero.
         ///     </para>
         /// </remarks>
-        protected int IgnoreResetCount { get; private set; }
+        protected int IgnoreResetCount
+        {
+            get;
+            private set;
+        }
+
+#endregion
+
+#region Methods
+
+#region Interface implementations
+
+        /// <summary>
+        ///     Returns a locking enumerator that iterates through the collection.
+        /// </summary>
+        /// <returns>
+        ///     An atomic enumerator of type <see cref="StandardExtensions.Threading.AtomicEnumerator{TItem,TEnumerator}" /> that
+        ///     can be used to iterate through the collection in a thread-safe manner.
+        /// </returns>
+        /// <remarks>
+        ///     <para>This enumerator returns an atomic enumerator.</para>
+        ///     <para>
+        ///         The atomic enumerator read-locks the collection whenever the <see cref="IEnumerator.MoveNext" /> method is
+        ///         called, and the result is cached.
+        ///     </para>
+        ///     <para>
+        ///         The collection, however, cannot be held responsible for changes to the item that is held in
+        ///         <see cref="IEnumerator{T}.Current" />.
+        ///     </para>
+        /// </remarks>
+        [SuppressMessage(
+            "Performance",
+            "HAA0401:Possible allocation of reference type enumerator",
+            Justification = "We're doing an atomic enumerator, so we don't care.")]
+        [SuppressMessage(
+            "Performance",
+            "HAA0603:Delegate allocation from a method group",
+            Justification = "It's for the atomic enumerator.")]
+        public virtual IEnumerator<T> GetEnumerator()
+        {
+            this.RequiresNotDisposed();
+
+            if (this.SynchronizationLock == null)
+            {
+                return this.InternalContainer.GetEnumerator();
+            }
+
+            return AtomicEnumerator<T>.FromCollection(
+                (CollectionAdapter<T>)this.InternalContainer,
+                this.ReadLock);
+        }
+
+        /// <summary>
+        ///     Copies the contents of the container to an array.
+        /// </summary>
+        /// <param name="array">The array.</param>
+        /// <param name="index">Index of the array.</param>
+        /// <remarks>
+        ///     <para>On concurrent collections, this property is read-synchronized.</para>
+        /// </remarks>
+        void ICollection.CopyTo(
+            Array array,
+            int index)
+        {
+            this.RequiresNotDisposed();
+
+            T[] tempArray;
+
+            using (this.ReadLock())
+            {
+                tempArray = new T[this.InternalContainer.Count - index];
+                this.InternalContainer.CopyTo(
+                    tempArray,
+                    index);
+            }
+
+            tempArray.CopyTo(
+                array,
+                index);
+        }
+
+        /// <summary>
+        ///     Returns an enumerator that iterates through a collection.
+        /// </summary>
+        /// <returns>
+        ///     An <see cref="IEnumerator" /> object that can be used to iterate through the collection.
+        /// </returns>
+        [SuppressMessage(
+            "Performance",
+            "HAA0401:Possible allocation of reference type enumerator",
+            Justification = "Unavoidable with this interface.")]
+        IEnumerator IEnumerable.GetEnumerator() =>
+            this.GetEnumerator();
+
+#endregion
 
         /// <summary>
         ///     Determines whether the <see cref="ObservableCollectionBase{T}" /> contains a specific value.
@@ -218,7 +334,8 @@ namespace IX.Observable
                 }
                 else
                 {
-                    array = this.InternalContainer.Skip(fromIndex).ToArray();
+                    array = this.InternalContainer.Skip(fromIndex)
+                        .ToArray();
                 }
 
                 return array;
@@ -242,90 +359,48 @@ namespace IX.Observable
                 this.InternalContainer.CopyTo(
                     array,
                     0);
+
                 return array;
             }
         }
 
-        /// <summary>
-        ///     Returns a locking enumerator that iterates through the collection.
-        /// </summary>
-        /// <returns>
-        ///     An atomic enumerator of type <see cref="StandardExtensions.Threading.AtomicEnumerator{TItem,TEnumerator}" /> that
-        ///     can be used to iterate through the collection in a thread-safe manner.
-        /// </returns>
-        /// <remarks>
-        ///     <para>This enumerator returns an atomic enumerator.</para>
-        ///     <para>
-        ///         The atomic enumerator read-locks the collection whenever the <see cref="IEnumerator.MoveNext" /> method is
-        ///         called, and the result is cached.
-        ///     </para>
-        ///     <para>
-        ///         The collection, however, cannot be held responsible for changes to the item that is held in
-        ///         <see cref="IEnumerator{T}.Current" />.
-        ///     </para>
-        /// </remarks>
-        [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
-            "Performance",
-            "HAA0401:Possible allocation of reference type enumerator",
-            Justification = "We're doing an atomic enumerator, so we don't care.")]
-        [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
-            "Performance",
-            "HAA0603:Delegate allocation from a method group",
-            Justification = "It's for the atomic enumerator.")]
-        public virtual IEnumerator<T> GetEnumerator()
-        {
-            this.RequiresNotDisposed();
+#region Disposable
 
-            if (this.SynchronizationLock == null)
+        /// <summary>
+        ///     Disposes the managed context.
+        /// </summary>
+        [SuppressMessage(
+            "CodeSmell",
+            "ERP022:Unobserved exception in generic exception handler",
+            Justification = "Acceptable.")]
+        [SuppressMessage(
+            "ReSharper",
+            "EmptyGeneralCatchClause",
+            Justification = "Acceptable.")]
+        protected override void DisposeManagedContext()
+        {
+            try
             {
-                return this.InternalContainer.GetEnumerator();
+                this.internalContainer.Clear();
+            }
+            catch
+            {
             }
 
-            return AtomicEnumerator<T>.FromCollection(
-                (CollectionAdapter<T>)this.InternalContainer,
-                this.ReadLock);
+            base.DisposeManagedContext();
         }
 
         /// <summary>
-        ///     Returns an enumerator that iterates through a collection.
+        ///     Disposes the general context.
         /// </summary>
-        /// <returns>
-        ///     An <see cref="IEnumerator" /> object that can be used to iterate through the collection.
-        /// </returns>
-        [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
-            "Performance",
-            "HAA0401:Possible allocation of reference type enumerator",
-            Justification = "Unavoidable with this interface.")]
-        IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
-
-        /// <summary>
-        ///     Copies the contents of the container to an array.
-        /// </summary>
-        /// <param name="array">The array.</param>
-        /// <param name="index">Index of the array.</param>
-        /// <remarks>
-        ///     <para>On concurrent collections, this property is read-synchronized.</para>
-        /// </remarks>
-        void ICollection.CopyTo(
-            Array array,
-            int index)
+        protected override void DisposeGeneralContext()
         {
-            this.RequiresNotDisposed();
+            this.internalContainer = null;
 
-            T[] tempArray;
-
-            using (this.ReadLock())
-            {
-                tempArray = new T[((ICollection<T>)this.InternalContainer).Count - index];
-                this.InternalContainer.CopyTo(
-                    tempArray,
-                    index);
-            }
-
-            tempArray.CopyTo(
-                array,
-                index);
+            base.DisposeGeneralContext();
         }
+
+#endregion
 
         /// <summary>
         ///     Increases the <see cref="IgnoreResetCount" /> by one.
@@ -357,67 +432,37 @@ namespace IX.Observable
         {
         }
 
-        /// <summary>
-        ///     Disposes the managed context.
-        /// </summary>
-        [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
-            "CodeSmell",
-            "ERP022:Unobserved exception in generic exception handler",
-            Justification = "Acceptable.")]
-        [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
-            "ReSharper",
-            "EmptyGeneralCatchClause",
-            Justification = "Acceptable.")]
-        protected override void DisposeManagedContext()
-        {
-            try
-            {
-                this.internalContainer.Clear();
-            }
-            catch
-            {
-            }
-
-            base.DisposeManagedContext();
-        }
-
-        /// <summary>
-        ///     Disposes the general context.
-        /// </summary>
-        protected override void DisposeGeneralContext()
-        {
-            this.internalContainer = null;
-
-            base.DisposeGeneralContext();
-        }
-
         private void InternalContainer_MustReset(
             object sender,
-            EventArgs e) => this.Invoke(
-            thisL1 =>
-            {
-                bool shouldReset;
-                lock (thisL1.resetCountLocker)
+            EventArgs e) =>
+            this.Invoke(
+                thisL1 =>
                 {
-                    if (thisL1.IgnoreResetCount > 0)
+                    bool shouldReset;
+                    lock (thisL1.resetCountLocker)
                     {
-                        thisL1.IgnoreResetCount--;
-                        shouldReset = false;
+                        if (thisL1.IgnoreResetCount > 0)
+                        {
+                            thisL1.IgnoreResetCount--;
+                            shouldReset = false;
+                        }
+                        else
+                        {
+                            shouldReset = true;
+                        }
                     }
-                    else
+
+                    if (!shouldReset)
                     {
-                        shouldReset = true;
+                        return;
                     }
-                }
 
-                if (!shouldReset)
-                {
-                    return;
-                }
+                    thisL1.RaiseCollectionReset();
+                    thisL1.RaisePropertyChanged(nameof(thisL1.Count));
+                    thisL1.ContentsMayHaveChanged();
+                },
+                this);
 
-                thisL1.RaiseCollectionReset();
-                thisL1.RaisePropertyChanged(nameof(thisL1.Count));
-                thisL1.ContentsMayHaveChanged();
-            }, this);
+#endregion
     }
 }

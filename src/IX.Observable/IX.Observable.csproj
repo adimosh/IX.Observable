@@ -23,7 +23,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <PackageReleaseNotes>- Added support for .NET 5.0.</PackageReleaseNotes>
+    <PackageReleaseNotes>- Dependency update.</PackageReleaseNotes>
     <SignAssembly>true</SignAssembly>
     <DelaySign>false</DelaySign>
     <AssemblyOriginatorKeyFile>../../opt/snk/ix.framework.strongname.snk</AssemblyOriginatorKeyFile>
@@ -37,7 +37,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="IX.StandardExtensions" Version="[0.7.3,0.8)" />
+    <PackageReference Include="IX.StandardExtensions" Version="[0.7.4,0.8)" />
   </ItemGroup>
 
   <!-- Text templates -->

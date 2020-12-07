@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using IX.StandardExtensions.Contracts;
 using JetBrains.Annotations;
 
 namespace IX.Observable.DebugAide
@@ -16,7 +17,13 @@ namespace IX.Observable.DebugAide
     [UsedImplicitly]
     public sealed class DictionaryDebugView<TKey, TValue>
     {
+#region Internal state
+
         private readonly ObservableDictionary<TKey, TValue> dict;
+
+#endregion
+
+#region Constructors
 
         /// <summary>Initializes a new instance of the <see cref="DictionaryDebugView{TKey, TValue}" /> class.</summary>
         /// <param name="dictionary">The dictionary.</param>
@@ -24,8 +31,15 @@ namespace IX.Observable.DebugAide
         [UsedImplicitly]
         public DictionaryDebugView(ObservableDictionary<TKey, TValue> dictionary)
         {
-            this.dict = dictionary ?? throw new ArgumentNullException(nameof(dictionary));
+            Requires.NotNull(
+                out this.dict,
+                dictionary,
+                nameof(dictionary));
         }
+
+#endregion
+
+#region Properties and indexers
 
         /// <summary>
         ///     Gets the items, in debug view.
@@ -39,14 +53,21 @@ namespace IX.Observable.DebugAide
         {
             get
             {
-                var items =
-                    new KeyValuePair<TKey, TValue>
-                        [((ICollection<KeyValuePair<TKey, TValue>>)this.dict.InternalContainer).Count];
+                var items = new KeyValuePair<TKey, TValue>[this.dict.InternalContainer.Count];
                 this.dict.InternalContainer.CopyTo(
                     items,
                     0);
-                return items.Select(p => new Kvp<TKey, TValue> { Key = p.Key, Value = p.Value }).ToArray();
+
+                return items.Select(
+                        p => new Kvp<TKey, TValue>
+                        {
+                            Key = p.Key,
+                            Value = p.Value
+                        })
+                    .ToArray();
             }
         }
+
+#endregion
     }
 }

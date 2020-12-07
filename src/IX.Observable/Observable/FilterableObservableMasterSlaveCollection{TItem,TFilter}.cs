@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using IX.Observable.DebugAide;
 using JetBrains.Annotations;
@@ -23,8 +24,14 @@ namespace IX.Observable
     [PublicAPI]
     public class FilterableObservableMasterSlaveCollection<TItem, TFilter> : ObservableMasterSlaveCollection<TItem>
     {
+#region Internal state
+
         private TFilter filter;
         private IList<TItem> filteredElements;
+
+#endregion
+
+#region Constructors
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="FilterableObservableMasterSlaveCollection{TItem, TFilter}" /> class.
@@ -56,6 +63,10 @@ namespace IX.Observable
             this.FilteringPredicate = filteringPredicate ?? throw new ArgumentNullException(nameof(filteringPredicate));
         }
 
+#endregion
+
+#region Properties and indexers
+
         /// <summary>
         ///     Gets the number of items in the collection.
         /// </summary>
@@ -86,7 +97,10 @@ namespace IX.Observable
         /// <value>
         ///     The filtering predicate.
         /// </value>
-        public Func<TItem, TFilter, bool> FilteringPredicate { get; }
+        public Func<TItem, TFilter, bool> FilteringPredicate
+        {
+            get;
+        }
 
         /// <summary>
         ///     Gets or sets the filter value.
@@ -96,7 +110,8 @@ namespace IX.Observable
         /// </value>
         public TFilter Filter
         {
-            get => this.filter;
+            get =>
+                this.filter;
             set
             {
                 this.filter = value;
@@ -109,12 +124,20 @@ namespace IX.Observable
             }
         }
 
+#endregion
+
+#region Methods
+
         /// <summary>
         ///     Returns an enumerator that iterates through the collection.
         /// </summary>
         /// <returns>
         ///     An enumerator that can be used to iterate through the collection.
         /// </returns>
+        [SuppressMessage(
+            "Performance",
+            "HAA0401:Possible allocation of reference type enumerator",
+            Justification = "This cannot be avoidable.")]
         public override IEnumerator<TItem> GetEnumerator()
         {
             if (!this.IsFilter())
@@ -128,6 +151,7 @@ namespace IX.Observable
             }
 
             this.FillCachedList();
+
             return base.GetEnumerator();
         }
 
@@ -197,36 +221,41 @@ namespace IX.Observable
             }
         }
 
+        [SuppressMessage(
+            "Performance",
+            "HAA0401:Possible allocation of reference type enumerator",
+            Justification = "This cannot be avoidable.")]
         private IEnumerator<TItem> EnumerateFiltered()
         {
-            TFilter filter = this.Filter;
+            TFilter localFilter = this.Filter;
 
-            using (IEnumerator<TItem> enumerator = base.GetEnumerator())
+            using IEnumerator<TItem> enumerator = base.GetEnumerator();
+
+            while (enumerator.MoveNext())
             {
-                while (enumerator.MoveNext())
+                TItem current = enumerator.Current;
+                if (this.FilteringPredicate(
+                    current,
+                    localFilter))
                 {
-                    TItem current = enumerator.Current;
-                    if (this.FilteringPredicate(
-                        current,
-                        filter))
-                    {
-                        yield return current;
-                    }
+                    yield return current;
                 }
             }
         }
 
+        [SuppressMessage(
+            "Performance",
+            "HAA0401:Possible allocation of reference type enumerator",
+            Justification = "This cannot be avoidable.")]
         private void FillCachedList()
         {
             this.filteredElements = new List<TItem>(base.Count);
 
-            using (IEnumerator<TItem> enumerator = this.EnumerateFiltered())
+            using IEnumerator<TItem> enumerator = this.EnumerateFiltered();
+            while (enumerator.MoveNext())
             {
-                while (enumerator.MoveNext())
-                {
-                    TItem current = enumerator.Current;
-                    this.filteredElements.Add(current);
-                }
+                TItem current = enumerator.Current;
+                this.filteredElements.Add(current);
             }
         }
 
@@ -242,8 +271,11 @@ namespace IX.Observable
             coll.Clear();
         }
 
-        private bool IsFilter() => !EqualityComparer<TFilter>.Default.Equals(
-            this.Filter,
-            default);
+        private bool IsFilter() =>
+            !EqualityComparer<TFilter>.Default.Equals(
+                this.Filter,
+                default);
+
+#endregion
     }
 }
